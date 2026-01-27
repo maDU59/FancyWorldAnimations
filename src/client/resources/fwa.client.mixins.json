@@ -3,7 +3,8 @@
 	"package": "fr.madu59.fwa.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ExampleClientMixin"
+		"ClientLevelMixin",
+		"BlockRenderDispatcherMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
