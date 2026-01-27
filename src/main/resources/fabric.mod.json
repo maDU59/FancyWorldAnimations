@@ -1,31 +1,31 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
+	"id": "fwa",
 	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Fancy World Animations",
+	"description": "Adds a bunch of animations to the world to make it feel more alive.",
 	"authors": [
-		"Me!"
+		"maDU59_"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
+	"license": "MIT",
+	"icon": "assets/fwa/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+			"fr.madu59.fwa.FancyWorldAnimations"
 		],
 		"client": [
-			"com.example.ExampleModClient"
+			"fr.madu59.fwa.FancyWorldAnimationsClient"
 		]
 	},
 	"mixins": [
-		"modid.mixins.json",
+		"fwa.mixins.json",
 		{
-			"config": "modid.client.mixins.json",
+			"config": "fwa.client.mixins.json",
 			"environment": "client"
 		}
 	],
