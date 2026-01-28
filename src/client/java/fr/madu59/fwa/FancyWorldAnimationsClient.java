@@ -6,6 +6,7 @@ import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
+import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import net.fabricmc.api.ClientModInitializer;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -119,6 +121,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof TrapDoorBlock) return state.getValue(TrapDoorBlock.OPEN);
 		if(block instanceof FenceGateBlock) return state.getValue(FenceGateBlock.OPEN);
 		if(block instanceof LeverBlock) return state.getValue(LeverBlock.POWERED);
+		if(block instanceof LecternBlock) return state.getValue(LecternBlock.HAS_BOOK);
 		return false;
 	}
 
@@ -130,6 +133,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case TRAPDOOR: return state.setValue(TrapDoorBlock.OPEN, false);
 			case FENCE_GATE: return state.setValue(FenceGateBlock.OPEN, false);
 			case LEVER: return state.setValue(LeverBlock.POWERED, false);
+			case LECTERN: return state.setValue(LecternBlock.HAS_BOOK, false);
 			default: return state;
 		}
 	}
@@ -141,6 +145,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.FENCE_GATE) return new FenceGateAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		if(type == Type.LEVER) return new LeverAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		if(type == Type.CHISELED_BOOKSHELF) return new ChiseledBookShelfAnimation(pos, newState, startTick, oldIsOpen, newIsOpen, oldState);
+		if(type == Type.LECTERN) return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 	}
 
@@ -152,6 +157,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
 		if(block instanceof LeverBlock) return Type.LEVER;
 		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
+		if(block instanceof LecternBlock) return Type.LECTERN;
 
 		block = newState.getBlock();
 		if(block instanceof DoorBlock) return Type.DOOR;
@@ -159,6 +165,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
 		if(block instanceof LeverBlock) return Type.LEVER;
 		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
+		if(block instanceof LecternBlock) return Type.LECTERN;
 
 		return Type.USELESS;
 	}
@@ -171,10 +178,24 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.FENCE_GATE && block instanceof FenceGateBlock) return true;
 		if(type == Type.LEVER && block instanceof LeverBlock) return true;
 		if(type == Type.CHISELED_BOOKSHELF && block instanceof ChiseledBookShelfBlock) return true;
+		if(type == Type.LECTERN && block instanceof LecternBlock) return true;
 		return false;
 	}
 
-	public static boolean shouldCancelRendering(BlockPos pos)
+	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
+	{
+		synchronized (animations){
+			if (animations.containsAt(pos)) {
+				Animation animation = animations.getAt(pos);
+				return animation.hideOriginalBlockEntity();
+			}
+			else{
+				return false;
+			}
+		}
+	}
+
+	public static boolean shouldCancelBlockRendering(BlockPos pos)
 	{
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
@@ -194,6 +215,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		FENCE_GATE,
 		LEVER,
 		CHISELED_BOOKSHELF,
+		LECTERN,
 		USELESS
 	}
 }

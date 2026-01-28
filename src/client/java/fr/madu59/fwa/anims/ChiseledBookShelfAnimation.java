@@ -35,8 +35,6 @@ public class ChiseledBookShelfAnimation extends Animation{
                 break;
             }
         }
-
-        System.out.println("ChiseledBookShelfAnimation at " + position + " pos=" + pos + " isAdding=" + isAdding);
     }
 
     @Override

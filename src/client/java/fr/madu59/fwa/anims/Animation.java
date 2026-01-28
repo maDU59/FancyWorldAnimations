@@ -33,6 +33,10 @@ public class Animation {
         return true;
     }
 
+    public boolean hideOriginalBlockEntity() {
+        return true;
+    }
+
     public BlockPos getPos() {
         return position;
     }

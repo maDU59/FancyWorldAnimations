@@ -21,6 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BlockRenderDispatcherMixin {
     @Inject(at = @At("HEAD"), method = "renderBatched", cancellable = true)
 	private void renderBatched(BlockState blockState, BlockPos blockPos, BlockAndTintGetter blockAndTintGetter, PoseStack poseStack, VertexConsumer vertexConsumer, boolean bl, List<BlockModelPart> list, CallbackInfo info) {
-		if (FancyWorldAnimationsClient.shouldCancelRendering(blockPos)) info.cancel();
+		if (FancyWorldAnimationsClient.shouldCancelBlockRendering(blockPos)) info.cancel();
 	}
 }
