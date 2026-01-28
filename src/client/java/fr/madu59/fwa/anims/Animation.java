@@ -1,6 +1,8 @@
 package fr.madu59.fwa.anims;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+
+import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
@@ -27,6 +29,11 @@ public class Animation {
 
     public boolean isUnique() {
         return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Enum<T>> T getCurve() {
+        return (T) Curves.Classic.LINEAR;
     }
 
     public boolean hideOriginalBlock() {

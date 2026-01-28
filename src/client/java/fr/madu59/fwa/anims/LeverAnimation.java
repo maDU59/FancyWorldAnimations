@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.utils.Curves;
-import fr.madu59.fwa.utils.Curves.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -35,6 +34,12 @@ public class LeverAnimation extends Animation{
         return 5;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Enum<T>> T getCurve() {
+        return (T) Curves.Classic.LINEAR;
+    }
+
     private double getStartAngle(boolean isOpen){
         if (!isOpen) return 0f;
         return 90f;
@@ -43,7 +48,7 @@ public class LeverAnimation extends Animation{
     private double getAngle(double nowTick, Direction facing) {
         double angle1 = getStartAngle(this.oldIsOpen);
         double angle2 = getStartAngle(this.newIsOpen);
-        double finalAngle = angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), Type.LINEAR);
+        double finalAngle = angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), getCurve());
         if(facing == Direction.NORTH || facing == Direction.EAST){
             finalAngle = -finalAngle;
         }

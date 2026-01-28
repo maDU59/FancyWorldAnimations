@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.utils.Curves;
-import fr.madu59.fwa.utils.Curves.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -45,6 +44,12 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Enum<T>> T getCurve() {
+        return (T) Curves.Classic.LINEAR;
+    }
+
+    @Override
     public boolean isUnique() {
         return false;
     }
@@ -57,7 +62,7 @@ public class ChiseledBookShelfAnimation extends Animation{
     private float getDistance(double nowTick) {
         float max = 3f/16f;
         float min = 1f/16f;
-        float progress = (float)Curves.ease(getProgress(nowTick), Type.LINEAR);
+        float progress = (float)Curves.ease(getProgress(nowTick), getCurve());
         return isAdding ? max - (max - min) * progress : min + (max - min) * progress;
     }
 
