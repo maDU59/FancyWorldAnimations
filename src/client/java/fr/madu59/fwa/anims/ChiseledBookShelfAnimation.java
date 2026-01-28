@@ -41,7 +41,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10;
+        return 5;
     }
 
     @Override
@@ -52,6 +52,13 @@ public class ChiseledBookShelfAnimation extends Animation{
     @Override
     public boolean hideOriginalBlock() {
         return false;
+    }
+
+    private float getDistance(double nowTick) {
+        float max = 3f/16f;
+        float min = 1f/16f;
+        float progress = (float)getProgress(nowTick);
+        return isAdding ? max - (max - min) * progress : min + (max - min) * progress;
     }
 
     @Override
@@ -67,7 +74,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
         float y = pos > 3 ? 4/16f : 12f/16f;
         float x = 3f/16f + ((pos - 1) % 3) * 5f/16f;
-        float z = .1f;
+        float z = getDistance(nowTick);
 
         if(facing == Direction.EAST){
             x = 1-x;
@@ -87,48 +94,36 @@ public class ChiseledBookShelfAnimation extends Animation{
 
         poseStack.translate(z, y, x);
         poseStack.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
-        poseStack.translate(-w / 2f, -h / 2f, -d / 2f);
+        poseStack.translate(-w / 2f, -(6f/16f) / 2f, -d / 2f);
 
-        float u1=0f;
-        float u2=1f;
-        float v1=0f;
-        float v2=1f;
+        float u1 = 1f/16f + ((pos - 1) % 3) * 5f/16f;
+        float u2 = u1 + w;
+        float v1 = 1 - (y - 3f/16f + h);
+        float v2 = v1 + h;
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.relative(facing));
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
 
-        // 1. FRONT FACE (Z = d)
-        // Normal: 0, 0, 1
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 
             u1, v1, u2, v2, light, 0, 0, -1);
 
-        // 2. BACK FACE (Z = 0)
-        // Normal: 0, 0, -1
         writeQuad(entry, buffer, 
             w, 0, 0,  w, h, 0,  0, h, 0,  0, 0, 0, 
             u1, v1, u2, v2, light, 0, 0, 1);
 
-        // 3. TOP FACE (Y = h)
-        // Normal: 0, 1, 0
         writeQuad(entry, buffer, 
             0, h, d,  0, h, 0,  w, h, 0,  w, h, d, 
             u1, v1, u2, v2, light, 0, -1, 0);
 
-        // 4. BOTTOM FACE (Y = 0)
-        // Normal: 0, -1, 0
         writeQuad(entry, buffer, 
             0, 0, 0,  0, 0, d,  w, 0, d,  w, 0, 0, 
             u1, v1, u2, v2, light, 0, 1, 0);
 
-        // 5. RIGHT FACE (X = w)
-        // Normal: 1, 0, 0
         writeQuad(entry, buffer, 
             w, 0, d,  w, h, d,  w, h, 0,  w, 0, 0, 
             u1, v1, u2, v2, light, -1, 0, 0);
 
-        // 6. LEFT FACE (X = 0)
-        // Normal: -1, 0, 0
         writeQuad(entry, buffer, 
             0, 0, 0,  0, h, 0,  0, h, d,  0, 0, d, 
             u1, v1, u2, v2, light, 1, 0, 0);

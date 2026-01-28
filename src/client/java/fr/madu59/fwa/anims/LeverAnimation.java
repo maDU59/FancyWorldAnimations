@@ -30,7 +30,7 @@ public class LeverAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10;
+        return 5;
     }
 
     private double getStartAngle(boolean isOpen){
