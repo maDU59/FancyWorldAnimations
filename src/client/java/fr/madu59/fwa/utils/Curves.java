@@ -5,8 +5,6 @@ public class Curves {
     public static <T> double ease(double progress, T type) {
         if (type instanceof Classic c) {
             switch (c) {
-                case LINEAR:
-                    return progress;
                 default:
                     return progress;
             }
@@ -21,6 +19,24 @@ public class Curves {
                     return wrap(Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1);
                 case DEFAULT:
                     return wrap(1 - Math.pow(1 - progress, 5));
+                default:
+                    return progress;
+            }
+        }
+        else return progress;
+    }
+
+    public static <T> double unease(double progress, T type) {
+        if (type instanceof Classic c) {
+            switch (c) {
+                default:
+                    return progress;
+            }
+        }
+        else if (type instanceof Door c) {
+            switch (c) {
+                case DEFAULT:
+                    return 1 - Math.pow(1 - progress, 1/5);
                 default:
                     return progress;
             }
@@ -46,6 +62,7 @@ public class Curves {
     public static enum Door {
         DEFAULT,
         SPRINGY,
-        ELASTIC
+        ELASTIC,
+        LINEAR,
     }
 }

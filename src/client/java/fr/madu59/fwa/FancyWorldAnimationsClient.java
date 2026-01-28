@@ -9,6 +9,7 @@ import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
+import fr.madu59.fwa.utils.Curves;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
@@ -67,7 +68,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (animations.containsAt(blockPos)) {
 				Animation animation = animations.getAt(blockPos);
 				if (animation.isUnique()) {
-					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - Curves.unease(animation.getProgress(getPartialTick()), animation.getCurve()));
 					animations.removeAt(blockPos);
 				}
 			}
