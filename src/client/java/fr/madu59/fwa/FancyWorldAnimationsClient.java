@@ -34,7 +34,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-			double tickDelta = client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+			double tickDelta = getPartialTick();
             render(context, tickDelta);
 		});
 	}
