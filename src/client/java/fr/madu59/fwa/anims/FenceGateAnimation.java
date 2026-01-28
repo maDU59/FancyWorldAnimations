@@ -7,6 +7,8 @@ import org.joml.Vector3fc;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.utils.Curves;
+import fr.madu59.fwa.utils.Curves.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -42,7 +44,7 @@ public class FenceGateAnimation extends Animation{
     private double getAngle(double nowTick, Direction facing) {
         double angle1 = getStartAngle(this.oldIsOpen);
         double angle2 = getStartAngle(this.newIsOpen);
-        double finalAngle = angle1 + (angle2 - angle1) * getProgress(nowTick);
+        double finalAngle = angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), Type.DOOR);
         if(facing == Direction.NORTH || facing == Direction.WEST){
             finalAngle = -finalAngle;
         }

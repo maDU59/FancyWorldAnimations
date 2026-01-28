@@ -3,6 +3,8 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.utils.Curves;
+import fr.madu59.fwa.utils.Curves.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
@@ -35,7 +37,7 @@ public class TrapDoorAnimation extends Animation{
     private double getAngle(double nowTick, Direction hingeSide) {
         double angle1 = getStartAngle(this.oldIsOpen, hingeSide);
         double angle2 = getStartAngle(this.newIsOpen, hingeSide);
-        return angle1 + (angle2 - angle1) * getProgress(nowTick);
+        return angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), Type.DOOR);
     }
 
     @Override

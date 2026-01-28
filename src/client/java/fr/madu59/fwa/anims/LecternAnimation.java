@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.utils.Curves;
+import fr.madu59.fwa.utils.Curves.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
@@ -57,7 +59,7 @@ public class LecternAnimation extends Animation{
         VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(Identifier.tryParse("minecraft:textures/entity/enchanting_table_book.png")));
         
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        BookModel.State bookState = new BookModel.State(0f, 0.1f, 0.9f, (float)getAngle(getProgress(nowTick)));
+        BookModel.State bookState = new BookModel.State(0f, 0.1f, 0.9f, (float)getAngle(Curves.ease(getProgress(nowTick), Type.LINEAR)));
 
         bookModel.setupAnim(bookState);
         poseStack.translate(0.5F, 1.0625F, 0.5F);
