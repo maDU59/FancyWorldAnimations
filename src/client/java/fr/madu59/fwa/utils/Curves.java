@@ -2,6 +2,10 @@ package fr.madu59.fwa.utils;
 
 public class Curves {
 
+    public static <T> double ease(double progress, T type, boolean isForward) {
+        return isForward? ease(progress, type):1-ease(1-progress, type);
+    }
+
     public static <T> double ease(double progress, T type) {
         if (type instanceof Classic c) {
             switch (c) {

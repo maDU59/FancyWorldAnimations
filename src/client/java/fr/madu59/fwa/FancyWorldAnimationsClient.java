@@ -3,6 +3,7 @@ package fr.madu59.fwa;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.anims.Animation;
+import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
@@ -17,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
@@ -123,6 +125,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof FenceGateBlock) return state.getValue(FenceGateBlock.OPEN);
 		if(block instanceof LeverBlock) return state.getValue(LeverBlock.POWERED);
 		if(block instanceof LecternBlock) return state.getValue(LecternBlock.HAS_BOOK);
+		if(block instanceof ButtonBlock) return state.getValue(ButtonBlock.POWERED);
 		return false;
 	}
 
@@ -135,6 +138,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case FENCE_GATE: return state.setValue(FenceGateBlock.OPEN, false);
 			case LEVER: return state.setValue(LeverBlock.POWERED, false);
 			case LECTERN: return state.setValue(LecternBlock.HAS_BOOK, false);
+			case BUTTON: return state.setValue(ButtonBlock.POWERED, false);
 			default: return state;
 		}
 	}
@@ -147,6 +151,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.LEVER) return new LeverAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		if(type == Type.CHISELED_BOOKSHELF) return new ChiseledBookShelfAnimation(pos, newState, startTick, oldIsOpen, newIsOpen, oldState);
 		if(type == Type.LECTERN) return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+		if(type == Type.BUTTON) return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 	}
 
@@ -159,6 +164,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof LeverBlock) return Type.LEVER;
 		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
 		if(block instanceof LecternBlock) return Type.LECTERN;
+		if(block instanceof ButtonBlock) return Type.BUTTON;
 
 		block = newState.getBlock();
 		if(block instanceof DoorBlock) return Type.DOOR;
@@ -167,6 +173,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof LeverBlock) return Type.LEVER;
 		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
 		if(block instanceof LecternBlock) return Type.LECTERN;
+		if(block instanceof ButtonBlock) return Type.BUTTON;
 
 		return Type.USELESS;
 	}
@@ -180,6 +187,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.LEVER && block instanceof LeverBlock) return true;
 		if(type == Type.CHISELED_BOOKSHELF && block instanceof ChiseledBookShelfBlock) return true;
 		if(type == Type.LECTERN && block instanceof LecternBlock) return true;
+		if(type == Type.BUTTON && block instanceof ButtonBlock) return true;
 		return false;
 	}
 
@@ -217,6 +225,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LEVER,
 		CHISELED_BOOKSHELF,
 		LECTERN,
+		BUTTON,
 		USELESS
 	}
 }
