@@ -7,6 +7,7 @@ import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
+import fr.madu59.fwa.anims.JukeBoxAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
@@ -101,9 +103,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
 	{
-		if(type == Type.CHISELED_BOOKSHELF){
-			return oldState.getBlock() == newState.getBlock();
-		}
+		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
+		if(type == Type.JUKEBOX) return newState.getValue(JukeboxBlock.HAS_RECORD);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -126,6 +127,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof LeverBlock) return state.getValue(LeverBlock.POWERED);
 		if(block instanceof LecternBlock) return state.getValue(LecternBlock.HAS_BOOK);
 		if(block instanceof ButtonBlock) return state.getValue(ButtonBlock.POWERED);
+		if(block instanceof JukeboxBlock) return state.getValue(JukeboxBlock.HAS_RECORD);
 		return false;
 	}
 
@@ -139,20 +141,25 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case LEVER: return state.setValue(LeverBlock.POWERED, false);
 			case LECTERN: return state.setValue(LecternBlock.HAS_BOOK, false);
 			case BUTTON: return state.setValue(ButtonBlock.POWERED, false);
+			case JUKEBOX: return state.setValue(JukeboxBlock.HAS_RECORD, false);
 			default: return state;
 		}
 	}
 
-	private static Animation createAnimation(BlockPos pos, Type type, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState)
+	private static Animation createAnimation(BlockPos pos, Type type, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)
 	{
-		if(type == Type.DOOR) return new DoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-		if(type == Type.TRAPDOOR) return new TrapDoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-		if(type == Type.FENCE_GATE) return new FenceGateAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-		if(type == Type.LEVER) return new LeverAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-		if(type == Type.CHISELED_BOOKSHELF) return new ChiseledBookShelfAnimation(pos, newState, startTick, oldIsOpen, newIsOpen, oldState);
-		if(type == Type.LECTERN) return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-		if(type == Type.BUTTON) return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-		return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+		switch (type)
+		{
+			case DOOR: return new DoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case TRAPDOOR: return new TrapDoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case FENCE_GATE: return new FenceGateAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case LEVER: return new LeverAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case CHISELED_BOOKSHELF: return new ChiseledBookShelfAnimation(pos, newState, startTick, oldIsOpen, newIsOpen, oldState);
+			case LECTERN: return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case BUTTON: return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case JUKEBOX: return new JukeBoxAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState);
+			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+		}
 	}
 
 	private static Type typeOf(BlockState oldState, BlockState newState)
@@ -165,6 +172,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
 		if(block instanceof LecternBlock) return Type.LECTERN;
 		if(block instanceof ButtonBlock) return Type.BUTTON;
+		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
 
 		block = newState.getBlock();
 		if(block instanceof DoorBlock) return Type.DOOR;
@@ -174,6 +182,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
 		if(block instanceof LecternBlock) return Type.LECTERN;
 		if(block instanceof ButtonBlock) return Type.BUTTON;
+		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
 
 		return Type.USELESS;
 	}
@@ -188,6 +197,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.CHISELED_BOOKSHELF && block instanceof ChiseledBookShelfBlock) return true;
 		if(type == Type.LECTERN && block instanceof LecternBlock) return true;
 		if(type == Type.BUTTON && block instanceof ButtonBlock) return true;
+		if(type == Type.JUKEBOX && block instanceof JukeboxBlock) return true;
 		return false;
 	}
 
@@ -226,6 +236,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		CHISELED_BOOKSHELF,
 		LECTERN,
 		BUTTON,
+		JUKEBOX,
 		USELESS
 	}
 }

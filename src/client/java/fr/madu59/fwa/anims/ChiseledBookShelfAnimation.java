@@ -63,7 +63,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         float max = 3f/16f;
         float min = 1f/16f;
         float progress = (float)Curves.ease(getProgress(nowTick), getCurve());
-        return isAdding ? max - (max - min) * progress : min + (max - min) * progress;
+        return isAdding ? min + (max - min) * progress :max - (max - min) * progress;
     }
 
     @Override
