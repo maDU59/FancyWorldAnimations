@@ -46,6 +46,11 @@ public class JukeBoxAnimation extends Animation{
         return (T) Curves.Door.DEFAULT;
     }
 
+    public static boolean hasInfiniteAnimation(){
+        boolean isFinite = false;
+        return !isFinite;
+    }
+
     @Override
     public boolean hideOriginalBlock() {
         return false;

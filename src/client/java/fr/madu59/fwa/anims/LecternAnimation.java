@@ -57,6 +57,11 @@ public class LecternAnimation extends Animation{
         return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
     }
 
+    public static boolean hasInfiniteAnimation(){
+        boolean isFinite = false;
+        return !isFinite;
+    }
+
     private double getAngle(double progress) {
         double startAngle = oldIsOpen ? 1.2 : 0.0;
         double endAngle = newIsOpen ? 1.2 : 0.0;

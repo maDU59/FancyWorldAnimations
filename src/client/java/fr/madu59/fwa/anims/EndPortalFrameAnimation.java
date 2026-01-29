@@ -46,14 +46,12 @@ public class EndPortalFrameAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
 
-        Direction facing = defaultState.getValue(EndPortalFrameBlock.FACING);
-
         BlockState eyeState = defaultState.setValue(EndPortalFrameBlock.HAS_EYE, true);
 
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(eyeState));
         BlockModelPart part = model.collectParts(random).get(0);
-        poseStack.translate(0f,1f/16f - (float)Curves.ease(getProgress(nowTick), getCurve())/16f,0f);
+        poseStack.translate(0f,1f/8f - (float)Curves.ease(getProgress(nowTick), getCurve())/8f,0f);
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
             renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light);
