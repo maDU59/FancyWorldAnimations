@@ -137,18 +137,18 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static BlockState getDefaultState(BlockState state, Type type)
 	{
-		switch (type)
+		return switch (type)
 		{
-			case DOOR: return state.setValue(DoorBlock.OPEN, false);
-			case TRAPDOOR: return state.setValue(TrapDoorBlock.OPEN, false);
-			case FENCE_GATE: return state.setValue(FenceGateBlock.OPEN, false);
-			case LEVER: return state.setValue(LeverBlock.POWERED, false);
-			case LECTERN: return state.setValue(LecternBlock.HAS_BOOK, false);
-			case BUTTON: return state.setValue(ButtonBlock.POWERED, false);
-			case JUKEBOX: return state.setValue(JukeboxBlock.HAS_RECORD, false);
-			case END_PORTAL_FRAME: return state.setValue(EndPortalFrameBlock.HAS_EYE, false);
-			default: return state;
-		}
+			case DOOR -> state.setValue(DoorBlock.OPEN, false);
+			case TRAPDOOR -> state.setValue(TrapDoorBlock.OPEN, false);
+			case FENCE_GATE -> state.setValue(FenceGateBlock.OPEN, false);
+			case LEVER -> state.setValue(LeverBlock.POWERED, false);
+			case LECTERN -> state.setValue(LecternBlock.HAS_BOOK, false);
+			case BUTTON -> state.setValue(ButtonBlock.POWERED, false);
+			case JUKEBOX -> state.setValue(JukeboxBlock.HAS_RECORD, false);
+			case END_PORTAL_FRAME -> state.setValue(EndPortalFrameBlock.HAS_EYE, false);
+			default -> state;
+		};
 	}
 
 	private static Animation createAnimation(BlockPos pos, Type type, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)

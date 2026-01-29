@@ -26,6 +26,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class FenceGateAnimation extends Animation{
 
+    private final RandomSource random = RandomSource.create(42);
+
     public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
     }
@@ -58,7 +60,6 @@ public class FenceGateAnimation extends Animation{
     
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
-        RandomSource random = RandomSource.create(42);
 
         Direction facing = defaultState.getValue(FenceGateBlock.FACING);
 

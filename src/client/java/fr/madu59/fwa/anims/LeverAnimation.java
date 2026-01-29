@@ -25,6 +25,8 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 
 public class LeverAnimation extends Animation{
     
+    private final RandomSource random = RandomSource.create(42);
+
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
     }
@@ -57,7 +59,6 @@ public class LeverAnimation extends Animation{
 
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
-        RandomSource random = RandomSource.create(42);
 
         Direction facing = defaultState.getValue(LeverBlock.FACING);
         AttachFace face = defaultState.getValue(LeverBlock.FACE);
