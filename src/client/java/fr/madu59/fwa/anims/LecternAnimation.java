@@ -22,16 +22,23 @@ import net.minecraft.world.level.block.state.BlockState;
 public class LecternAnimation extends Animation{
     
     BookModel bookModel;
-    double animationDuration = 5.0;
+    float hash;
 
     public LecternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
+        this.hash = position.hashCode();
     }
 
     @Override
     public double getAnimDuration() {
-        return animationDuration;
+        return 5.0;
+    }
+
+    @Override
+    public double getLifeSpan(){
+        boolean isFinite = false;
+        return isFinite || !newIsOpen? getAnimDuration() : Double.MAX_VALUE;
     }
 
     @Override
@@ -47,13 +54,27 @@ public class LecternAnimation extends Animation{
 
     @Override
     public double getProgress(double nowTick) {
-        return Math.clamp((nowTick - this.startTick) / animationDuration, 0.0, 1.0);
+        return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
     }
 
     private double getAngle(double progress) {
         double startAngle = oldIsOpen ? 1.2 : 0.0;
         double endAngle = newIsOpen ? 1.2 : 0.0;
         return startAngle + (endAngle - startAngle) * progress;
+    }
+
+    private float getPageAngle(float defaultVal, double nowTick){
+        float time = (float)(nowTick - this.startTick);
+        if (time <= getAnimDuration()) return defaultVal;
+        else {
+            float uniqueOffset = (float)((hash + defaultVal * 67) % 100);
+            time += uniqueOffset;
+            float slowWave = (float) Math.sin(time * 0.1f) * 0.05f;
+
+            float fastWave = (float) Math.sin(time * 0.25f) * 0.02f;
+
+            return defaultVal + (slowWave + fastWave) / 2f;
+        }
     }
 
     @Override
@@ -64,7 +85,7 @@ public class LecternAnimation extends Animation{
         VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(Identifier.tryParse("minecraft:textures/entity/enchanting_table_book.png")));
         
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        BookModel.State bookState = new BookModel.State(0f, 0.1f, 0.9f, (float)getAngle(Curves.ease(getProgress(nowTick), getCurve())));
+        BookModel.State bookState = new BookModel.State(0f, getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick), (float)getAngle(Curves.ease(getProgress(nowTick), getCurve())));
 
         bookModel.setupAnim(bookState);
         poseStack.translate(0.5F, 1.0625F, 0.5F);
