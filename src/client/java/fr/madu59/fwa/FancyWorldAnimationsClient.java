@@ -64,7 +64,6 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
-		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
 
 		double startTick = (double)client.level.getGameTime();
 		synchronized (animations){
@@ -76,6 +75,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 					animations.removeAt(blockPos);
 				}
 			}
+
+			if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
 
 			animations.add(createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState));
 		}

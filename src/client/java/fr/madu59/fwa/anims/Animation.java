@@ -53,11 +53,15 @@ public class Animation {
     }
 
     public boolean isFinished(double nowTick) {
-        return nowTick - startTick >= getAnimDuration();
+        return nowTick - startTick >= getLifeSpan();
     }
 
     public double getAnimDuration() {
         return 0;
+    }
+
+    public double getLifeSpan(){
+        return getAnimDuration();
     }
 
     public double getProgress(double nowTick) {

@@ -15,6 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class JukeBoxAnimation extends Animation{
@@ -34,6 +35,12 @@ public class JukeBoxAnimation extends Animation{
     }
 
     @Override
+    public double getLifeSpan(){
+        boolean isFinite = false;
+        return isFinite? getAnimDuration() : Double.MAX_VALUE;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
         return (T) Curves.Door.DEFAULT;
@@ -44,18 +51,28 @@ public class JukeBoxAnimation extends Animation{
         return false;
     }
 
+    private float getDeltaY(double nowTick){
+        boolean isFinite = false;
+        float progress = (float)Curves.ease(getProgress(nowTick), getCurve());
+        if (isFinite) return progress;
+        else return 3f * progress/4f;
+    }
+
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
 
         float scale = 0.67f;
 
-        //JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) client.level.getBlockEntity(position);
+        JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) client.level.getBlockEntity(position);
+        ItemStack discItemStack = jukeboxBlockEntity.getTheItem();
 
-        ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
+        if (discItemStack.isEmpty()) {
+            discItemStack = new ItemStack(Items.MUSIC_DISC_13);
+        }
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
 
-        float dy = (float)Curves.ease(getProgress(nowTick), getCurve());
+        float dy = getDeltaY(nowTick);
         dy = newIsOpen? 1f - dy : dy;
 
         poseStack.mulPose(Axis.YP.rotationDegrees(90f));
