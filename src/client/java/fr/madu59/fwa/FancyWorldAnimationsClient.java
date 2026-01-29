@@ -6,6 +6,7 @@ import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
+import fr.madu59.fwa.anims.EndPortalFrameAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.JukeBoxAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.EndPortalFrameBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.LecternBlock;
@@ -129,6 +131,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof LecternBlock) return state.getValue(LecternBlock.HAS_BOOK);
 		if(block instanceof ButtonBlock) return state.getValue(ButtonBlock.POWERED);
 		if(block instanceof JukeboxBlock) return state.getValue(JukeboxBlock.HAS_RECORD);
+		if(block instanceof EndPortalFrameBlock) return state.getValue(EndPortalFrameBlock.HAS_EYE);
 		return false;
 	}
 
@@ -143,6 +146,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case LECTERN: return state.setValue(LecternBlock.HAS_BOOK, false);
 			case BUTTON: return state.setValue(ButtonBlock.POWERED, false);
 			case JUKEBOX: return state.setValue(JukeboxBlock.HAS_RECORD, false);
+			case END_PORTAL_FRAME: return state.setValue(EndPortalFrameBlock.HAS_EYE, false);
 			default: return state;
 		}
 	}
@@ -159,47 +163,35 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case LECTERN: return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case BUTTON: return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case JUKEBOX: return new JukeBoxAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState);
+			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
 
+	private static Type typeOf(BlockState state){
+		Block block = state.getBlock();
+		if(block instanceof DoorBlock) return Type.DOOR;
+		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
+		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
+		if(block instanceof LeverBlock) return Type.LEVER;
+		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
+		if(block instanceof LecternBlock) return Type.LECTERN;
+		if(block instanceof ButtonBlock) return Type.BUTTON;
+		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
+		if(block instanceof EndPortalFrameBlock) return Type.END_PORTAL_FRAME;
+		return Type.USELESS;
+	}
+
 	private static Type typeOf(BlockState oldState, BlockState newState)
 	{
-		Block block = oldState.getBlock();
-		if(block instanceof DoorBlock) return Type.DOOR;
-		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
-		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
-		if(block instanceof LeverBlock) return Type.LEVER;
-		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
-		if(block instanceof LecternBlock) return Type.LECTERN;
-		if(block instanceof ButtonBlock) return Type.BUTTON;
-		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
-
-		block = newState.getBlock();
-		if(block instanceof DoorBlock) return Type.DOOR;
-		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
-		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
-		if(block instanceof LeverBlock) return Type.LEVER;
-		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
-		if(block instanceof LecternBlock) return Type.LECTERN;
-		if(block instanceof ButtonBlock) return Type.BUTTON;
-		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
-
-		return Type.USELESS;
+		Type type = typeOf(oldState);
+		if (type != Type.USELESS) return type;
+		else return typeOf(newState);
 	}
 
 	private static boolean isSameType(Type type, BlockState state)
 	{
-		Block block = state.getBlock();
-		if(type == Type.DOOR && block instanceof DoorBlock) return true;
-		if(type == Type.TRAPDOOR && block instanceof TrapDoorBlock) return true;
-		if(type == Type.FENCE_GATE && block instanceof FenceGateBlock) return true;
-		if(type == Type.LEVER && block instanceof LeverBlock) return true;
-		if(type == Type.CHISELED_BOOKSHELF && block instanceof ChiseledBookShelfBlock) return true;
-		if(type == Type.LECTERN && block instanceof LecternBlock) return true;
-		if(type == Type.BUTTON && block instanceof ButtonBlock) return true;
-		if(type == Type.JUKEBOX && block instanceof JukeboxBlock) return true;
-		return false;
+		return type == typeOf(state);
 	}
 
 	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
@@ -238,6 +230,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LECTERN,
 		BUTTON,
 		JUKEBOX,
+		END_PORTAL_FRAME,
 		USELESS
 	}
 }
