@@ -17,10 +17,10 @@ public class Curves {
             switch (c) {
                 case SPRINGY:
                     return wrap(1 + 2.70158 * Math.pow(progress - 1, 3) + 1.70158 * Math.pow(progress - 1, 2));
-                case ELASTIC:
-                    if (progress == 0) return 0;
-                    if (progress == 1) return 1;
-                    return wrap(Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1);
+                // case ELASTIC:
+                //     if (progress == 0) return 0;
+                //     if (progress == 1) return 1;
+                //     return wrap(Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1);
                 case DEFAULT:
                     return wrap(1 - Math.pow(1 - progress, 5));
                 default:
@@ -66,7 +66,6 @@ public class Curves {
     public static enum Door {
         DEFAULT,
         SPRINGY,
-        ELASTIC,
         LINEAR,
     }
 }

@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -30,7 +31,12 @@ public class DoorAnimation extends Animation{
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) Curves.Door.DEFAULT;
+        return (T) SettingsManager.DOOR_EASING.getValue();
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.DOOR_STATE.getValue();
     }
 
     private double getStartAngle(boolean isOpen, DoorHingeSide hinge){

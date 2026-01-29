@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -31,7 +32,12 @@ public class TrapDoorAnimation extends Animation{
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) Curves.Door.DEFAULT;
+        return (T) SettingsManager.TRAPDOOR_EASING.getValue();
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.TRAPDOOR_STATE.getValue();
     }
 
     private double getStartAngle(boolean isOpen, Direction hingeSide){

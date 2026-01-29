@@ -1,0 +1,17 @@
+{
+    "fwa.config.category.door":"DOORS",
+    "fwa.config.category.trapdoor":"TRAPDOORS",
+    "fwa.config.category.fencegate":"FENCE GATE",
+
+    "fwa.config.option.state.name":"Animations state",
+    "fwa.config.option.easing.name":"Animations type",
+
+    "fwa.config.value.true":"Enabled",
+    "fwa.config.value.false":"Disabled",
+    "fwa.config.value.default":"Default",
+    "fwa.config.value.linear":"Linear",
+    "fwa.config.value.springy":"Springy",
+    "fwa.config.value.elastic":"Elastic",
+
+    "fwa.config.done":"Done"
+}

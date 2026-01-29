@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"fr.madu59.fwa.FancyWorldAnimationsClient"
+		],
+		"modmenu": [
+			"fr.madu59.fwa.config.configscreen.ModMenuIntegration"
 		]
 	},
 	"mixins": [

@@ -36,6 +36,10 @@ public class Animation {
         return (T) Curves.Classic.LINEAR;
     }
 
+    public boolean isEnabled(){
+        return true;
+    }
+
     public static boolean hasInfiniteAnimation(){
         return false;
     }

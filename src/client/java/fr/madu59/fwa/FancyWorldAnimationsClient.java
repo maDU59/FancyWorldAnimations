@@ -12,6 +12,7 @@ import fr.madu59.fwa.anims.JukeBoxAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
+import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.utils.Curves;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
@@ -39,6 +40,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		FancyWorldAnimationsConfigScreen.registerCommand();
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
 			double tickDelta = getPartialTick();
             render(context, tickDelta);
@@ -80,7 +82,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 			if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
 
-			animations.add(createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState));
+			Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
+			if (animation.isEnabled()) animations.add(animation);
 		}
 	}
 
