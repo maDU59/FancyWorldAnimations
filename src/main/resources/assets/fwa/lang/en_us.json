@@ -1,10 +1,18 @@
 {
     "fwa.config.category.door":"DOORS",
     "fwa.config.category.trapdoor":"TRAPDOORS",
-    "fwa.config.category.fencegate":"FENCE GATE",
+    "fwa.config.category.fencegate":"FENCE GATES",
+    "fwa.config.category.lever":"LEVERS",
+    "fwa.config.category.button":"BUTTONS",
+    "fwa.config.category.jukebox":"JUKEBOXES",
+    "fwa.config.category.chiseld_bookshelf":"CHISELED BOOKSHELVES",
+    "fwa.config.category.end_portal_frame":"END PORTAL FRAMES",
+    "fwa.config.category.lectern":"LECTERNS",
+    "fwa.config.category.chest":"CHESTS",
 
-    "fwa.config.option.state.name":"Animations state",
-    "fwa.config.option.easing.name":"Animations type",
+    "fwa.config.option.state.name":"Animation state",
+    "fwa.config.option.easing.name":"Animation type",
+    "fwa.config.option.easing.speed":"Animation speed",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",

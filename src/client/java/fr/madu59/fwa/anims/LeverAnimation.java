@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -39,7 +40,12 @@ public class LeverAnimation extends Animation{
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) Curves.Classic.LINEAR;
+        return (T) SettingsManager.LEVER_EASING.getValue();
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.LEVER_STATE.getValue();
     }
 
     private double getStartAngle(boolean isOpen){

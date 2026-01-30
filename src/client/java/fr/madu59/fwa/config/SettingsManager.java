@@ -71,6 +71,20 @@ public class SettingsManager {
         Curves.Door.DEFAULT
     );
 
+    public static Option<Boolean> LEVER_STATE = loadOptionWithDefaults(
+        "lever_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> LEVER_EASING = loadOptionWithDefaults(
+        "lever_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {
