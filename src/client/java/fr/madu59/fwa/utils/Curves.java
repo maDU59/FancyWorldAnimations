@@ -2,11 +2,11 @@ package fr.madu59.fwa.utils;
 
 public class Curves {
 
-    public static <T> double ease(double progress, T type, boolean isForward) {
+    public static double ease(double progress, Enum<?> type, boolean isForward) {
         return isForward? ease(progress, type):1-ease(1-progress, type);
     }
 
-    public static <T> double ease(double progress, T type) {
+    public static double ease(double progress, Enum<?> type) {
         if (type instanceof Classic c) {
             switch (c) {
                 default:
@@ -30,7 +30,7 @@ public class Curves {
         else return progress;
     }
 
-    public static <T> double unease(double progress, T type) {
+    public static double unease(double progress, Enum<?> type) {
         if (type instanceof Classic c) {
             switch (c) {
                 default:

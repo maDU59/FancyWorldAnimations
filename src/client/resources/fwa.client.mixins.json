@@ -6,7 +6,8 @@
 		"ClientLevelMixin",
 		"BlockRenderDispatcherMixin",
 		"BlockEntityRenderDispatcherMixin",
-		"ChestLidControllerMixin"
+		"ChestLidControllerMixin",
+		"SetSectionDirtyInvoker"
 	],
 	"injectors": {
 		"defaultRequire": 1

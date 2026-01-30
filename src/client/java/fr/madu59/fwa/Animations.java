@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import fr.madu59.fwa.anims.Animation;
+import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 
@@ -28,7 +29,7 @@ public class Animations extends ArrayList<Animation> {
                     it.remove();
 
                     BlockPos pos = animation.getPos();
-                    Minecraft.getInstance().levelRenderer.setBlocksDirty(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
+                    ((SetSectionDirtyInvoker) Minecraft.getInstance().levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
                 }
             }
         }
