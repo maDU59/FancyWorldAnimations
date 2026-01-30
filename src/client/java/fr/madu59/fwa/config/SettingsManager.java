@@ -85,6 +85,48 @@ public class SettingsManager {
         Curves.Door.DEFAULT
     );
 
+    public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(
+        "lectern_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> LECTERN_EASING = loadOptionWithDefaults(
+        "lectern_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
+    public static Option<Boolean> LECTERN_INFINITE = loadOptionWithDefaults(
+        "lectern_infinite",
+        "fwa.config.option.infinite.name",
+        "fwa.config.option.infinite.description",
+        true
+    );
+
+    public static Option<Boolean> JUKEBOX_STATE = loadOptionWithDefaults(
+        "jukebox_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> JUKEBOX_EASING = loadOptionWithDefaults(
+        "jukebox_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
+    public static Option<Boolean> JUKEBOX_INFINITE = loadOptionWithDefaults(
+        "lectern_infinite",
+        "fwa.config.option.infinite.name",
+        "fwa.config.option.infinite.description",
+        true
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {

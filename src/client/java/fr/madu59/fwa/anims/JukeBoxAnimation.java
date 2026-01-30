@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -36,19 +37,22 @@ public class JukeBoxAnimation extends Animation{
 
     @Override
     public double getLifeSpan(){
-        boolean isFinite = false;
-        return isFinite? getAnimDuration() : Double.MAX_VALUE;
+        return hasInfiniteAnimation()? Double.MAX_VALUE : getAnimDuration();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) Curves.Door.DEFAULT;
+        return (T) SettingsManager.JUKEBOX_EASING.getValue();
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.JUKEBOX_STATE.getValue();
     }
 
     public static boolean hasInfiniteAnimation(){
-        boolean isFinite = false;
-        return !isFinite;
+        return SettingsManager.JUKEBOX_INFINITE.getValue();
     }
 
     @Override
@@ -57,10 +61,9 @@ public class JukeBoxAnimation extends Animation{
     }
 
     private float getDeltaY(double nowTick){
-        boolean isFinite = false;
         float progress = (float)Curves.ease(getProgress(nowTick), getCurve());
-        if (isFinite) return progress;
-        else return 3f * progress/4f;
+        if (hasInfiniteAnimation()) return 3f * progress/4f;
+        else return progress;
     }
 
     @Override

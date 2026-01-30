@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -37,14 +38,18 @@ public class LecternAnimation extends Animation{
 
     @Override
     public double getLifeSpan(){
-        boolean isFinite = false;
-        return isFinite || !newIsOpen? getAnimDuration() : Double.MAX_VALUE;
+        return !(hasInfiniteAnimation()  && newIsOpen)? getAnimDuration() : Double.MAX_VALUE;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) Curves.Classic.LINEAR;
+        return (T) SettingsManager.LECTERN_EASING.getValue();
+    }
+
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.LECTERN_STATE.getValue();
     }
 
     @Override
@@ -58,8 +63,7 @@ public class LecternAnimation extends Animation{
     }
 
     public static boolean hasInfiniteAnimation(){
-        boolean isFinite = false;
-        return !isFinite;
+        return SettingsManager.LECTERN_INFINITE.getValue();
     }
 
     private double getAngle(double progress) {

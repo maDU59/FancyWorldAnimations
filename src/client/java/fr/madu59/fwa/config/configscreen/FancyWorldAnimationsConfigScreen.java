@@ -48,8 +48,14 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.FENCEGATE_STATE);
         list.addButton(SettingsManager.FENCEGATE_EASING);
         list.addCategory("fwa.config.category.lectern");
+        list.addButton(SettingsManager.LECTERN_STATE);
+        list.addButton(SettingsManager.LECTERN_EASING);
+        list.addButton(SettingsManager.LECTERN_INFINITE);
         list.addCategory("fwa.config.category.chiseled_bookshelf");
         list.addCategory("fwa.config.category.jukebox");
+        list.addButton(SettingsManager.JUKEBOX_STATE);
+        list.addButton(SettingsManager.JUKEBOX_EASING);
+        list.addButton(SettingsManager.JUKEBOX_INFINITE);
         list.addCategory("fwa.config.category.lever");
         list.addButton(SettingsManager.LEVER_STATE);
         list.addButton(SettingsManager.LEVER_EASING);
