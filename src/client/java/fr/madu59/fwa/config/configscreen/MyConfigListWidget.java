@@ -17,8 +17,6 @@ import net.minecraft.sounds.SoundEvents;
 
 public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
 
-    private boolean isRight = false;
-
     public MyConfigListWidget(Minecraft client, int width, int height, int top, int itemHeight) {
         super(client, width, height, top, itemHeight);
     }
@@ -35,7 +33,6 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
     public void addCategory(String name) {
         this.addEntry(new CategoryEntry(name));
-        this.isRight = false;
     }
 
     public void addButton(String name, Button.OnPress onPress) {
@@ -147,44 +144,23 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     public static class ButtonEntry extends MyConfigListWidget.Entry{
         private final Button button;
         private final String name;
-        private final String description;
         private final String indent;
         private final Option<?> option;
-        private final boolean isHalf;
-        private final boolean isRight;
 
         public ButtonEntry(Button button, Option<?> option, String indent) {
             this.button = button;
             this.name = option.getName();
-            this.description = option.getDescription();
             this.indent = indent;
             this.option = option;
-            this.isHalf = false;
-            this.isRight = false;
-        }
-
-        public ButtonEntry(Button button, Option<?> option, String indent, boolean isRight) {
-            this.button = button;
-            this.name = option.getName();
-            this.description = option.getDescription();
-            this.indent = indent;
-            this.option = option;
-            this.isHalf = true;
-            this.isRight = isRight;
-        }
-
-        private int getXPos(boolean isHalf, boolean isRight){
-            if (!isHalf) return this.getContentWidth() - this.button.getWidth() - 10;
-            else return (isRight? this.getContentWidth() / 4 : this.getContentWidth() - (this.getContentWidth() / 4)) - this.button.getWidth() / 2;
         }
 
         @Override
         public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
-            this.button.setX(getXPos(isHalf, isRight));
+            this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
             this.button.render(context, mouseX, mouseY, tickDelta);
 
-            if(this.name == null || isHalf) return;
+            if(this.name == null) return;
 
             Font textRenderer = Minecraft.getInstance().font;
             context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
@@ -217,13 +193,11 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     public static class SliderEntry extends MyConfigListWidget.Entry{
         private final AbstractSliderButton slider;
         private final String name;
-        private final String description;
         private final String indent;
 
         public SliderEntry(AbstractSliderButton slider, Option<?> option, String indent) {
             this.slider = slider;
             this.name = option.getName();
-            this.description = option.getDescription();
             this.indent = indent;
         }
 

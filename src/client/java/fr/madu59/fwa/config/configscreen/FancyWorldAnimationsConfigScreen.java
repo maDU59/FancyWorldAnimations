@@ -13,7 +13,6 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
     
     private MyConfigListWidget list;
     private final Screen parent;
-    private final String INDENT = " ⤷  ";
 
     protected FancyWorldAnimationsConfigScreen(Screen parent) {
         super(Component.literal("Fwa configuration screen"));
