@@ -52,6 +52,8 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.LECTERN_EASING);
         list.addButton(SettingsManager.LECTERN_INFINITE);
         list.addCategory("fwa.config.category.chiseled_bookshelf");
+        list.addButton(SettingsManager.CHISELED_BOOKSHELF_STATE);
+        list.addButton(SettingsManager.CHISELED_BOOKSHELF_EASING);
         list.addCategory("fwa.config.category.jukebox");
         list.addButton(SettingsManager.JUKEBOX_STATE);
         list.addButton(SettingsManager.JUKEBOX_EASING);
@@ -60,8 +62,13 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.LEVER_STATE);
         list.addButton(SettingsManager.LEVER_EASING);
         list.addCategory("fwa.config.category.button");
+        list.addButton(SettingsManager.BUTTON_STATE);
+        list.addButton(SettingsManager.BUTTON_EASING);
         list.addCategory("fwa.config.category.end_portal_frame");
+        list.addButton(SettingsManager.END_PORTAL_FRAME_STATE);
+        list.addButton(SettingsManager.END_PORTAL_FRAME_EASING);
         list.addCategory("fwa.config.category.chest");
+        list.addButton(SettingsManager.CHEST_EASING);
         
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {

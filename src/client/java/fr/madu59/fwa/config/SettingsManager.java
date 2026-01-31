@@ -127,6 +127,55 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> CHISELED_BOOKSHELF_STATE = loadOptionWithDefaults(
+        "chiseled_bookshelf_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> CHISELED_BOOKSHELF_EASING = loadOptionWithDefaults(
+        "chiseled_bookshelf_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
+    public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
+        "button_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> BUTTON_EASING = loadOptionWithDefaults(
+        "button_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
+    public static Option<Boolean> END_PORTAL_FRAME_STATE = loadOptionWithDefaults(
+        "end_portal_frame_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> END_PORTAL_FRAME_EASING = loadOptionWithDefaults(
+        "end_portal_frame_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
+    public static Option<Curves.Door> CHEST_EASING = loadOptionWithDefaults(
+        "chest_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.SPRINGY
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {
