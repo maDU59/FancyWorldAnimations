@@ -27,10 +27,11 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 public class LeverAnimation extends Animation{
     
     private final RandomSource random = RandomSource.create(42);
-    private final BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+    private final BlockStateModel model;
 
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
     @Override

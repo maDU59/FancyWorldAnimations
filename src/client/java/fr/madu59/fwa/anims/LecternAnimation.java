@@ -22,8 +22,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LecternAnimation extends Animation{
     
-    BookModel bookModel;
-    float hash;
+    private final BookModel bookModel;
+    private final float hash;
 
     public LecternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);

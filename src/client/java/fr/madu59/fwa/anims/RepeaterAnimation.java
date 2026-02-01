@@ -20,22 +20,22 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RepeaterAnimation extends Animation{
 
-    BlockState oldState;
-    BlockState newState;
+    private final BlockState oldState;
+    private final BlockState newState;
     private final RandomSource random = RandomSource.create(42);
-    private final BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+    private final BlockStateModel model;
     
     public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
 
         newState = newBlockState;
         oldState = oldBlockState;
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
     @Override
