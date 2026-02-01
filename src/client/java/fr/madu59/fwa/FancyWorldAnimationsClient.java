@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
+import fr.madu59.fwa.anims.CampfireAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.EndPortalFrameAnimation;
@@ -26,6 +27,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.DoorBlock;
@@ -151,6 +153,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof JukeboxBlock) return state.getValue(JukeboxBlock.HAS_RECORD);
 		if(block instanceof EndPortalFrameBlock) return state.getValue(EndPortalFrameBlock.HAS_EYE);
 		if(block instanceof BellBlock) return true;
+		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
 		return false;
 	}
 
@@ -167,6 +170,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case JUKEBOX -> state.setValue(JukeboxBlock.HAS_RECORD, false);
 			case END_PORTAL_FRAME -> state.setValue(EndPortalFrameBlock.HAS_EYE, false);
 			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
+			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
 			default -> state;
 		};
 	}
@@ -187,6 +191,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case REPEATER: return new RepeaterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case BELL: return new BellAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -205,6 +210,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof RepeaterBlock) return Type.REPEATER;
 		if(block instanceof LayeredCauldronBlock || block instanceof CauldronBlock || block instanceof LavaCauldronBlock) return Type.LAYERED_CAULDRON;
 		if(block instanceof BellBlock) return Type.BELL;
+		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
 		return Type.USELESS;
 	}
 
@@ -260,6 +266,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		REPEATER,
 		LAYERED_CAULDRON,
 		BELL,
+		CAMPFIRE,
 		USELESS
 	}
 }

@@ -132,11 +132,11 @@ public class LeverAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantHandle, int light) {
-    for (BakedQuad quad : quads) {
-        String path = quad.sprite().contents().name().getPath();
-        if (path.contains("lever") == wantHandle) {
-            buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+        for (BakedQuad quad : quads) {
+            String path = quad.sprite().contents().name().getPath();
+            if (path.contains("lever") == wantHandle) {
+                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+            }
         }
     }
-}
 }

@@ -295,6 +295,20 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> CAMPFIRE_STATE = loadOptionWithDefaults(
+        "campfire_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    );
+
+    public static Option<Double> CAMPFIRE_SPEED = loadOptionWithDefaults(
+        "campfire_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
     public static Option<Curves.Door> CHEST_EASING = loadOptionWithDefaults(
         "chest_easing",
         "fwa.config.option.easing.name",
