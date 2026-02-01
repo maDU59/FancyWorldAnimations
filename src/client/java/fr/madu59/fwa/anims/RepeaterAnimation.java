@@ -60,8 +60,6 @@ public class RepeaterAnimation extends Animation{
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
 
-        Direction facing = defaultState.getValue(RepeaterBlock.FACING);
-
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));

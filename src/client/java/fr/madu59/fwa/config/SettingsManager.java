@@ -82,7 +82,7 @@ public class SettingsManager {
         "lever_easing",
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
-        Curves.Door.DEFAULT
+        Curves.Door.LINEAR
     );
 
     public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(
@@ -138,7 +138,7 @@ public class SettingsManager {
         "chiseled_bookshelf_easing",
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
-        Curves.Door.DEFAULT
+        Curves.Door.LINEAR
     );
 
     public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
@@ -152,7 +152,7 @@ public class SettingsManager {
         "button_easing",
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
-        Curves.Door.DEFAULT
+        Curves.Door.LINEAR
     );
 
     public static Option<Boolean> REPEATER_STATE = loadOptionWithDefaults(
