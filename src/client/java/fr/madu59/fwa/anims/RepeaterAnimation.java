@@ -17,8 +17,10 @@ import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -60,6 +62,7 @@ public class RepeaterAnimation extends Animation{
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
 
+        Direction facing = defaultState.getValue(RepeaterBlock.FACING);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
@@ -71,7 +74,9 @@ public class RepeaterAnimation extends Animation{
         }
 
         float dx = getPosition(nowTick, newState.getValue(RepeaterBlock.DELAY), oldState.getValue(RepeaterBlock.DELAY));
-        poseStack.translate(-(dx-1)*2f/16f,0,0);
+        dx = (dx-1)*2f/16f * facing.getAxisDirection().getStep();
+        if (facing.getAxis() == Axis.X) poseStack.translate(dx,0,0);
+        else poseStack.translate(0,0,dx);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
@@ -82,7 +87,7 @@ public class RepeaterAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantTorch, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
-            if ((path.contains("redstone_torch") && quad.position0().x() > 4f/16f && quad.position0().x() < 12f/16f && quad.position0().z() > 4f/16f && quad.position0().z() < 12f/16f) == wantTorch) {
+            if ((path.contains("redstone_torch") && quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f && quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f && quad.position0().z() > 5f/16f && quad.position0().z()  < 11f/16f && quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f) == wantTorch) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }
         }

@@ -166,7 +166,7 @@ public class SettingsManager {
         "repeater_easing",
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
-        Curves.Door.DEFAULT
+        Curves.Door.SPRINGY
     );
 
     public static Option<Boolean> END_PORTAL_FRAME_STATE = loadOptionWithDefaults(
