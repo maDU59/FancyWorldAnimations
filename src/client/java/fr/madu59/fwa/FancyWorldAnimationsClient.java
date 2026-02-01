@@ -9,6 +9,7 @@ import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.EndPortalFrameAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.JukeBoxAnimation;
+import fr.madu59.fwa.anims.LayeredCauldronAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
@@ -23,11 +24,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.LavaCauldronBlock;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
@@ -114,6 +118,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
 		if(type == Type.JUKEBOX) return newState.getValue(JukeboxBlock.HAS_RECORD);
 		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(RepeaterBlock.DELAY) != oldState.getValue(RepeaterBlock.DELAY);
+		if(type == Type.LAYERED_CAULDRON) {
+			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(LayeredCauldronBlock.LEVEL) != oldState.getValue(LayeredCauldronBlock.LEVEL)) return true;
+			if (oldState.getBlock() != newState.getBlock() && (newState.getBlock() instanceof LayeredCauldronBlock && oldState.getBlock() instanceof CauldronBlock)|| (oldState.getBlock() instanceof LayeredCauldronBlock && newState.getBlock() instanceof CauldronBlock)) return true;
+			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
+			return false;
+		}
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -172,6 +182,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case JUKEBOX: return new JukeBoxAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState);
 			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case REPEATER: return new RepeaterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
+			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -188,6 +199,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
 		if(block instanceof EndPortalFrameBlock) return Type.END_PORTAL_FRAME;
 		if(block instanceof RepeaterBlock) return Type.REPEATER;
+		if(block instanceof LayeredCauldronBlock || block instanceof CauldronBlock || block instanceof LavaCauldronBlock) return Type.LAYERED_CAULDRON;
 		return Type.USELESS;
 	}
 
@@ -241,6 +253,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		JUKEBOX,
 		END_PORTAL_FRAME,
 		REPEATER,
+		LAYERED_CAULDRON,
 		USELESS
 	}
 }
