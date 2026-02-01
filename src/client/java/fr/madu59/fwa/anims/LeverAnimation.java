@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 public class LeverAnimation extends Animation{
     
     private final RandomSource random = RandomSource.create(42);
+    private final BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -68,7 +69,6 @@ public class LeverAnimation extends Animation{
 
         Direction facing = defaultState.getValue(LeverBlock.FACING);
         AttachFace face = defaultState.getValue(LeverBlock.FACE);
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 

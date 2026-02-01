@@ -9,6 +9,7 @@
     "fwa.config.category.end_portal_frame":"END PORTAL FRAMES",
     "fwa.config.category.lectern":"LECTERNS",
     "fwa.config.category.chest":"CHESTS",
+    "fwa.config.category.repeater":"REPEATERS",
 
     "fwa.config.option.state.name":"Animation state",
     "fwa.config.option.easing.name":"Animation type",

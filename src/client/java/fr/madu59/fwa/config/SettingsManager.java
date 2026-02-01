@@ -155,6 +155,20 @@ public class SettingsManager {
         Curves.Door.DEFAULT
     );
 
+    public static Option<Boolean> REPEATER_STATE = loadOptionWithDefaults(
+        "repeater_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> REPEATER_EASING = loadOptionWithDefaults(
+        "repeater_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
     public static Option<Boolean> END_PORTAL_FRAME_STATE = loadOptionWithDefaults(
         "end_portal_frame_state",
         "fwa.config.option.state.name",

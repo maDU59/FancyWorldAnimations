@@ -11,6 +11,7 @@ import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.JukeBoxAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
+import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.utils.Curves;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -111,6 +113,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	{
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
 		if(type == Type.JUKEBOX) return newState.getValue(JukeboxBlock.HAS_RECORD);
+		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(RepeaterBlock.DELAY) != oldState.getValue(RepeaterBlock.DELAY);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -150,6 +153,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case BUTTON -> state.setValue(ButtonBlock.POWERED, false);
 			case JUKEBOX -> state.setValue(JukeboxBlock.HAS_RECORD, false);
 			case END_PORTAL_FRAME -> state.setValue(EndPortalFrameBlock.HAS_EYE, false);
+			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
 			default -> state;
 		};
 	}
@@ -167,6 +171,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case BUTTON: return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case JUKEBOX: return new JukeBoxAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState);
 			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case REPEATER: return new RepeaterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -182,6 +187,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof ButtonBlock) return Type.BUTTON;
 		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
 		if(block instanceof EndPortalFrameBlock) return Type.END_PORTAL_FRAME;
+		if(block instanceof RepeaterBlock) return Type.REPEATER;
 		return Type.USELESS;
 	}
 
@@ -234,6 +240,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		BUTTON,
 		JUKEBOX,
 		END_PORTAL_FRAME,
+		REPEATER,
 		USELESS
 	}
 }
