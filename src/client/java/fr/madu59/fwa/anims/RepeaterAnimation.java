@@ -40,7 +40,7 @@ public class RepeaterAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * Curves.getSpeedCoeff(SettingsManager.REPEATER_SPEED.getValue());
+        return 10 * SettingsManager.REPEATER_SPEED.getValue();
     }
 
     @Override

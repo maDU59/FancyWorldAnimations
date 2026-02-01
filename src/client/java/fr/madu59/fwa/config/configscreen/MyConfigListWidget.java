@@ -14,7 +14,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 
 public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
