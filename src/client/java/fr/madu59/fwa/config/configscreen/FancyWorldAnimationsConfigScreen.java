@@ -73,6 +73,9 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addCategory("fwa.config.category.end_portal_frame");
         list.addButton(SettingsManager.END_PORTAL_FRAME_STATE);
         list.addButton(SettingsManager.END_PORTAL_FRAME_EASING);
+        list.addCategory("fwa.config.category.bell");
+        list.addButton(SettingsManager.BELL_STATE);
+        list.addButton(SettingsManager.BELL_INFINITE);
         list.addCategory("fwa.config.category.chest");
         list.addButton(SettingsManager.CHEST_EASING);
         

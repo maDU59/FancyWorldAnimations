@@ -3,6 +3,7 @@ package fr.madu59.fwa;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.anims.Animation;
+import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
@@ -22,6 +23,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CauldronBlock;
@@ -148,6 +150,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof ButtonBlock) return state.getValue(ButtonBlock.POWERED);
 		if(block instanceof JukeboxBlock) return state.getValue(JukeboxBlock.HAS_RECORD);
 		if(block instanceof EndPortalFrameBlock) return state.getValue(EndPortalFrameBlock.HAS_EYE);
+		if(block instanceof BellBlock) return true;
 		return false;
 	}
 
@@ -183,6 +186,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case REPEATER: return new RepeaterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
+			case BELL: return new BellAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -200,6 +204,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof EndPortalFrameBlock) return Type.END_PORTAL_FRAME;
 		if(block instanceof RepeaterBlock) return Type.REPEATER;
 		if(block instanceof LayeredCauldronBlock || block instanceof CauldronBlock || block instanceof LavaCauldronBlock) return Type.LAYERED_CAULDRON;
+		if(block instanceof BellBlock) return Type.BELL;
 		return Type.USELESS;
 	}
 
@@ -254,6 +259,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		END_PORTAL_FRAME,
 		REPEATER,
 		LAYERED_CAULDRON,
+		BELL,
 		USELESS
 	}
 }

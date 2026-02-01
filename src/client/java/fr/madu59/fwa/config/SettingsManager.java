@@ -127,6 +127,20 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> BELL_STATE = loadOptionWithDefaults(
+        "bell_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Boolean> BELL_INFINITE = loadOptionWithDefaults(
+        "bell_infinite",
+        "fwa.config.option.infinite.name",
+        "fwa.config.option.infinite.description",
+        true
+    );
+
     public static Option<Boolean> CHISELED_BOOKSHELF_STATE = loadOptionWithDefaults(
         "chiseled_bookshelf_state",
         "fwa.config.option.state.name",
