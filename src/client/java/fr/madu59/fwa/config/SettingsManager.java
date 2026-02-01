@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import fr.madu59.fwa.Animations;
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
@@ -43,6 +44,13 @@ public class SettingsManager {
         Curves.Door.DEFAULT
     );
 
+    public static Option<Curves.Speed> DOOR_SPEED = loadOptionWithDefaults(
+        "door_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> TRAPDOOR_STATE = loadOptionWithDefaults(
         "trapdoor_state",
         "fwa.config.option.state.name",
@@ -55,6 +63,13 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.DEFAULT
+    );
+
+    public static Option<Curves.Speed> TRAPDOOR_SPEED = loadOptionWithDefaults(
+        "trapdoor_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
     );
 
     public static Option<Boolean> FENCEGATE_STATE = loadOptionWithDefaults(
@@ -71,6 +86,13 @@ public class SettingsManager {
         Curves.Door.SPRINGY
     );
 
+    public static Option<Curves.Speed> FENCEGATE_SPEED = loadOptionWithDefaults(
+        "fencegate_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> LEVER_STATE = loadOptionWithDefaults(
         "lever_state",
         "fwa.config.option.state.name",
@@ -85,6 +107,13 @@ public class SettingsManager {
         Curves.Door.LINEAR
     );
 
+    public static Option<Curves.Speed> LEVER_SPEED = loadOptionWithDefaults(
+        "lever_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(
         "lectern_state",
         "fwa.config.option.state.name",
@@ -97,6 +126,13 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.DEFAULT
+    );
+
+    public static Option<Curves.Speed> LECTERN_SPEED = loadOptionWithDefaults(
+        "lectern_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
     );
 
     public static Option<Boolean> LECTERN_INFINITE = loadOptionWithDefaults(
@@ -120,6 +156,13 @@ public class SettingsManager {
         Curves.Door.DEFAULT
     );
 
+    public static Option<Curves.Speed> JUKEBOX_SPEED = loadOptionWithDefaults(
+        "jukebox_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> JUKEBOX_INFINITE = loadOptionWithDefaults(
         "lectern_infinite",
         "fwa.config.option.infinite.name",
@@ -132,7 +175,14 @@ public class SettingsManager {
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
         true
-    ); 
+    );
+
+    public static Option<Curves.Speed> BELL_SPEED = loadOptionWithDefaults(
+        "bell_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
 
     public static Option<Boolean> BELL_INFINITE = loadOptionWithDefaults(
         "bell_infinite",
@@ -155,6 +205,13 @@ public class SettingsManager {
         Curves.Door.LINEAR
     );
 
+    public static Option<Curves.Speed> CHISELED_BOOKSHELF_SPEED = loadOptionWithDefaults(
+        "chiseled_bookshelf_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> CAULDRON_STATE = loadOptionWithDefaults(
         "cauldron_state",
         "fwa.config.option.state.name",
@@ -167,6 +224,13 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.SPRINGY
+    );
+
+    public static Option<Curves.Speed> CAULDRON_SPEED = loadOptionWithDefaults(
+        "cauldron_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
     );
 
     public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
@@ -183,6 +247,13 @@ public class SettingsManager {
         Curves.Door.LINEAR
     );
 
+    public static Option<Curves.Speed> BUTTON_SPEED = loadOptionWithDefaults(
+        "button_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> REPEATER_STATE = loadOptionWithDefaults(
         "repeater_state",
         "fwa.config.option.state.name",
@@ -197,6 +268,13 @@ public class SettingsManager {
         Curves.Door.SPRINGY
     );
 
+    public static Option<Curves.Speed> REPEATER_SPEED = loadOptionWithDefaults(
+        "repeater_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
+    );
+
     public static Option<Boolean> END_PORTAL_FRAME_STATE = loadOptionWithDefaults(
         "end_portal_frame_state",
         "fwa.config.option.state.name",
@@ -209,6 +287,13 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.DEFAULT
+    );
+
+    public static Option<Curves.Speed> END_PORTAL_FRAME_SPEED = loadOptionWithDefaults(
+        "end_portal_frame_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        Curves.Speed.DEFAULT
     );
 
     public static Option<Curves.Door> CHEST_EASING = loadOptionWithDefaults(

@@ -52,7 +52,7 @@ public class LayeredCauldronAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10;
+        return 10 * Curves.getSpeedCoeff(SettingsManager.CAULDRON_SPEED.getValue());
     }
 
     @Override

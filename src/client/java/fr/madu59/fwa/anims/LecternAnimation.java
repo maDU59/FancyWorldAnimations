@@ -33,7 +33,7 @@ public class LecternAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5.0;
+        return 5.0 * Curves.getSpeedCoeff(SettingsManager.LECTERN_SPEED.getValue());
     }
 
     @Override

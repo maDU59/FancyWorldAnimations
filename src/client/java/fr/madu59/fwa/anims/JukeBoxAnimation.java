@@ -32,7 +32,7 @@ public class JukeBoxAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10;
+        return 10 * Curves.getSpeedCoeff(SettingsManager.JUKEBOX_SPEED.getValue());
     }
 
     @Override

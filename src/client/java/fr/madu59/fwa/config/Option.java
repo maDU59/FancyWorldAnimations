@@ -70,22 +70,4 @@ public class Option<T> {
         }
         else return null;
     }
-
-    public static enum ElementState {
-		ENABLED,
-		DYNAMIC,
-		DISABLED;
-	}
-
-    public static enum CrosshairState {
-		ENABLED,
-		DYNAMIC,
-        ADAPTIVE,
-		DISABLED;
-	}
-
-    public static enum xpBarState{
-        ON_GAIN,
-        ON_LEVEL
-    }
 }

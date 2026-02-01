@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
@@ -39,7 +40,7 @@ public class BellAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 100;
+        return 50 * Curves.getSpeedCoeff(SettingsManager.BELL_SPEED.getValue());
     }
 
     @Override
@@ -73,7 +74,7 @@ public class BellAnimation extends Animation{
 
     private float animatePlacement(double nowTick){
         double progress = getProgress(nowTick);
-        return Mth.sin(progress * 50 / 3.1415927) / (float)(4.0 + progress * 50 / 3.0);
+        return Mth.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
     }
 
     private ModelPart rotateBell(ModelPart bellBody, float rot, Direction facing, BellAttachType attachment){

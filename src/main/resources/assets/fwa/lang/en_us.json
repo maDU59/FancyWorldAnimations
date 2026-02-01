@@ -24,6 +24,8 @@
     "fwa.config.value.linear":"Linear",
     "fwa.config.value.springy":"Springy",
     "fwa.config.value.elastic":"Elastic",
+    "fwa.config.value.slow":"Slow",
+    "fwa.config.value.fast":"Fastc",
 
     "fwa.config.done":"Done"
 }

@@ -59,6 +59,14 @@ public class Curves {
         }
     }
 
+    public static double getSpeedCoeff(Speed speed){
+        switch(speed){
+            case FAST: return 1.5;
+            case SLOW: return 0.65;
+            default: return 1;
+        }
+    }
+
     public static enum Classic {
         LINEAR
     }
@@ -67,5 +75,11 @@ public class Curves {
         DEFAULT,
         SPRINGY,
         LINEAR,
+    }
+
+    public static enum Speed{
+        SLOW,
+        DEFAULT,
+        FAST,
     }
 }

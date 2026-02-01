@@ -24,7 +24,7 @@ public class ButtonAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 3;
+        return 3 * Curves.getSpeedCoeff(SettingsManager.BUTTON_SPEED.getValue());
     }
 
     @Override
