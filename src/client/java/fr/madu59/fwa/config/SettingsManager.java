@@ -295,6 +295,13 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> END_PORTAL_FRAME_INFINITE = loadOptionWithDefaults(
+        "end_portal_frame_infinite",
+        "fwa.config.option.infinite.name",
+        "fwa.config.option.infinite.description",
+        true
+    );
+
     public static Option<Boolean> CAMPFIRE_STATE = loadOptionWithDefaults(
         "campfire_state",
         "fwa.config.option.state.name",

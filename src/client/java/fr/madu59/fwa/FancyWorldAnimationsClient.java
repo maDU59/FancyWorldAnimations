@@ -16,8 +16,8 @@ import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
-import fr.madu59.fwa.utils.Curves;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
@@ -85,7 +85,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (animations.containsAt(blockPos)) {
 				Animation animation = animations.getAt(blockPos);
 				if (animation.isUnique()) {
-					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - Curves.unease(animation.getProgress(getPartialTick()), animation.getCurve()));
+					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
 					animations.removeAt(blockPos);
 				}
 			}
@@ -119,6 +119,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
 	{
+		if(type == Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_INFINITE.getValue()) return true;
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
 		if(type == Type.JUKEBOX) return newState.getValue(JukeboxBlock.HAS_RECORD);
 		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(RepeaterBlock.DELAY) != oldState.getValue(RepeaterBlock.DELAY);

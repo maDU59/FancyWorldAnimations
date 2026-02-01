@@ -57,11 +57,6 @@ public class LecternAnimation extends Animation{
         return false;
     }
 
-    @Override
-    public double getProgress(double nowTick) {
-        return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
-    }
-
     public static boolean hasInfiniteAnimation(){
         return SettingsManager.LECTERN_INFINITE.getValue();
     }
