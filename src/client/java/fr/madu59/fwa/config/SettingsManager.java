@@ -205,7 +205,7 @@ public class SettingsManager {
     private static Map<String, String> toMap(List<Option<?>> options) {
         Map<String, String> map = new LinkedHashMap<>();
         for (Option<?> option : options) {
-            map.put(option.getId(), option.value.toString());
+            if (option.getValue() != option.getDefaultValue()) map.put(option.getId(), option.getValue().toString());
         }
         return map;
     }

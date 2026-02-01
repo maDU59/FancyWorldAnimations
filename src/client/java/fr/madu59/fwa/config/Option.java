@@ -3,11 +3,11 @@ package fr.madu59.fwa.config;
 import net.minecraft.client.resources.language.I18n;
 
 public class Option<T> {
-    public String id;
-    public String name;
-    public String description;
-    public T value;
-    public T defaultValue;
+    private String id;
+    private String name;
+    private String description;
+    private T value;
+    private T defaultValue;
 
     public Option(String id, String name, String description, T value, T defaultValue) {
         this.id = id;
@@ -24,6 +24,10 @@ public class Option<T> {
 
     public T getValue() {
         return this.value;
+    }
+
+    public T getDefaultValue() {
+        return this.defaultValue;
     }
 
     public String getId() {
