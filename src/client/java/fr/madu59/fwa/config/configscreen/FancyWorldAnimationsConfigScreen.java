@@ -58,6 +58,9 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.JUKEBOX_STATE);
         list.addButton(SettingsManager.JUKEBOX_EASING);
         list.addButton(SettingsManager.JUKEBOX_INFINITE);
+        list.addCategory("fwa.config.category.cauldron");
+        list.addButton(SettingsManager.CAULDRON_STATE);
+        list.addButton(SettingsManager.CAULDRON_EASING);
         list.addCategory("fwa.config.category.lever");
         list.addButton(SettingsManager.LEVER_STATE);
         list.addButton(SettingsManager.LEVER_EASING);

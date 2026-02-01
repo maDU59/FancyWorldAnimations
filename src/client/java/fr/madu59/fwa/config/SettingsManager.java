@@ -68,7 +68,7 @@ public class SettingsManager {
         "fencegate_easing",
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
-        Curves.Door.DEFAULT
+        Curves.Door.SPRINGY
     );
 
     public static Option<Boolean> LEVER_STATE = loadOptionWithDefaults(
@@ -139,6 +139,20 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.LINEAR
+    );
+
+    public static Option<Boolean> CAULDRON_STATE = loadOptionWithDefaults(
+        "cauldron_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> CAULDRON_EASING = loadOptionWithDefaults(
+        "cauldron_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.SPRINGY
     );
 
     public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
