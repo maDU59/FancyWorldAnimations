@@ -12,11 +12,14 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.AtlasIds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
@@ -24,7 +27,6 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     int pos;
     boolean isAdding;
-    TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(ResourceLocation.tryParse("minecraft:blocks")).apply(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
     
     public ChiseledBookShelfAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -75,8 +77,8 @@ public class ChiseledBookShelfAnimation extends Animation{
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
 
-        //Direction facing = defaultState.getValue(ChiseledBookShelfBlock);
-        Direction facing = Direction.NORTH;
+        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png")).apply(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
 
         PoseStack.Pose entry = poseStack.last();
 
@@ -118,27 +120,27 @@ public class ChiseledBookShelfAnimation extends Animation{
 
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 
-            u1, v1, u2, v2, light, 0, 0, -1);
+            u1, v1, u2, v2, light, 0, 0, -1, sprite);
 
         writeQuad(entry, buffer, 
             w, 0, 0,  w, h, 0,  0, h, 0,  0, 0, 0, 
-            u1, v1, u2, v2, light, 0, 0, 1);
+            u1, v1, u2, v2, light, 0, 0, 1, sprite);
 
         writeQuad(entry, buffer, 
             0, h, d,  0, h, 0,  w, h, 0,  w, h, d, 
-            u1, v1, u2, v2, light, 0, -1, 0);
+            u1, v1, u2, v2, light, 0, -1, 0, sprite);
 
         writeQuad(entry, buffer, 
             0, 0, 0,  0, 0, d,  w, 0, d,  w, 0, 0, 
-            u1, v1, u2, v2, light, 0, 1, 0);
+            u1, v1, u2, v2, light, 0, 1, 0, sprite);
 
         writeQuad(entry, buffer, 
             w, 0, d,  w, h, d,  w, h, 0,  w, 0, 0, 
-            u1, v1, u2, v2, light, -1, 0, 0);
+            u1, v1, u2, v2, light, -1, 0, 0, sprite);
 
         writeQuad(entry, buffer, 
             0, 0, 0,  0, h, 0,  0, h, d,  0, 0, d, 
-            u1, v1, u2, v2, light, 1, 0, 0);
+            u1, v1, u2, v2, light, 1, 0, 0, sprite);
         
         poseStack.translate(0.0f, 0.0f, 0.0f);
 }
@@ -149,7 +151,7 @@ public class ChiseledBookShelfAnimation extends Animation{
                         float x3, float y3, float z3,
                         float x4, float y4, float z4,
                         float uMin, float vMin, float uMax, float vMax, 
-                        int light, float nx, float ny, float nz) {
+                        int light, float nx, float ny, float nz, TextureAtlasSprite sprite) {
 
         uMin = sprite.getU(uMin);
         uMax = sprite.getU(uMax);
