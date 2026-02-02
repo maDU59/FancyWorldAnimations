@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +24,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     int pos;
     boolean isAdding;
-    TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
+    TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(ResourceLocation.tryParse("minecraft:blocks")).getSprite(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
     
     public ChiseledBookShelfAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);

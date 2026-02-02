@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
@@ -44,13 +45,14 @@ public class LevelChunkMixin {
     private void scanSectionFor(LevelChunkSection section, LevelChunk chunk, int sectionIndex){
         if (section.getStates().maybeHas(state -> state.is(Blocks.END_PORTAL_FRAME) || 
                                               state.is(Blocks.LECTERN) || 
-                                              state.is(Blocks.JUKEBOX))){
+                                              state.is(Blocks.JUKEBOX) ||
+                                              state.is(Blocks.BELL))){
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
                         BlockState state = section.getBlockState(x, y, z);
                         
-                        if (state.is(Blocks.END_PORTAL_FRAME) || state.is(Blocks.LECTERN) || state.is(Blocks.JUKEBOX)) {
+                        if (state.is(Blocks.END_PORTAL_FRAME) || state.is(Blocks.LECTERN) || state.is(Blocks.JUKEBOX) || state.is(Blocks.BELL)) {
                             BlockPos worldPos = chunk.getPos().getWorldPosition().offset(x, chunk.getMinY() + y + (sectionIndex * 16), z);
                             init(state.getBlock(), state, worldPos);
                         }
@@ -68,6 +70,9 @@ public class LevelChunkMixin {
             FancyWorldAnimationsClient.onBlockUpdate(blockPos, airState, state);
         }
         if (block instanceof JukeboxBlock){
+            FancyWorldAnimationsClient.onBlockUpdate(blockPos, airState, state);
+        }
+        if (block instanceof BellBlock){
             FancyWorldAnimationsClient.onBlockUpdate(blockPos, airState, state);
         }
 	}

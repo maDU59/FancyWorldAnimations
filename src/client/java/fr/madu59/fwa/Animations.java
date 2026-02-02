@@ -1,14 +1,17 @@
 package fr.madu59.fwa;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 
-public class Animations extends ArrayList<Animation> {
+public class Animations{
+
+    public final Long2ObjectMap<Animation> animations = new Long2ObjectOpenHashMap<>();
 
     public Animations() {
         super();
@@ -16,13 +19,13 @@ public class Animations extends ArrayList<Animation> {
     
     public void removeAt(BlockPos blockPos) {
         synchronized (this) {
-            this.removeIf(animation -> animation.getPos().equals(blockPos));
+            this.animations.remove(blockPos.asLong());
         }
     }
 
     public void clean(double nowTick) {
         synchronized (this) {
-            Iterator<Animation> it = this.iterator();
+            Iterator<Animation> it = this.animations.values().iterator();
             while (it.hasNext()) {
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
@@ -36,20 +39,20 @@ public class Animations extends ArrayList<Animation> {
     }
 
     public boolean containsAt(BlockPos blockPos) {
-        for (Animation animation : this) {
-            if (animation.getPos().equals(blockPos)) {
-                return true;
-            }
-        }
-        return false;
+        return this.animations.containsKey(blockPos.asLong());
     }
 
     public Animation getAt(BlockPos blockPos) {
-        for (Animation animation : this) {
-            if (animation.getPos().equals(blockPos)) {
-                return animation;
-            }
+        return this.animations.getOrDefault(blockPos.asLong(), null);
+    }
+
+    public void add(BlockPos pos, Animation anim) {
+        synchronized (this) {
+            animations.put(pos.asLong(), anim);
         }
-        return null;
+    }
+
+    public boolean isEmpty(){
+        return animations.isEmpty();
     }
 }

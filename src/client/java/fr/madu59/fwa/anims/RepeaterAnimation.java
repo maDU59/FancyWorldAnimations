@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -87,7 +88,7 @@ public class RepeaterAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantTorch, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
-            if ((path.contains("redstone_torch") && quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f && quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f && quad.position0().z() > 5f/16f && quad.position0().z()  < 11f/16f && quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f) == wantTorch) {
+            if ((path.contains("redstone_torch") && Backport.getPos(quad, 0).x() > 5f/16f && Backport.getPos(quad, 0).x() < 11f/16f && Backport.getPos(quad, 2).x() > 5f/16f && Backport.getPos(quad, 2).x() < 11f/16f && Backport.getPos(quad, 0).z() > 5f/16f && Backport.getPos(quad, 0).z()  < 11f/16f && Backport.getPos(quad, 2).z() > 5f/16f && Backport.getPos(quad, 2).z() < 11f/16f) == wantTorch) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }
         }

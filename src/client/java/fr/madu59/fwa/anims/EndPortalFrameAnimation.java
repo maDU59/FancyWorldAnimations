@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -84,7 +84,7 @@ public class EndPortalFrameAnimation extends Animation{
         }
         else{
 
-            VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.translucentMovingBlock());
+            VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucentMovingBlock());
             float time = (float)(nowTick - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
 

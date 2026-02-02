@@ -6,7 +6,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.object.bell.BellModel;
+import net.minecraft.client.model.BellModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
@@ -15,8 +15,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
@@ -28,8 +27,8 @@ public class BellAnimation extends Animation{
     private final Minecraft client = Minecraft.getInstance();
     private final BellModel bellModel;
     private final float hash;
-    private final BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
-    private final TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
+    private BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+    private final TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(ResourceLocation.tryParse("minecraft:blocks")).getSprite(ResourceLocation.tryParse("minecraft:entity/bell/bell_body"));
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -73,7 +72,7 @@ public class BellAnimation extends Animation{
 
     private float animatePlacement(double nowTick){
         double progress = getProgress(nowTick);
-        return Mth.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
+        return (float)Math.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
     }
 
     private ModelPart rotateBell(ModelPart bellBody, float rot, Direction facing, BellAttachType attachment){
@@ -109,6 +108,10 @@ public class BellAnimation extends Animation{
 
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+        if (bellBlockEntity == null) {
+            bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+            return;
+        }
         Direction facing = defaultState.getValue(BellBlock.FACING);
         BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
 

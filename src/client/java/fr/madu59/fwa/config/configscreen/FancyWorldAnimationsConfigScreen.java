@@ -24,7 +24,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
             dispatcher.register(
                 literal("fwaConfig")
                     .executes(context -> {
-                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new FancyWorldAnimationsConfigScreen(null)));
+                        Minecraft.getInstance().schedule(() -> Minecraft.getInstance().setScreen(new FancyWorldAnimationsConfigScreen(null)));
                         return 1;
                     })
             );
