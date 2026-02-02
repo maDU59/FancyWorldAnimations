@@ -8,7 +8,8 @@
 		"BlockEntityRenderDispatcherMixin",
 		"ChestLidControllerMixin",
 		"SetSectionDirtyInvoker",
-		"GetContentHeightInvoker"
+		"GetContentHeightInvoker",
+		"LevelChunkMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -72,10 +72,13 @@ public class JukeBoxAnimation extends Animation{
         float scale = 0.67f;
 
         JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) client.level.getBlockEntity(position);
-        ItemStack discItemStack = jukeboxBlockEntity.getTheItem();
+        ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
+        if(jukeboxBlockEntity != null){
+            discItemStack = jukeboxBlockEntity.getTheItem();
 
-        if (discItemStack.isEmpty()) {
-            discItemStack = new ItemStack(Items.MUSIC_DISC_13);
+            if (discItemStack.isEmpty()) {
+                discItemStack = new ItemStack(Items.MUSIC_DISC_13);
+            }
         }
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
