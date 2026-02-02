@@ -97,7 +97,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
 
 			Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
-			if (animation.isEnabled()) animations.add(animation);
+			if (animation.isEnabled()) animations.add(blockPos, animation);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		PoseStack poseStack = context.matrices();
 		MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
 
-		for (Animation animation : animations) {
+		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, nowTick, cameraPos, poseStack, bufferSource);
 		}
 

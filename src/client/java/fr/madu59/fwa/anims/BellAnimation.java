@@ -28,7 +28,7 @@ public class BellAnimation extends Animation{
     private final Minecraft client = Minecraft.getInstance();
     private final BellModel bellModel;
     private final float hash;
-    private final BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+    private BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
     private final TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
@@ -109,6 +109,10 @@ public class BellAnimation extends Animation{
 
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+        if(bellBlockEntity == null){
+            bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+            return;
+        }
         Direction facing = defaultState.getValue(BellBlock.FACING);
         BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
 
