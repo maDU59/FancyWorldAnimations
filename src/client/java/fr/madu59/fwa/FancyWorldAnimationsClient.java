@@ -17,6 +17,7 @@ import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
+import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -42,6 +43,7 @@ import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -131,9 +133,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
-		if(type == Type.COMPOSTER) {
-			return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
-		}
+		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -160,6 +160,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof EndPortalFrameBlock) return state.getValue(EndPortalFrameBlock.HAS_EYE);
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
+		if(block instanceof TripWireHookBlock) return state.getValue(TripWireHookBlock.ATTACHED);
 		return false;
 	}
 
@@ -177,6 +178,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case END_PORTAL_FRAME -> state.setValue(EndPortalFrameBlock.HAS_EYE, false);
 			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
 			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
+			case TRIPWIRE_HOOK -> state.setValue(TripWireHookBlock.ATTACHED, false);
 			default -> state;
 		};
 	}
@@ -199,6 +201,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case BELL: return new BellAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
+			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -219,6 +222,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof BellBlock) return Type.BELL;
 		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
 		if(block instanceof ComposterBlock) return Type.COMPOSTER;
+		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
 		return Type.USELESS;
 	}
 
@@ -276,6 +280,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		BELL,
 		CAMPFIRE,
 		COMPOSTER,
+		TRIPWIRE_HOOK,
 		USELESS
 	}
 }
