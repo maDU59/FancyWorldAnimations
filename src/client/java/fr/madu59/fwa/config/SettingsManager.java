@@ -232,6 +232,27 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> COMPOSTER_STATE = loadOptionWithDefaults(
+        "composter_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> COMPOSTER_EASING = loadOptionWithDefaults(
+        "composter_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.SPRINGY
+    );
+
+    public static Option<Double> COMPOSTER_SPEED = loadOptionWithDefaults(
+        "composter_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
     public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
         "button_state",
         "fwa.config.option.state.name",

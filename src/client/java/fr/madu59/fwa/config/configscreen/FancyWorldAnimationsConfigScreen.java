@@ -68,6 +68,10 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.CAULDRON_STATE);
         list.addButton(SettingsManager.CAULDRON_EASING);
         list.addSlider(SettingsManager.CAULDRON_SPEED, 0.5, 2.0, 0.1);
+        list.addCategory("fwa.config.category.composter");
+        list.addButton(SettingsManager.COMPOSTER_STATE);
+        list.addButton(SettingsManager.COMPOSTER_EASING);
+        list.addSlider(SettingsManager.COMPOSTER_SPEED, 0.5, 2.0, 0.1);
         list.addCategory("fwa.config.category.lever");
         list.addButton(SettingsManager.LEVER_STATE);
         list.addButton(SettingsManager.LEVER_EASING);

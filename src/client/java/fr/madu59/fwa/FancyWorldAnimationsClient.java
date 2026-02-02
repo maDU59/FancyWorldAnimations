@@ -7,6 +7,7 @@ import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.CampfireAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
+import fr.madu59.fwa.anims.ComposterAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.EndPortalFrameAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
+import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
@@ -129,6 +131,9 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
+		if(type == Type.COMPOSTER) {
+			return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
+		}
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -193,6 +198,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case BELL: return new BellAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -212,6 +218,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof LayeredCauldronBlock || block instanceof CauldronBlock || block instanceof LavaCauldronBlock) return Type.LAYERED_CAULDRON;
 		if(block instanceof BellBlock) return Type.BELL;
 		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
+		if(block instanceof ComposterBlock) return Type.COMPOSTER;
 		return Type.USELESS;
 	}
 
@@ -268,6 +275,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LAYERED_CAULDRON,
 		BELL,
 		CAMPFIRE,
+		COMPOSTER,
 		USELESS
 	}
 }
