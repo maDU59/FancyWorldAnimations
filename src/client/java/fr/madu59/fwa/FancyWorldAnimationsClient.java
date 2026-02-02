@@ -21,8 +21,8 @@ import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -110,7 +110,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(animations.isEmpty() || client.level == null) return;
 
 		Vec3 cameraPos = client.gameRenderer.getMainCamera().position();
-		PoseStack poseStack = context.matrices();
+		PoseStack poseStack = context.matrixStack();
 		MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
 
 		for (Animation animation : animations.animations.values()) {

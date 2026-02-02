@@ -89,9 +89,8 @@ public class LecternAnimation extends Animation{
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.tryParse("minecraft:textures/entity/enchanting_table_book.png")));
         
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        BookModel.State bookState = new BookModel.State(0f, getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick), (float)getAngle(Curves.ease(getProgress(nowTick), getCurve())));
-
-        bookModel.setupAnim(bookState);
+        
+        bookModel.setupAnim(0f, getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick), (float)getAngle(Curves.ease(getProgress(nowTick), getCurve())));
         poseStack.translate(0.5F, 1.0625F, 0.5F);
         poseStack.mulPose(Axis.YP.rotationDegrees(-facing.getClockWise().toYRot()));
         poseStack.mulPose(Axis.ZP.rotationDegrees(67.5F));

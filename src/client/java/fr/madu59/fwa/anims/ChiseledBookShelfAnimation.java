@@ -24,7 +24,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     int pos;
     boolean isAdding;
-    TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(ResourceLocation.tryParse("minecraft:blocks")).getSprite(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
+    TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(ResourceLocation.tryParse("minecraft:blocks")).apply(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
     
     public ChiseledBookShelfAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -75,7 +75,8 @@ public class ChiseledBookShelfAnimation extends Animation{
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
 
-        Direction facing = defaultState.getValue(ChiseledBookShelfBlock.FACING);
+        //Direction facing = defaultState.getValue(ChiseledBookShelfBlock);
+        Direction facing = Direction.NORTH;
 
         PoseStack.Pose entry = poseStack.last();
 

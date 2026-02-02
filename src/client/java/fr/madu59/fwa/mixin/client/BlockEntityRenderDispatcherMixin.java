@@ -8,15 +8,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 @Mixin(BlockEntityRenderDispatcher.class)
 public class BlockEntityRenderDispatcherMixin {
-    @Inject(at = @At("HEAD"), method = "submit", cancellable = true)
-	private <S extends BlockEntityRenderState> void submit(S blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo info) {
-		if (FancyWorldAnimationsClient.shouldCancelBlockEntityRendering(blockEntityRenderState.blockPos)) info.cancel();
+    @Inject(at = @At("HEAD"), method = "render", cancellable = true)
+	private <E extends BlockEntity> void render(E blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, CallbackInfo info) {
+		if (FancyWorldAnimationsClient.shouldCancelBlockEntityRendering(blockEntity.getBlockPos())) info.cancel();
 	}
 }

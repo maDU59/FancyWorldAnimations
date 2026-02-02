@@ -8,7 +8,6 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -90,9 +89,8 @@ public class JukeBoxAnimation extends Animation{
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.ON_SHELF, client.player.level(), null, position.hashCode());
+        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, client.player.level(), null, position.hashCode());
 
-        SubmitNodeCollector submitNodeCollector = client.gameRenderer.getSubmitNodeStorage();
-        discState.submit(poseStack, submitNodeCollector, light, OverlayTexture.NO_OVERLAY, 0);
+        discState.render(poseStack, Minecraft.getInstance().renderBuffers().bufferSource(), light, OverlayTexture.NO_OVERLAY);
     }
 }
