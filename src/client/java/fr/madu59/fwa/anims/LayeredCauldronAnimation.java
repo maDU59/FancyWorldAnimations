@@ -58,12 +58,12 @@ public class LayeredCauldronAnimation extends Animation{
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) SettingsManager.REPEATER_EASING.getValue();
+        return (T) SettingsManager.CAULDRON_EASING.getValue();
     }
 
     @Override
     public boolean isEnabled(){
-        return SettingsManager.REPEATER_STATE.getValue();
+        return SettingsManager.CAULDRON_STATE.getValue();
     }
 
     private float getPosition(double nowTick, double newPos, double oldPos){
