@@ -6,12 +6,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import net.minecraft.client.renderer.chunk.RenderSectionRegion;
+import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(RenderSectionRegion.class)
+@Mixin(RenderChunkRegion.class)
 public class BlockRenderDispatcherMixin {
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)

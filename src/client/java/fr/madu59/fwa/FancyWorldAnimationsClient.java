@@ -109,7 +109,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	{
 		if(animations.isEmpty() || client.level == null) return;
 
-		Vec3 cameraPos = client.gameRenderer.getMainCamera().position();
+		Vec3 cameraPos = client.gameRenderer.getMainCamera().getPosition();
 		PoseStack poseStack = context.matrixStack();
 		MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
 
