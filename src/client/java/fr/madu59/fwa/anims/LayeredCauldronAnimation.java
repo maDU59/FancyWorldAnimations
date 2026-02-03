@@ -13,9 +13,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -31,7 +30,7 @@ public class LayeredCauldronAnimation extends Animation{
     private final BlockState newState;
     private final boolean isInverted;
     private final RandomSource random = RandomSource.create(42);
-    private final BlockStateModel model;
+    private final BakedModel model;
     
     public LayeredCauldronAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -83,30 +82,29 @@ public class LayeredCauldronAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(newState));
-        BlockModelPart part = model.collectParts(random).get(0);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(newState, dir, random), false, light);
         }
 
         float dy = getPosition(nowTick, getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(newState, dir, random), true, light);
         }
     }
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantLiquid, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.getSprite().contents().name().getPath();
             if (path.contains("cauldron") != wantLiquid) {
                 float r = 1.0f, g = 1.0f, b = 1.0f;
 
                 if (quad.isTinted()) {
-                    int color = Minecraft.getInstance().getBlockColors().getColor(newState, Minecraft.getInstance().level, position, quad.tintIndex());
+                    int color = Minecraft.getInstance().getBlockColors().getColor(newState, Minecraft.getInstance().level, position, quad.getTintIndex());
                     r = (float) (color >> 16 & 255) / 255.0F;
                     g = (float) (color >> 8 & 255) / 255.0F;
                     b = (float) (color & 255) / 255.0F;

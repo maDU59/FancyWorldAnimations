@@ -9,9 +9,9 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.BellModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -111,7 +111,7 @@ public class BellAnimation extends Animation{
             bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
             return;
         }
-        TextureAtlasSprite sprite = client.getTextureAtlas(Sheets.BLOCKS_MAPPER.sheet()).apply(ResourceLocation.tryParse("minecraft:entity/bell/bell_body"));
+        TextureAtlasSprite sprite = client.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(ResourceLocation.tryParse("minecraft:entity/bell/bell_body"));
         Direction facing = defaultState.getValue(BellBlock.FACING);
         BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
 

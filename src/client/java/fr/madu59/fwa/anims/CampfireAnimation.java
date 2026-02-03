@@ -12,8 +12,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -60,15 +60,15 @@ public class CampfireAnimation extends Animation{
         if (oldIsOpen) state = oldState;
         else state = newState;
 
-        BlockModelPart part = client.getBlockRenderer().getBlockModel(state).collectParts(random).get(0);
+        BakedModel model = client.getBlockRenderer().getBlockModel(state);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(state));
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(state, null, random), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(state, dir, random), false, light);
         }
 
         float scaleY;
@@ -84,15 +84,15 @@ public class CampfireAnimation extends Animation{
         poseStack.scale(scaleXZ,scaleY,scaleXZ);
         poseStack.translate(-0.5f,-1f/16f,-0.5f);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(state, null, random), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(state, dir, random), true, light);
         }
     }
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantFire, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.getSprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }

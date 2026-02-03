@@ -15,9 +15,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -74,14 +73,13 @@ public class FenceGateAnimation extends Animation{
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
 
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        BlockModelPart part = model.collectParts(random).get(0);
+        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
         List<BakedQuad> quads = new java.util.ArrayList<>();
         for (Direction dir : Direction.values()) {
-            quads.addAll(part.getQuads(dir));
+            quads.addAll(model.getQuads(defaultState, dir, random));
         }
-        quads.addAll(part.getQuads(null));
+        quads.addAll(model.getQuads(defaultState, null, random));
 
         FenceGate fenceGate = splitFenceGateQuads(quads, facing);
 

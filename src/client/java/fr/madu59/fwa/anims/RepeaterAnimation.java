@@ -13,9 +13,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -29,7 +28,7 @@ public class RepeaterAnimation extends Animation{
     private final BlockState oldState;
     private final BlockState newState;
     private final RandomSource random = RandomSource.create(42);
-    private final BlockStateModel model;
+    private final BakedModel model;
     
     public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -67,11 +66,10 @@ public class RepeaterAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
-        BlockModelPart part = model.collectParts(random).get(0);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), false, light);
         }
 
         float dx = getPosition(nowTick, newState.getValue(RepeaterBlock.DELAY), oldState.getValue(RepeaterBlock.DELAY));
@@ -79,15 +77,15 @@ public class RepeaterAnimation extends Animation{
         if (facing.getAxis() == Axis.X) poseStack.translate(dx,0,0);
         else poseStack.translate(0,0,dx);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), true, light);
         }
     }
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantTorch, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.getSprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && Backport.getPos(quad, 0).x() > 5f/16f && Backport.getPos(quad, 0).x() < 11f/16f && Backport.getPos(quad, 2).x() > 5f/16f && Backport.getPos(quad, 2).x() < 11f/16f && Backport.getPos(quad, 0).z() > 5f/16f && Backport.getPos(quad, 0).z()  < 11f/16f && Backport.getPos(quad, 2).z() > 5f/16f && Backport.getPos(quad, 2).z() < 11f/16f) == wantTorch) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }

@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.world.level.block.BellBlock;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 @Mixin(LevelChunk.class)
 public class LevelChunkMixin {
@@ -30,7 +30,7 @@ public class LevelChunkMixin {
     private final BlockState airState = Blocks.AIR.defaultBlockState();
 
     @Inject(method = "replaceWithPacketData", at = @At("RETURN"))
-    private void onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
+    private void onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, CompoundTag compoundTag, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
         if(Minecraft.getInstance().level == null) return;
         LevelChunk chunk = (LevelChunk)(Object)this;
         LevelChunkSection[] sections = chunk.getSections();

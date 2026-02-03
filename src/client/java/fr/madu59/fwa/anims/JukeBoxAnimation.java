@@ -89,7 +89,7 @@ public class JukeBoxAnimation extends Animation{
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, client.player.level(), null, position.hashCode());
+        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, false, client.player.level(), null, position.hashCode());
 
         discState.render(poseStack, Minecraft.getInstance().renderBuffers().bufferSource(), light, OverlayTexture.NO_OVERLAY);
     }

@@ -13,9 +13,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -27,7 +26,7 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 public class LeverAnimation extends Animation{
     
     private final RandomSource random = RandomSource.create(42);
-    private final BlockStateModel model;
+    private final BakedModel model;
 
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -74,10 +73,9 @@ public class LeverAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
-        BlockModelPart part = model.collectParts(random).get(0);
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), false, light);
         }
 
         double angle = getAngle(nowTick, facing);
@@ -128,12 +126,12 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), true, light);
     }
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantHandle, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.getSprite().contents().name().getPath();
             if (path.contains("lever") == wantHandle) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }
