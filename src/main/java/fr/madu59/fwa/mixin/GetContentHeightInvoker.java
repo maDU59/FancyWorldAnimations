@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client;
+package fr.madu59.fwa.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;

@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client;
+package fr.madu59.fwa.mixin;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;

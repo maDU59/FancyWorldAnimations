@@ -20,9 +20,6 @@ import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -46,24 +43,38 @@ import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
-public class FancyWorldAnimationsClient implements ClientModInitializer {
+@Mod(value = FancyWorldAnimations.MOD_ID, dist = Dist.CLIENT)
+@EventBusSubscriber(modid = FancyWorldAnimations.MOD_ID, value = Dist.CLIENT)
+public class FancyWorldAnimationsClient{
 
-	public static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
 
-	@Override
-	public void onInitializeClient() {
-		FancyWorldAnimationsConfigScreen.registerCommand();
-		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-			double tickDelta = getPartialTick();
-            render(context, tickDelta);
-		});
-	}
+	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
+        NeoForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
+        container.registerExtensionPoint(IConfigScreenFactory.class, (client, parent) -> {
+            return new FancyWorldAnimationsConfigScreen(parent);
+        });
+    }
+
+	@SubscribeEvent
+    public static void onRenderLevelStage(RenderLevelStageEvent.AfterEntities event) {
+        double tickDelta = getPartialTick();
+        render(event, tickDelta);
+    }
 
 	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
 	{
-		if(client.level == null) return;
+		if(Minecraft.getInstance().level == null) return;
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
@@ -83,13 +94,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
 
-		double startTick = (double)client.level.getGameTime();
+		double startTick = (double)Minecraft.getInstance().level.getGameTime();
 		synchronized (animations){
 
 			if (animations.containsAt(blockPos)) {
 				Animation animation = animations.getAt(blockPos);
 				if (animation.isUnique()) {
-					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+					startTick = (double)Minecraft.getInstance().level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
 					animations.removeAt(blockPos);
 				}
 			}
@@ -102,16 +113,16 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	private static double getPartialTick() {
-		return client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
-	private static void render(WorldRenderContext context, double nowTick)
+	private static void render(RenderLevelStageEvent.AfterEntities context, double nowTick)
 	{
-		if(animations.isEmpty() || client.level == null) return;
+		if(animations.isEmpty() || Minecraft.getInstance().level == null) return;
 
-		Vec3 cameraPos = client.gameRenderer.getMainCamera().position();
-		PoseStack poseStack = context.matrices();
-		MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
+		Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+		PoseStack poseStack = context.getPoseStack();
+		MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, nowTick, cameraPos, poseStack, bufferSource);

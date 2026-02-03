@@ -1,8 +1,9 @@
 package fr.madu59.fwa.config.configscreen;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.minecraft.commands.Commands.literal;
 import fr.madu59.fwa.config.SettingsManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -14,21 +15,20 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
     private MyConfigListWidget list;
     private final Screen parent;
 
-    protected FancyWorldAnimationsConfigScreen(Screen parent) {
+    public FancyWorldAnimationsConfigScreen(Screen parent) {
         super(Component.literal("Fwa configuration screen"));
         this.parent = parent;
     }
 
-    public static void registerCommand() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(
-                literal("fwaConfig")
-                    .executes(context -> {
-                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new FancyWorldAnimationsConfigScreen(null)));
+    @SubscribeEvent
+    public static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
+        event.getDispatcher().register(
+            literal("fwaConfig")
+                .executes(context -> {
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new FancyWorldAnimationsConfigScreen(null)));
                         return 1;
-                    })
-            );
-        });
+                })
+        );
     }
 
     @Override

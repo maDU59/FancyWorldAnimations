@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client;
+package fr.madu59.fwa.mixin;
 
 import java.util.Map;
 import java.util.function.Consumer;

@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
-import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
+import fr.madu59.fwa.mixin.GetContentHeightInvoker;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;

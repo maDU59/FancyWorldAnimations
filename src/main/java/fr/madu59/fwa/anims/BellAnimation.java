@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.utils.FwaModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
@@ -25,14 +26,13 @@ import net.minecraft.world.level.block.state.properties.BellAttachType;
 
 public class BellAnimation extends Animation{
 
-    private final Minecraft client = Minecraft.getInstance();
     private final BellModel bellModel;
     private final float hash;
-    private BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+    private BellBlockEntity bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
+        this.bellModel = new BellModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL));
         this.hash = position.hashCode();
     }
 
@@ -109,20 +109,20 @@ public class BellAnimation extends Animation{
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
         if(bellBlockEntity == null){
-            bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+            bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
             return;
         }
-        TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
+        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
         Direction facing = defaultState.getValue(BellBlock.FACING);
         BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position);
+        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        float ticks = bellBlockEntity.ticks + Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+        float ticks = bellBlockEntity.ticks + Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
         Direction shakeDirection = bellBlockEntity.shaking ? bellBlockEntity.clickDirection : null;
         bellModel.setupAnim(new BellModel.State(ticks, shakeDirection));
 
-        ModelPart bellBody = bellModel.getChildPart("bell_body");
+        ModelPart bellBody = ((FwaModel) bellModel).getChildPart("bell_body");
 
         if (bellBlockEntity.ticks == 0) {
             float time = (float)(nowTick - this.startTick);
@@ -132,7 +132,7 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        SubmitNodeCollector submitNodeCollector = client.gameRenderer.getSubmitNodeStorage();
+        SubmitNodeCollector submitNodeCollector = Minecraft.getInstance().gameRenderer.getSubmitNodeStorage();
         submitNodeCollector.submitModelPart(bellBody, poseStack, ItemBlockRenderTypes.getRenderType(defaultState), light, OverlayTexture.NO_OVERLAY, sprite);
     }
 }

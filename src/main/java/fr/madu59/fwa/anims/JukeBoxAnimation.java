@@ -23,7 +23,6 @@ public class JukeBoxAnimation extends Animation{
 
     BlockState newState;
     private final ItemStackRenderState discState = new ItemStackRenderState();
-    private final Minecraft client = Minecraft.getInstance();
     
     public JukeBoxAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -71,7 +70,7 @@ public class JukeBoxAnimation extends Animation{
 
         float scale = 0.67f;
 
-        JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) client.level.getBlockEntity(position);
+        JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
         ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
         if(jukeboxBlockEntity != null){
             discItemStack = jukeboxBlockEntity.getTheItem();
@@ -81,7 +80,7 @@ public class JukeBoxAnimation extends Animation{
             }
         }
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
+        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.above());
 
         float dy = getDeltaY(nowTick);
         dy = newIsOpen? 1f - dy : dy;
@@ -90,9 +89,9 @@ public class JukeBoxAnimation extends Animation{
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.ON_SHELF, client.player.level(), null, position.hashCode());
+        Minecraft.getInstance().getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.ON_SHELF, Minecraft.getInstance().player.level(), null, position.hashCode());
 
-        SubmitNodeCollector submitNodeCollector = client.gameRenderer.getSubmitNodeStorage();
+        SubmitNodeCollector submitNodeCollector = Minecraft.getInstance().gameRenderer.getSubmitNodeStorage();
         discState.submit(poseStack, submitNodeCollector, light, OverlayTexture.NO_OVERLAY, 0);
     }
 }

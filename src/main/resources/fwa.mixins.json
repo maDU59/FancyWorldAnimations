@@ -3,7 +3,17 @@
 	"package": "fr.madu59.fwa.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+	],
+	"client": [
+		"ClientLevelMixin",
+		"RenderSectionRegionMixin",
+		"BlockEntityRenderDispatcherMixin",
+		"ChestLidControllerMixin",
+		"SetSectionDirtyInvoker",
+		"GetContentHeightInvoker",
+		"LevelChunkMixin",
+		"ModelMixin",
+		"ModelPartAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

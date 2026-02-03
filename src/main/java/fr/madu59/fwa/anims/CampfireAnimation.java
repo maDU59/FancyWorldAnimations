@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CampfireAnimation extends Animation{
 
-    private final Minecraft client = Minecraft.getInstance();
     private final BlockState oldState;
     private final BlockState newState;
     private final RandomSource random = RandomSource.create(42);
@@ -60,7 +59,7 @@ public class CampfireAnimation extends Animation{
         if (oldIsOpen) state = oldState;
         else state = newState;
 
-        BlockModelPart part = client.getBlockRenderer().getBlockModel(state).collectParts(random).get(0);
+        BlockModelPart part = Minecraft.getInstance().getBlockRenderer().getBlockModel(state).collectParts(random).get(0);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 

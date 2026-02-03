@@ -7,19 +7,19 @@ import com.google.gson.reflect.TypeToken;
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.util.*;
 
-import net.fabricmc.loader.api.FabricLoader;
 
 public class SettingsManager {
 
     public static List<Option<?>> ALL_OPTIONS = new ArrayList<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("fwa.json");
+    private static final Path CONFIG_PATH = FMLPaths.CONFIGDIR.get().resolve(FancyWorldAnimations.MOD_ID + ".json");
     private static Map<String, String> loadedSettings = loadSettings();
 
     public static Option<Boolean> MOD_TOGGLE = loadOptionWithDefaults(
