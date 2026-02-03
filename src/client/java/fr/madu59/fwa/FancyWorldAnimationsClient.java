@@ -102,7 +102,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	private static double getPartialTick() {
-		return client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return client.level.getGameTime() + (double) Math.clamp(client.getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
 	private static void render(WorldRenderContext context, double nowTick)

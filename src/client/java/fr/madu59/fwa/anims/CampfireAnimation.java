@@ -64,7 +64,7 @@ public class CampfireAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(state));
+        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(state, true));
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(state, null, random), false, light);
         for(Direction dir : Direction.values()){

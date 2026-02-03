@@ -65,7 +65,7 @@ public class RepeaterAnimation extends Animation{
         Direction facing = defaultState.getValue(RepeaterBlock.FACING);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState, true));
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), false, light);
         for(Direction dir : Direction.values()){

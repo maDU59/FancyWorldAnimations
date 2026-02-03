@@ -52,7 +52,7 @@ public class LevelChunkMixin {
                         BlockState state = section.getBlockState(x, y, z);
                         
                         if (state.is(Blocks.END_PORTAL_FRAME) || state.is(Blocks.LECTERN) || state.is(Blocks.JUKEBOX) || state.is(Blocks.BELL)) {
-                            BlockPos worldPos = chunk.getPos().getWorldPosition().offset(x, chunk.getMinY() + y + (sectionIndex * 16), z);
+                            BlockPos worldPos = chunk.getPos().getWorldPosition().offset(x, chunk.getMinBuildHeight() + y + (sectionIndex * 16), z);
                             init(state.getBlock(), state, worldPos);
                         }
                     }

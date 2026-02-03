@@ -6,16 +6,17 @@ import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.BellModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.blockentity.BellRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
@@ -25,13 +26,12 @@ import net.minecraft.world.level.block.state.properties.BellAttachType;
 public class BellAnimation extends Animation{
 
     private final Minecraft client = Minecraft.getInstance();
-    private final BellModel bellModel;
+    private ModelPart bellBody;
     private final float hash;
     private BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
         this.hash = position.hashCode();
     }
 
@@ -107,7 +107,9 @@ public class BellAnimation extends Animation{
 
     @Override
     public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
-        if (bellBlockEntity == null) {
+        ModelPart modelPart = client.getEntityModels().bakeLayer(ModelLayers.BELL);
+        this.bellBody = modelPart.getChild("bell_body");
+        if (bellBlockEntity == null || this.bellBody == null) {
             bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
             return;
         }
@@ -117,9 +119,7 @@ public class BellAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position);
 
-        bellModel.setupAnim(bellBlockEntity, Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f));
-
-        ModelPart bellBody = bellModel.allParts().get(0).getChild("bell_body");
+        setupAnim(bellBlockEntity, Math.clamp(client.getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f));
 
         if (bellBlockEntity.ticks == 0) {
             float time = (float)(nowTick - this.startTick);
@@ -129,6 +129,27 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        bellBody.render(poseStack, sprite.wrap(bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState))), light, OverlayTexture.NO_OVERLAY, -1);
+        bellBody.render(poseStack, sprite.wrap(bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState, true))), light, OverlayTexture.NO_OVERLAY, -1);
+    }
+
+    public void setupAnim(BellBlockEntity bellBlockEntity, float f) {
+        float g = (float)bellBlockEntity.ticks + f;
+        float h = 0.0F;
+        float k = 0.0F;
+        if (bellBlockEntity.shaking) {
+            float l = Mth.sin(g / 3.1415927F) / (4.0F + g / 3.0F);
+            if (bellBlockEntity.clickDirection == Direction.NORTH) {
+                h = -l;
+            } else if (bellBlockEntity.clickDirection == Direction.SOUTH) {
+                h = l;
+            } else if (bellBlockEntity.clickDirection == Direction.EAST) {
+                k = -l;
+            } else if (bellBlockEntity.clickDirection == Direction.WEST) {
+                k = l;
+            }
+        }
+
+        this.bellBody.xRot = h;
+        this.bellBody.zRot = k;
     }
 }

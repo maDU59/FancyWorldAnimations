@@ -72,7 +72,7 @@ public class LeverAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState, true));
         renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), false, light);
         for(Direction dir : Direction.values()){
             renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), false, light);
