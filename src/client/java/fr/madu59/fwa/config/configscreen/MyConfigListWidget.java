@@ -22,7 +22,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     }
 
     @Override
-	protected int scrollBarX() {
+	protected int getScrollbarPosition() {
 		return this.getX() + this.getWidth() - 6;
 	}
 

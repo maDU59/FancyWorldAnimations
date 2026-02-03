@@ -1,6 +1,5 @@
 package fr.madu59.fwa.mixin.client;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.spongepowered.asm.mixin.Mixin;

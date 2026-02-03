@@ -8,8 +8,9 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -21,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class JukeBoxAnimation extends Animation{
 
     BlockState newState;
-    private final ItemStackRenderState discState = new ItemStackRenderState();
     private final Minecraft client = Minecraft.getInstance();
     
     public JukeBoxAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState) {
@@ -71,6 +71,7 @@ public class JukeBoxAnimation extends Animation{
         float scale = 0.67f;
 
         JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) client.level.getBlockEntity(position);
+        ItemRenderer itemRenderer = client.getItemRenderer();
         ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
         if(jukeboxBlockEntity != null){
             discItemStack = jukeboxBlockEntity.getTheItem();
@@ -79,6 +80,7 @@ public class JukeBoxAnimation extends Animation{
                 discItemStack = new ItemStack(Items.MUSIC_DISC_13);
             }
         }
+        BakedModel model = itemRenderer.getModel(discItemStack, client.level, null, position.hashCode());
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
 
@@ -89,8 +91,6 @@ public class JukeBoxAnimation extends Animation{
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, false, client.player.level(), null, position.hashCode());
-
-        discState.render(poseStack, Minecraft.getInstance().renderBuffers().bufferSource(), light, OverlayTexture.NO_OVERLAY);
+        itemRenderer.render(discItemStack, ItemDisplayContext.FIXED, false, poseStack,client.renderBuffers().bufferSource(), light, OverlayTexture.NO_OVERLAY, model);
     }
 }
