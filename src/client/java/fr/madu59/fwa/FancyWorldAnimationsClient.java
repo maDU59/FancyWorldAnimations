@@ -49,7 +49,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
-	public static final Minecraft client = Minecraft.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
 
 	@Override
@@ -102,7 +102,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	private static double getPartialTick() {
-		return client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return (double) client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
 	private static void render(WorldRenderContext context, double nowTick)
