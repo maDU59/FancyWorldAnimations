@@ -30,7 +30,7 @@ public class LevelChunkMixin {
     private final BlockState airState = Blocks.AIR.defaultBlockState();
 
     @Inject(method = "replaceWithPacketData", at = @At("RETURN"))
-    private void onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
+    private void fwa$onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
         if(Minecraft.getInstance().level == null) return;
         LevelChunk chunk = (LevelChunk)(Object)this;
         LevelChunkSection[] sections = chunk.getSections();
