@@ -243,7 +243,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity();
+				return animation.hideOriginalBlockEntity() && !animation.isForRemoval();
 			}
 			else{
 				return false;
@@ -256,7 +256,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock();
+				return animation.hideOriginalBlock()  && !animation.isForRemoval();
 			}
 			else{
 				return false;

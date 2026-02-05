@@ -18,6 +18,7 @@ public class Animation {
     protected final boolean oldIsOpen;
     protected final boolean newIsOpen;
     protected final BlockState defaultState;
+    protected boolean toRemove = false;
 
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         this.position = position;
@@ -29,6 +30,14 @@ public class Animation {
 
     public boolean isUnique() {
         return true;
+    }
+
+    public void markForRemoval(){
+        toRemove = true;
+    }
+
+    public boolean isForRemoval(){
+        return toRemove;
     }
 
     @SuppressWarnings("unchecked")
