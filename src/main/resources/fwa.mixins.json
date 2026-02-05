@@ -2,6 +2,7 @@
 	"required": true,
 	"package": "fr.madu59.fwa.mixin",
 	"compatibilityLevel": "JAVA_21",
+	"plugin":"SodiumCompatPlugin",
 	"mixins": [
 	],
 	"client": [
@@ -13,7 +14,8 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"ModelMixin",
-		"ModelPartAccessor"
+		"ModelPartAccessor",
+		"sodium.LevelSliceMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
