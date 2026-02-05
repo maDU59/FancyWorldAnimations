@@ -18,8 +18,8 @@ group = mod_group_id
 
 repositories {
 	maven {
-		name = "Terraformers"
-		url = "https://maven.terraformersmc.com/"
+		name = "Neoforged"
+		url = "https://maven.neoforged.net/releases/"
 	}
 	maven {
         name = "Modrinth"
@@ -110,7 +110,8 @@ dependencies {
     // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
     implementation "net.neoforged:neoforge:${neo_version}"
 
-	implementation "net.caffeinemc:sodium-neoforge:0.8.2+mc1.21.11"
+	compileOnly "net.caffeinemc:sodium-neoforge-mod:0.8.2+mc1.21.11"
+    localRuntime "net.caffeinemc:sodium-neoforge-mod:0.8.2+mc1.21.11"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

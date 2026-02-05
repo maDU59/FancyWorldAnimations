@@ -2,7 +2,7 @@
 	"required": true,
 	"package": "fr.madu59.fwa.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"plugin":"SodiumCompatPlugin",
+	"plugin":"fr.madu59.fwa.compat.SodiumCompatPlugin",
 	"mixins": [
 	],
 	"client": [
