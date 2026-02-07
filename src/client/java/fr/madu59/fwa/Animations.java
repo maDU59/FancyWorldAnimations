@@ -29,10 +29,14 @@ public class Animations{
             while (it.hasNext()) {
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
-                    it.remove();
-
-                    BlockPos pos = animation.getPos();
-                    ((SetSectionDirtyInvoker) Minecraft.getInstance().levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+                    if (animation.isForRemoval()){
+                        if(Minecraft.getInstance().levelRenderer.isSectionCompiled(animation.getPos())) it.remove();
+                    }
+                    else{
+                        animation.markForRemoval();
+                        BlockPos pos = animation.getPos();
+                        ((SetSectionDirtyInvoker) Minecraft.getInstance().levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+                    }
                 }
             }
         }

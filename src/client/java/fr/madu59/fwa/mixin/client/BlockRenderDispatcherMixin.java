@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BlockRenderDispatcherMixin {
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
-    private void hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
+    private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
         if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
             cir.setReturnValue(Blocks.AIR.defaultBlockState());
         }
