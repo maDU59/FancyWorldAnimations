@@ -110,6 +110,10 @@ dependencies {
     // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
     implementation "net.neoforged:neoforge:${neo_version}"
 
+	implementation 'org.anarres:jcpp:1.4.14'
+    implementation 'io.github.douira:glsl-transformer:3.0.0-pre3'
+	implementation "maven.modrinth:iris:1.10.5+1.21.11-neoforge"
+
     compileOnly("net.caffeinemc:sodium-neoforge-mod:0.8.4+mc1.21.11")
     runtimeOnly("net.caffeinemc:sodium-neoforge:0.8.4+mc1.21.11")
 
