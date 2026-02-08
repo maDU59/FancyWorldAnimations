@@ -36,6 +36,10 @@ run/
 
 runs/
 
+# dependencies
+
+libs/
+
 # java
 
 hs_err_*.log

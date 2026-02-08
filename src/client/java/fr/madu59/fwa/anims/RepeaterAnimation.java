@@ -7,10 +7,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -60,12 +61,12 @@ public class RepeaterAnimation extends Animation{
 
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, WorldRenderContext context, double nowTick) {
 
         Direction facing = defaultState.getValue(RepeaterBlock.FACING);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = context.consumers().getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
         BlockModelPart part = model.collectParts(random).get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);

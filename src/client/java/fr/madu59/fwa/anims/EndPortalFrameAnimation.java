@@ -7,10 +7,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -62,7 +63,7 @@ public class EndPortalFrameAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, WorldRenderContext context, double nowTick) {
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
@@ -73,8 +74,8 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(eyeState));
-            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
+            VertexConsumer buffer = context.consumers().getBuffer(ItemBlockRenderTypes.getRenderType(eyeState));
+            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, context.consumers(), light, OverlayTexture.NO_OVERLAY);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(nowTick), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
             for(Direction dir : Direction.values()){
@@ -84,7 +85,7 @@ public class EndPortalFrameAnimation extends Animation{
         }
         else{
 
-            VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.translucentMovingBlock());
+            VertexConsumer buffer = context.consumers().getBuffer(RenderTypes.translucentMovingBlock());
             float time = (float)(nowTick - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
 

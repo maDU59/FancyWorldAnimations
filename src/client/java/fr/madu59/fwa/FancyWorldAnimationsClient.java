@@ -24,7 +24,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
@@ -109,15 +108,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	{
 		if(animations.isEmpty() || client.level == null) return;
 
-		Vec3 cameraPos = client.gameRenderer.getMainCamera().position();
+		Vec3 cameraPos = context.gameRenderer().getMainCamera().position();
 		PoseStack poseStack = context.matrices();
-		MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
 
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, nowTick, cameraPos, poseStack, bufferSource);
+			renderAnimation(animation, context, nowTick, cameraPos, poseStack);
 		}
 
-		bufferSource.endBatch();
 		animations.clean(nowTick);
 	}
 
@@ -137,13 +134,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource)
+	private static void renderAnimation(Animation animation, WorldRenderContext context, double nowTick, Vec3 cameraPos, PoseStack poseStack)
 	{
 		BlockPos pos = animation.getPos();
 
 		poseStack.pushPose();
 		poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		animation.render(poseStack, bufferSource, nowTick);
+		animation.render(poseStack, context, nowTick);
 		poseStack.popPose();
 	}
 
