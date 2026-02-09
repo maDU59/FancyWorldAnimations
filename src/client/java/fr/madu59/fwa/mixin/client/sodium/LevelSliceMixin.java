@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = LevelSlice.class, remap = false)
-public class LevelSliceMixin {
+public abstract class LevelSliceMixin {
 
     @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
     private void fwa$hideAnimatedBlocks(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
