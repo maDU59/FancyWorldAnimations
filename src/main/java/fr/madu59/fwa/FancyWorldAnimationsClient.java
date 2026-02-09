@@ -22,6 +22,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
@@ -118,17 +119,22 @@ public class FancyWorldAnimationsClient{
 
 	private static void render(RenderLevelStageEvent.AfterEntities context, double nowTick)
 	{
+		render(context.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), nowTick);
+	}
+
+	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector)
+	{
+		render(poseStack, camPos, bufferSource, submitNodeCollector, getPartialTick());
+	}
+
+	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick)
+	{
 		if(animations.isEmpty() || Minecraft.getInstance().level == null) return;
 
-		Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-		PoseStack poseStack = context.getPoseStack();
-		MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, nowTick, cameraPos, poseStack, bufferSource);
+			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource, submitNodeCollector);
 		}
 
-		bufferSource.endBatch();
 		animations.clean(nowTick);
 	}
 
@@ -148,13 +154,13 @@ public class FancyWorldAnimationsClient{
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource)
+	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector)
 	{
 		BlockPos pos = animation.getPos();
 
 		poseStack.pushPose();
 		poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		animation.render(poseStack, bufferSource, nowTick);
+		animation.render(poseStack, bufferSource, submitNodeCollector, nowTick);
 		poseStack.popPose();
 	}
 

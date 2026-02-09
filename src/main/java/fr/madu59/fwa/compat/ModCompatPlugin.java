@@ -4,14 +4,18 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import net.neoforged.fml.loading.LoadingModList;
+
 import java.util.List;
 import java.util.Set;
 
-public class SodiumCompatPlugin implements IMixinConfigPlugin {
+public class ModCompatPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".sodium.")) {
             return LoadingModList.get().getModFileById("sodium") != null;
+        }
+        if (mixinClassName.contains(".iris.")) {
+            return LoadingModList.get().getModFileById("iris") != null;
         }
         return true;
     }

@@ -15,7 +15,8 @@
 		"LevelChunkMixin",
 		"ModelMixin",
 		"ModelPartAccessor",
-		"sodium.LevelSliceMixin"
+		"sodium.LevelSliceMixin",
+		"iris.ShadowRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
