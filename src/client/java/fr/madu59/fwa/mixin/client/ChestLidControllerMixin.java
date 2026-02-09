@@ -1,10 +1,12 @@
 package fr.madu59.fwa.mixin.client;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import net.minecraft.world.level.block.entity.ChestLidController;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
