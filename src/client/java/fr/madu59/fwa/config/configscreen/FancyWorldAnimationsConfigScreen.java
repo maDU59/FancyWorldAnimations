@@ -88,6 +88,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.END_PORTAL_FRAME_STATE);
         list.addButton(SettingsManager.END_PORTAL_FRAME_EASING);
         list.addSlider(SettingsManager.END_PORTAL_FRAME_SPEED, 0.5, 2.0, 0.1);
+        list.addButton(SettingsManager.END_PORTAL_FRAME_INFINITE);
         list.addCategory("fwa.config.category.bell");
         list.addButton(SettingsManager.BELL_STATE);
         list.addSlider(SettingsManager.BELL_SPEED, 0.5, 2.0, 0.1);
