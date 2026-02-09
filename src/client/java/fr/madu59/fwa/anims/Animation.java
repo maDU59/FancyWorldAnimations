@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -18,6 +18,7 @@ public class Animation {
     protected final boolean oldIsOpen;
     protected final boolean newIsOpen;
     protected final BlockState defaultState;
+    protected boolean toRemove = false;
 
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         this.position = position;
@@ -29,6 +30,14 @@ public class Animation {
 
     public boolean isUnique() {
         return true;
+    }
+
+    public void markForRemoval(){
+        toRemove = true;
+    }
+
+    public boolean isForRemoval(){
+        return toRemove;
     }
 
     @SuppressWarnings("unchecked")
@@ -76,7 +85,7 @@ public class Animation {
         return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
     }
 
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
     }

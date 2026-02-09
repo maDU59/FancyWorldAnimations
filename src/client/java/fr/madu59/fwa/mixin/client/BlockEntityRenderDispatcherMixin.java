@@ -13,9 +13,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 @Mixin(BlockEntityRenderDispatcher.class)
-public class BlockEntityRenderDispatcherMixin {
+public abstract class BlockEntityRenderDispatcherMixin {
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-	private <E extends BlockEntity> void render(E blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, CallbackInfo info) {
+	private <E extends BlockEntity> void fwa$render(E blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, CallbackInfo info) {
 		if (FancyWorldAnimationsClient.shouldCancelBlockEntityRendering(blockEntity.getBlockPos())) info.cancel();
 	}
 }

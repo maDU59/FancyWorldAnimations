@@ -8,8 +8,7 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.blockentity.BellRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -106,7 +105,7 @@ public class BellAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
         ModelPart modelPart = client.getEntityModels().bakeLayer(ModelLayers.BELL);
         this.bellBody = modelPart.getChild("bell_body");
         if (bellBlockEntity == null || this.bellBody == null) {

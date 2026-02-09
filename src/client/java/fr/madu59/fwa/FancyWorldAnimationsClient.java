@@ -107,17 +107,22 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static void render(WorldRenderContext context, double nowTick)
 	{
+		render(context.matrixStack(), context.camera().getPosition(), context.consumers(), nowTick);
+	}
+
+	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource)
+	{
+		render(poseStack, camPos, bufferSource, getPartialTick());
+	}
+
+	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, double nowTick)
+	{
 		if(animations.isEmpty() || client.level == null) return;
 
-		Vec3 cameraPos = client.gameRenderer.getMainCamera().getPosition();
-		PoseStack poseStack = context.matrixStack();
-		MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
-
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, nowTick, cameraPos, poseStack, bufferSource);
+			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource);
 		}
 
-		bufferSource.endBatch();
 		animations.clean(nowTick);
 	}
 
@@ -137,7 +142,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource)
+	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource bufferSource)
 	{
 		BlockPos pos = animation.getPos();
 
@@ -243,7 +248,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity();
+				return animation.hideOriginalBlockEntity() && !animation.isForRemoval();
 			}
 			else{
 				return false;
@@ -256,7 +261,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock();
+				return animation.hideOriginalBlock() && !animation.isForRemoval();
 			}
 			else{
 				return false;

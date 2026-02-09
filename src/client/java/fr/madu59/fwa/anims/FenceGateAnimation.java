@@ -13,7 +13,7 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -66,7 +66,7 @@ public class FenceGateAnimation extends Animation{
     }
     
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
 
         Direction facing = defaultState.getValue(FenceGateBlock.FACING);
 

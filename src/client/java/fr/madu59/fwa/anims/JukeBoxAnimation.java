@@ -7,7 +7,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -66,7 +66,7 @@ public class JukeBoxAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
 
         float scale = 0.67f;
 
@@ -91,6 +91,6 @@ public class JukeBoxAnimation extends Animation{
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        itemRenderer.render(discItemStack, ItemDisplayContext.FIXED, false, poseStack,client.renderBuffers().bufferSource(), light, OverlayTexture.NO_OVERLAY, model);
+        itemRenderer.render(discItemStack, ItemDisplayContext.FIXED, false, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY, model);
     }
 }
