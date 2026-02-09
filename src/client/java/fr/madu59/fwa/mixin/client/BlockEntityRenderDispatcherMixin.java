@@ -14,8 +14,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
 
 @Mixin(BlockEntityRenderDispatcher.class)
-public class BlockEntityRenderDispatcherMixin {
-    @Inject(at = @At("HEAD"), method = "submit", cancellable = true)
+public abstract class BlockEntityRenderDispatcherMixin {
+  @Inject(at = @At("HEAD"), method = "submit", cancellable = true)
 	private <S extends BlockEntityRenderState> void fwa$submit(S blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo info) {
 		if (FancyWorldAnimationsClient.shouldCancelBlockEntityRendering(blockEntityRenderState.blockPos)) info.cancel();
 	}

@@ -1,5 +1,6 @@
 package fr.madu59.fwa.mixin.client.iris;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,8 +19,9 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.phys.Vec3;
 
 @Mixin(ShadowRenderer.class)
-public class ShadowRendererMixin {
+public abstract class ShadowRendererMixin {
 
+    @Final
     @Shadow
     private SubmitNodeStorage submitNodeStorage;
     
