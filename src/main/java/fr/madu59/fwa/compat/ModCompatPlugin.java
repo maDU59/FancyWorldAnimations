@@ -3,7 +3,8 @@ package fr.madu59.fwa.compat;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import net.neoforged.fml.loading.LoadingModList;
+
+import net.neoforged.fml.loading.FMLLoader;
 
 import java.util.List;
 import java.util.Set;
@@ -12,10 +13,10 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".sodium.")) {
-            return LoadingModList.get().getModFileById("sodium") != null;
+            return FMLLoader.getCurrent().getLoadingModList().getModFileById("sodium") != null;
         }
         if (mixinClassName.contains(".iris.")) {
-            return LoadingModList.get().getModFileById("iris") != null;
+            return FMLLoader.getCurrent().getLoadingModList().getModFileById("iris") != null;
         }
         return true;
     }
