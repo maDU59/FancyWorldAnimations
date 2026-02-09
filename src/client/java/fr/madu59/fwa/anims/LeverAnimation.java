@@ -8,11 +8,12 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -67,14 +68,14 @@ public class LeverAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, WorldRenderContext context, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick) {
 
         Direction facing = defaultState.getValue(LeverBlock.FACING);
         AttachFace face = defaultState.getValue(LeverBlock.FACE);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.consumers().getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
         BlockModelPart part = model.collectParts(random).get(0);
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){

@@ -24,6 +24,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
@@ -106,13 +108,20 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static void render(WorldRenderContext context, double nowTick)
 	{
+		render(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), nowTick);
+	}
+
+	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector)
+	{
+		render(poseStack, camPos, bufferSource, submitNodeCollector, getPartialTick());
+	}
+
+	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick)
+	{
 		if(animations.isEmpty() || client.level == null) return;
 
-		Vec3 cameraPos = context.gameRenderer().getMainCamera().position();
-		PoseStack poseStack = context.matrices();
-
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, context, nowTick, cameraPos, poseStack);
+			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource, submitNodeCollector);
 		}
 
 		animations.clean(nowTick);
@@ -134,13 +143,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, WorldRenderContext context, double nowTick, Vec3 cameraPos, PoseStack poseStack)
+	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector)
 	{
 		BlockPos pos = animation.getPos();
 
 		poseStack.pushPose();
 		poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		animation.render(poseStack, context, nowTick);
+		animation.render(poseStack, bufferSource, submitNodeCollector, nowTick);
 		poseStack.popPose();
 	}
 
