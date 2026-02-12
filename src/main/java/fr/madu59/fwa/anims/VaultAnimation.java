@@ -53,7 +53,7 @@ public class VaultAnimation extends Animation{
 
     @Override
     public boolean isEnabled(){
-        return SettingsManager.JUKEBOX_STATE.getValue();
+        return SettingsManager.VAULT_STATE.getValue();
     }
 
     @Override
