@@ -18,6 +18,7 @@ import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
+import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -45,6 +46,8 @@ import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
+import net.minecraft.world.level.block.VaultBlock;
+import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -167,6 +170,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
 		if(block instanceof TripWireHookBlock) return state.getValue(TripWireHookBlock.ATTACHED);
+		if(block instanceof VaultBlock) return state.getValue(VaultBlock.STATE) == VaultState.UNLOCKING;
 		return false;
 	}
 
@@ -185,6 +189,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
 			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
 			case TRIPWIRE_HOOK -> state.setValue(TripWireHookBlock.ATTACHED, false);
+			case VAULT -> state.setValue(VaultBlock.STATE, VaultState.UNLOCKING);
 			default -> state;
 		};
 	}
@@ -208,6 +213,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case VAULT: return new VaultAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -229,6 +235,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
 		if(block instanceof ComposterBlock) return Type.COMPOSTER;
 		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
+		if(block instanceof VaultBlock) return Type.VAULT;
 		return Type.USELESS;
 	}
 
@@ -287,6 +294,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		CAMPFIRE,
 		COMPOSTER,
 		TRIPWIRE_HOOK,
+		VAULT,
 		USELESS
 	}
 }

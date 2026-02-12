@@ -337,6 +337,14 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> VAULT_STATE = loadOptionWithDefaults(
+        "vault_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    );
+
+
     public static Option<Curves.Door> CHEST_EASING = loadOptionWithDefaults(
         "chest_easing",
         "fwa.config.option.easing.name",

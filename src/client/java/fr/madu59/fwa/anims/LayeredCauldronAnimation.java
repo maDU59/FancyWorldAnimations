@@ -104,7 +104,7 @@ public class LayeredCauldronAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantLiquid, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
-            if (path.contains("cauldron") != wantLiquid) {
+            if ((path.contains("cauldron") || path.contains("liquid")) != wantLiquid){
                 float r = 1.0f, g = 1.0f, b = 1.0f;
 
                 if (quad.isTinted()) {
