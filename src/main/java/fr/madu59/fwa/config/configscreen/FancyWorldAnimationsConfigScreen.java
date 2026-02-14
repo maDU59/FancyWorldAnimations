@@ -98,6 +98,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addSlider(SettingsManager.CAMPFIRE_SPEED, 0.5, 2.0, 0.1);
         list.addCategory("fwa.config.category.vault");
         list.addButton(SettingsManager.VAULT_STATE);
+        list.addButton(SettingsManager.VAULT_EASING);
         list.addCategory("fwa.config.category.chest");
         list.addButton(SettingsManager.CHEST_EASING);
         

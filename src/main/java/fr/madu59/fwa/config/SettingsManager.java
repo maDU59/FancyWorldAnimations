@@ -344,6 +344,13 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Curves.Door> VAULT_EASING = loadOptionWithDefaults(
+        "vault_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
     public static Option<Curves.Door> CHEST_EASING = loadOptionWithDefaults(
         "chest_easing",
         "fwa.config.option.easing.name",
