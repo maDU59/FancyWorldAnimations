@@ -17,12 +17,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.VaultBlock;
-import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class VaultAnimation extends Animation{
 
@@ -48,7 +44,7 @@ public class VaultAnimation extends Animation{
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
-        return (T) Curves.Door.DEFAULT;
+        return (T) SettingsManager.VAULT_EASING.getValue();
     }
 
     @Override
