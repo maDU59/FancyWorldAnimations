@@ -65,10 +65,10 @@ public class VaultAnimation extends Animation{
     }
 
     private float getRotation(double nowTick) {
-        float progress = (float) Math.clamp((nowTick - (this.startTick + 2)) / getAnimDuration(), 0.0, 1.0);
-        float max = 720f;
-        float min = 0f;
-        return oldIsOpen ? 0f :max - (max - min) * progress;
+        double progress = Math.clamp((nowTick - (this.startTick + 2)) / getAnimDuration(), 0.0, 1.0);
+        double max = 720;
+        double min = 0;
+        return (float)Curves.ease(oldIsOpen ? 0 : max - (max - min) * progress, Curves.Classic.EASE_IN_OUT_CUBIC);
     }
 
     @Override
