@@ -15,6 +15,17 @@ repositories {
 		name = "Terraformers"
 		url = "https://maven.terraformersmc.com/"
 	}
+	maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+	maven {
+        name = "sodium"
+        url = "https://maven.caffeinemc.net/releases"
+    }
 }
 
 loom {
@@ -38,6 +49,12 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
+	modImplementation "maven.modrinth:sodium:mc1.21.5-0.6.13-fabric"
+
+	modImplementation("org.antlr:antlr4-runtime:4.13.1")
+    modImplementation("io.github.douira:glsl-transformer:2.0.1")
+    modImplementation("org.anarres:jcpp:1.4.14")
+	modImplementation "maven.modrinth:iris:1.8.11+1.21.5-fabric"
 }
 
 processResources {

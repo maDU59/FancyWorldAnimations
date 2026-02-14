@@ -11,13 +11,13 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 
 @Mixin(ChestLidController.class)
-public class ChestLidControllerMixin {
+public abstract class ChestLidControllerMixin {
 
 	@Shadow
 	private boolean shouldBeOpen;
 
 	@Inject(at = @At("RETURN"), method = "getOpenness", cancellable = true)
-	private void getOpenness(float f, CallbackInfoReturnable<Float> info) {
+	private void fwa$getOpenness(float f, CallbackInfoReturnable<Float> info) {
 		info.setReturnValue((float)Curves.ease(info.getReturnValue(), SettingsManager.CHEST_EASING.getValue(), shouldBeOpen));
 	}
 }

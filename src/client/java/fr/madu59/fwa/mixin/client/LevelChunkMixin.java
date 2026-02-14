@@ -25,12 +25,12 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 @Mixin(LevelChunk.class)
-public class LevelChunkMixin {
+public abstract class LevelChunkMixin {
 
     private final BlockState airState = Blocks.AIR.defaultBlockState();
 
     @Inject(method = "replaceWithPacketData", at = @At("RETURN"))
-    private void onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
+    private void fwa$onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
         if(Minecraft.getInstance().level == null) return;
         LevelChunk chunk = (LevelChunk)(Object)this;
         LevelChunkSection[] sections = chunk.getSections();
@@ -38,11 +38,11 @@ public class LevelChunkMixin {
         for (int i = 0; i < sections.length; i++) {
             LevelChunkSection section = sections[i];
             if (section == null || section.hasOnlyAir()) continue;
-            scanSectionFor(section, chunk, i);
+            fwa$scanSectionFor(section, chunk, i);
         }
     }
 
-    private void scanSectionFor(LevelChunkSection section, LevelChunk chunk, int sectionIndex){
+    private void fwa$scanSectionFor(LevelChunkSection section, LevelChunk chunk, int sectionIndex){
         if (section.getStates().maybeHas(state -> state.is(Blocks.END_PORTAL_FRAME) || 
                                               state.is(Blocks.LECTERN) || 
                                               state.is(Blocks.JUKEBOX) ||
@@ -54,7 +54,7 @@ public class LevelChunkMixin {
                         
                         if (state.is(Blocks.END_PORTAL_FRAME) || state.is(Blocks.LECTERN) || state.is(Blocks.JUKEBOX) || state.is(Blocks.BELL)) {
                             BlockPos worldPos = chunk.getPos().getWorldPosition().offset(x, chunk.getMinY() + y + (sectionIndex * 16), z);
-                            init(state.getBlock(), state, worldPos);
+                            fwa$init(state.getBlock(), state, worldPos);
                         }
                     }
                 }
@@ -62,7 +62,7 @@ public class LevelChunkMixin {
         }
     }
 
-	private void init(Block block, BlockState state, BlockPos blockPos) {
+	private void fwa$init(Block block, BlockState state, BlockPos blockPos) {
         if (block instanceof LecternBlock){
             FancyWorldAnimationsClient.onBlockUpdate(blockPos, airState, state);
         }

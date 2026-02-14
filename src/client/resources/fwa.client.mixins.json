@@ -1,6 +1,7 @@
 {
 	"required": true,
 	"package": "fr.madu59.fwa.mixin.client",
+	"plugin": "fr.madu59.fwa.compat.ModCompatPlugin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ClientLevelMixin",
@@ -9,7 +10,9 @@
 		"ChestLidControllerMixin",
 		"SetSectionDirtyInvoker",
 		"GetContentHeightInvoker",
-		"LevelChunkMixin"
+		"LevelChunkMixin",
+		"sodium.LevelSliceMixin",
+		"iris.ShadowRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

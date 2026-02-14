@@ -337,6 +337,20 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> VAULT_STATE = loadOptionWithDefaults(
+        "vault_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    );
+
+    public static Option<Curves.Door> VAULT_EASING = loadOptionWithDefaults(
+        "vault_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.DEFAULT
+    );
+
     public static Option<Curves.Door> CHEST_EASING = loadOptionWithDefaults(
         "chest_easing",
         "fwa.config.option.easing.name",
@@ -383,6 +397,9 @@ public class SettingsManager {
         }
         else if (defaultValue instanceof Float){
             return (T) Float.valueOf(loadedSettings.get(key));
+        }
+        else if (defaultValue instanceof Boolean){
+            return (T) (Boolean) Boolean.parseBoolean(loadedSettings.get(key));
         }
         else return null;
     }

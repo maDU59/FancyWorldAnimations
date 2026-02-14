@@ -9,6 +9,8 @@ public class Curves {
     public static double ease(double progress, Enum<?> type) {
         if (type instanceof Classic c) {
             switch (c) {
+                case EASE_IN_OUT_CUBIC:
+                    return progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
                 default:
                     return progress;
             }
@@ -68,7 +70,8 @@ public class Curves {
     }
 
     public static enum Classic {
-        LINEAR
+        LINEAR,
+        EASE_IN_OUT_CUBIC
     }
 
     public static enum Door {

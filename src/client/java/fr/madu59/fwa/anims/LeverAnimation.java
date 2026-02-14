@@ -11,7 +11,7 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -50,6 +50,14 @@ public class LeverAnimation extends Animation{
         return SettingsManager.LEVER_STATE.getValue();
     }
 
+    /*
+    Visual glitches with Iris
+    */
+    @Override
+    public boolean renderShadow(){
+        return false;
+    }
+
     private double getStartAngle(boolean isOpen){
         if (!isOpen) return 0f;
         return 90f;
@@ -66,7 +74,7 @@ public class LeverAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
 
         Direction facing = defaultState.getValue(LeverBlock.FACING);
         AttachFace face = defaultState.getValue(LeverBlock.FACE);
@@ -134,7 +142,7 @@ public class LeverAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantHandle, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
-            if (path.contains("lever") == wantHandle) {
+            if ((path.contains("lever") && !path.contains("base")) == wantHandle) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }
         }

@@ -13,7 +13,7 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class FenceGateAnimation extends Animation{
 
     private final RandomSource random = RandomSource.create(42);
+    private final float EPSILON = 0.0001f;
 
     public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -66,7 +67,7 @@ public class FenceGateAnimation extends Animation{
     }
     
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
 
         Direction facing = defaultState.getValue(FenceGateBlock.FACING);
 
@@ -141,13 +142,12 @@ public class FenceGateAnimation extends Animation{
                 max = Math.max(pos1.x(), Math.max(pos2.x(), Math.max(pos3.x(), pos4.x())));
             }
 
-
-            if (min >= 0.125f && max <= 0.875f && !(max == min && (max <= 0.125f || max >= 0.875f))) {
-                if(min == 0.5f && max == 0.5f){
+            if (gte(min, 0.125f) && lte(max, 0.875f) && !(is(max,min) && (lte(max,0.125f) || gte(max, 0.875f)))) {
+                if(is(min,0.5f) && is(max,0.5f)){
                     right.add(quad);
                     left.add(quad);
                 }
-                else if(min >= 0.5f && max >= 0.5f){
+                else if(gte(min,0.5f) && gte(max,0.5f)){
                     right.add(quad);
                 }
                 else{
@@ -160,6 +160,18 @@ public class FenceGateAnimation extends Animation{
         }
 
         return new FenceGate(post, left, right);
+    }
+
+    private boolean is(float value, float target) {
+        return Math.abs(value - target) < EPSILON;
+    }
+
+    private boolean gte(float value, float target) {
+        return value > target - EPSILON;
+    }
+
+    private boolean lte(float value, float target) {
+        return value < target + EPSILON;
     }
 
     public class FenceGate{

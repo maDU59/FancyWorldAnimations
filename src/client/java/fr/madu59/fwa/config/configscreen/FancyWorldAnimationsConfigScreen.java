@@ -88,6 +88,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.END_PORTAL_FRAME_STATE);
         list.addButton(SettingsManager.END_PORTAL_FRAME_EASING);
         list.addSlider(SettingsManager.END_PORTAL_FRAME_SPEED, 0.5, 2.0, 0.1);
+        list.addButton(SettingsManager.END_PORTAL_FRAME_INFINITE);
         list.addCategory("fwa.config.category.bell");
         list.addButton(SettingsManager.BELL_STATE);
         list.addSlider(SettingsManager.BELL_SPEED, 0.5, 2.0, 0.1);
@@ -95,6 +96,9 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addCategory("fwa.config.category.campfire");
         list.addButton(SettingsManager.CAMPFIRE_STATE);
         list.addSlider(SettingsManager.CAMPFIRE_SPEED, 0.5, 2.0, 0.1);
+        list.addCategory("fwa.config.category.vault");
+        list.addButton(SettingsManager.VAULT_STATE);
+        list.addButton(SettingsManager.VAULT_EASING);
         list.addCategory("fwa.config.category.chest");
         list.addButton(SettingsManager.CHEST_EASING);
         

@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 
 public class Backport {
     public static Vector3f getPos(BakedQuad quad, int vertexIndex) {
-        int[] vertexData = quad.getVertices();
+        int[] vertexData = quad.vertices();
         int offset = vertexIndex * 8; 
         
         float x = Float.intBitsToFloat(vertexData[offset]);
