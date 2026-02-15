@@ -124,7 +124,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(animations.isEmpty() || client.level == null) return;
 
 		for (Animation animation : animations.animations.values()) {
-			if (animation.renderShadow()) renderAnimation(animation, nowTick, camPos, poseStack, bufferSource);
+			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource);
 		}
 
 		animations.clean(nowTick);

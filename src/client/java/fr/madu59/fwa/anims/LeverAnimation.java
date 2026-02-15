@@ -50,14 +50,6 @@ public class LeverAnimation extends Animation{
         return SettingsManager.LEVER_STATE.getValue();
     }
 
-    /*
-    Visual glitches with Iris
-    */
-    @Override
-    public boolean renderShadow(){
-        return false;
-    }
-
     private double getStartAngle(boolean isOpen){
         if (!isOpen) return 0f;
         return 90f;
