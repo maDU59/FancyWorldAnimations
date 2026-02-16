@@ -59,7 +59,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
-		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			double tickDelta = getPartialTick();
             render(context, tickDelta);
 		});
