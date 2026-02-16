@@ -58,7 +58,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
-		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			double tickDelta = getPartialTick();
             render(context, tickDelta);
 		});
@@ -111,7 +111,11 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	private static void render(WorldRenderContext context, double nowTick)
 	{
 		if(animations.isEmpty() || client.level == null) return;
-		render(context.matrixStack(), context.camera().getPosition(), context.consumers(), nowTick, false);
+		PoseStack stack = context.matrixStack();
+		if (stack == null) {
+			stack = new PoseStack();
+		}
+		render(stack, context.camera().getPosition(), context.consumers(), nowTick, false);
 	}
 
 	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource)
