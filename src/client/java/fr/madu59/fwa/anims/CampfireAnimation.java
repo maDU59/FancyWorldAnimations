@@ -37,7 +37,7 @@ public class CampfireAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 15 * SettingsManager.CAMPFIRE_SPEED.getValue();
+        return 15 / SettingsManager.CAMPFIRE_SPEED.getValue();
     }
 
     @Override

@@ -39,7 +39,7 @@ public class BellAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 50 * SettingsManager.BELL_SPEED.getValue();
+        return 50 / SettingsManager.BELL_SPEED.getValue();
     }
 
     @Override

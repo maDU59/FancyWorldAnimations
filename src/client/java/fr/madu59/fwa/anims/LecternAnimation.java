@@ -35,7 +35,7 @@ public class LecternAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5.0 * SettingsManager.LECTERN_SPEED.getValue();
+        return 5.0 / SettingsManager.LECTERN_SPEED.getValue();
     }
 
     @Override

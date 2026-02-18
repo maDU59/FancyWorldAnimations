@@ -26,7 +26,7 @@ public class ButtonAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 3 * SettingsManager.BUTTON_SPEED.getValue();
+        return 3 / SettingsManager.BUTTON_SPEED.getValue();
     }
 
     @Override
