@@ -71,7 +71,7 @@ public class FancyWorldAnimationsClient{
     }
 
 	@SubscribeEvent
-    public static void onRenderLevelStage(RenderLevelStageEvent.AfterEntities event) {
+    public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
         double tickDelta = getPartialTick();
         render(event, tickDelta);
     }
@@ -120,7 +120,7 @@ public class FancyWorldAnimationsClient{
 		return Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
-	private static void render(RenderLevelStageEvent.AfterEntities context, double nowTick)
+	private static void render(RenderLevelStageEvent.AfterOpaqueBlocks context, double nowTick)
 	{
 		render(context.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), nowTick);
 	}
