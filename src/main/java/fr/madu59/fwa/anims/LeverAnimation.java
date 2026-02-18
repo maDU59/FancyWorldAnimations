@@ -37,7 +37,7 @@ public class LeverAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5 * SettingsManager.LEVER_SPEED.getValue();
+        return 5 / SettingsManager.LEVER_SPEED.getValue();
     }
 
     @Override

@@ -26,7 +26,7 @@ public class DoorAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.DOOR_SPEED.getValue();
+        return 10 / SettingsManager.DOOR_SPEED.getValue();
     }
 
     @Override

@@ -34,7 +34,7 @@ public class EndPortalFrameAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.END_PORTAL_FRAME_SPEED.getValue();
+        return 10 / SettingsManager.END_PORTAL_FRAME_SPEED.getValue();
     }
 
     @Override
