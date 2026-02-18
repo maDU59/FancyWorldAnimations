@@ -26,7 +26,7 @@ public class TrapDoorAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5 * SettingsManager.TRAPDOOR_SPEED.getValue();
+        return 5 / SettingsManager.TRAPDOOR_SPEED.getValue();
     }
 
     @Override

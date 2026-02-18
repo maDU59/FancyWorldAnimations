@@ -41,7 +41,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5 * SettingsManager.CHISELED_BOOKSHELF_SPEED.getValue();
+        return 5 / SettingsManager.CHISELED_BOOKSHELF_SPEED.getValue();
     }
 
     @Override

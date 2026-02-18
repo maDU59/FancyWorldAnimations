@@ -40,7 +40,7 @@ public class ComposterAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.COMPOSTER_SPEED.getValue();
+        return 10 / SettingsManager.COMPOSTER_SPEED.getValue();
     }
 
     @Override
