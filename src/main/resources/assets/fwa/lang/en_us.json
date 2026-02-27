@@ -1,4 +1,5 @@
 {
+    "fwa.config.category.general":"GENERAL",
     "fwa.config.category.door":"DOORS",
     "fwa.config.category.trapdoor":"TRAPDOORS",
     "fwa.config.category.fencegate":"FENCE GATES",

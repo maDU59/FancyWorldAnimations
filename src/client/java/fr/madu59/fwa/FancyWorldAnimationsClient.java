@@ -60,8 +60,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
-			double tickDelta = getPartialTick();
-            render(context, tickDelta);
+			if(SettingsManager.MOD_TOGGLE.getValue()) {
+				double tickDelta = getPartialTick();
+				render(context, tickDelta);
+			}
 		});
 	}
 
@@ -256,7 +258,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity() && !animation.isForRemoval();
+				return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
@@ -269,7 +271,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock()  && !animation.isForRemoval();
+				return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
