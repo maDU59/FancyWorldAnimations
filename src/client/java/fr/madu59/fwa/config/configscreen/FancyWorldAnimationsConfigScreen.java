@@ -38,6 +38,8 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         this.list = new MyConfigListWidget(this.minecraft, this.width, this.height - 80, 40, 26);
 
         // Example: Add categories + buttons
+        list.addCategory("fwa.config.category.general");
+        list.addButton(SettingsManager.MOD_TOGGLE);
         list.addCategory("fwa.config.category.door");
         list.addButton(SettingsManager.DOOR_STATE);
         list.addButton(SettingsManager.DOOR_EASING);

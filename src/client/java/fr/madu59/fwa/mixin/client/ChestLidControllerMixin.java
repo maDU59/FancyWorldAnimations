@@ -18,6 +18,6 @@ public abstract class ChestLidControllerMixin {
 
 	@Inject(at = @At("RETURN"), method = "getOpenness", cancellable = true)
 	private void fwa$getOpenness(float f, CallbackInfoReturnable<Float> info) {
-		info.setReturnValue((float)Curves.ease(info.getReturnValue(), SettingsManager.CHEST_EASING.getValue(), shouldBeOpen));
+		info.setReturnValue(SettingsManager.MOD_TOGGLE.getValue()? (float)Curves.ease(info.getReturnValue(), SettingsManager.CHEST_EASING.getValue(), shouldBeOpen): info.getReturnValue());
 	}
 }
