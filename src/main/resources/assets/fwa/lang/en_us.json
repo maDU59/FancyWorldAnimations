@@ -18,6 +18,7 @@
     "fwa.config.category.tripwire_hook":"TRIPWIRE HOOKS",
     "fwa.config.category.vault":"VAULTS",
 
+    "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.state.name":"Animation state",
     "fwa.config.option.easing.name":"Animation type",
     "fwa.config.option.speed.name":"Animation speed multiplier",
