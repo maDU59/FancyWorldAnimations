@@ -72,8 +72,10 @@ public class FancyWorldAnimationsClient{
 
 	@SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
-        double tickDelta = getPartialTick();
-        render(event, tickDelta);
+		if(SettingsManager.MOD_TOGGLE.getValue()) {
+			double tickDelta = getPartialTick();
+			render(event, tickDelta);
+		}
     }
 
 	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
@@ -267,7 +269,7 @@ public class FancyWorldAnimationsClient{
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity() && !animation.isForRemoval();
+				return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
@@ -280,7 +282,7 @@ public class FancyWorldAnimationsClient{
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock() && !animation.isForRemoval();
+				return animation.hideOriginalBlock() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
