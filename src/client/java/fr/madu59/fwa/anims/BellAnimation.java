@@ -1,9 +1,12 @@
 package fr.madu59.fwa.anims;
 
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
-
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
@@ -12,12 +15,16 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
@@ -27,13 +34,16 @@ import net.minecraft.world.level.block.state.properties.BellAttachType;
 public class BellAnimation extends Animation{
 
     private final Minecraft client = Minecraft.getInstance();
+    private final RandomSource random = RandomSource.create(42);
     private final BellModel bellModel;
+    private final BlockStateModel model;
     private final float hash;
     private BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
     }
 
@@ -49,7 +59,11 @@ public class BellAnimation extends Animation{
 
     @Override
     public boolean hideOriginalBlock() {
-        return false;
+        return shouldUseFallbackRender();
+    }
+
+    private boolean shouldUseFallbackRender() {
+        return FabricLoader.getInstance().isModLoaded("betterblockentities");
     }
 
     public static boolean hasInfiniteAnimation(){
@@ -134,5 +148,20 @@ public class BellAnimation extends Animation{
         }
 
         submitNodeCollector.submitModelPart(bellBody, poseStack, ItemBlockRenderTypes.getRenderType(defaultState), light, OverlayTexture.NO_OVERLAY, sprite);
+
+        if(shouldUseFallbackRender()){
+            VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+            BlockModelPart part = model.collectParts(random).get(0);
+            renderQuads(poseStack, buffer, part.getQuads(null), light);
+            for(Direction dir : Direction.values()){
+                renderQuads(poseStack, buffer, part.getQuads(dir), light);
+            }
+        }
+    }
+
+    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
+        for (BakedQuad quad : quads) {
+            buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+        }
     }
 }
