@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -150,7 +151,7 @@ public class BellAnimation extends Animation{
         submitNodeCollector.submitModelPart(bellBody, poseStack, ItemBlockRenderTypes.getRenderType(defaultState), light, OverlayTexture.NO_OVERLAY, sprite);
 
         if(shouldUseFallbackRender()){
-            VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+            VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
             BlockModelPart part = model.collectParts(random).get(0);
             renderQuads(poseStack, buffer, part.getQuads(null), light);
             for(Direction dir : Direction.values()){

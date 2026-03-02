@@ -20,18 +20,16 @@ import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.LavaCauldronBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 
 public class LayeredCauldronAnimation extends Animation{
 
@@ -90,7 +88,7 @@ public class LayeredCauldronAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(newState));
+        VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
         BlockModelPart part = model.collectParts(random).get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
@@ -100,8 +98,6 @@ public class LayeredCauldronAnimation extends Animation{
 
         float dy = getPosition(nowTick, getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
-        RenderType renderType = ItemBlockRenderTypes.getRenderLayer(newState.getFluidState()) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentBlockItemSheet() : Sheets.cutoutBlockSheet();
-        buffer = bufferSource.getBuffer(renderType);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
