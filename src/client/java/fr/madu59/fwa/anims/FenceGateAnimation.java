@@ -73,7 +73,7 @@ public class FenceGateAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutout());
 
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         BlockModelPart part = model.collectParts(random).get(0);

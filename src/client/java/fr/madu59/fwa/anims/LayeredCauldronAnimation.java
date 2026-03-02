@@ -84,7 +84,7 @@ public class LayeredCauldronAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(newState));
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutout());
         BlockModelPart part = model.collectParts(random).get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
@@ -94,9 +94,6 @@ public class LayeredCauldronAnimation extends Animation{
 
         float dy = getPosition(nowTick, getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
-
-        RenderType renderType = ItemBlockRenderTypes.getRenderLayer(newState.getFluidState()) == RenderType.translucent() ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
-        buffer = bufferSource.getBuffer(renderType);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
