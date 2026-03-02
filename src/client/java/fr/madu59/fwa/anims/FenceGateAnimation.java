@@ -11,7 +11,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
+
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -74,7 +74,7 @@ public class FenceGateAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutout());
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
 
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         BlockModelPart part = model.collectParts(random).get(0);
