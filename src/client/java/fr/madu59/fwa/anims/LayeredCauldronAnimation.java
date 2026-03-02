@@ -13,19 +13,25 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.LavaCauldronBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 public class LayeredCauldronAnimation extends Animation{
 
@@ -94,6 +100,8 @@ public class LayeredCauldronAnimation extends Animation{
 
         float dy = getPosition(nowTick, getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
+        RenderType renderType = ItemBlockRenderTypes.getRenderLayer(newState.getFluidState()) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentBlockItemSheet() : Sheets.cutoutBlockSheet();
+        buffer = bufferSource.getBuffer(renderType);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
@@ -104,7 +112,8 @@ public class LayeredCauldronAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantLiquid, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
-            if ((path.contains("cauldron") && !path.contains("liquid") && !path.contains("water")) != wantLiquid){
+            String last = path.split("/")[path.split("/").length-1];
+            if ((path.contains("cauldron") && !last.contains("liquid") && !last.contains("water")) != wantLiquid){
                 float r = 1.0f, g = 1.0f, b = 1.0f;
 
                 if (quad.isTinted()) {
