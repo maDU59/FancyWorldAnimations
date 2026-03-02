@@ -115,7 +115,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         float v2 = v1 + h;
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.relative(facing));
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutout());
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
 
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 

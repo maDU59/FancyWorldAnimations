@@ -73,7 +73,7 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutout());
+            VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
             Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(nowTick), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
