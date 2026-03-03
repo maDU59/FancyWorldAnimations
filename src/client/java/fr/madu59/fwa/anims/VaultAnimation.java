@@ -92,8 +92,8 @@ public class VaultAnimation extends Animation{
         poseStack.mulPose(Axis.XP.rotationDegrees(90f));
         poseStack.mulPose(Axis.YP.rotationDegrees(180f));
 
-        Minecraft.getInstance().getItemModelResolver().updateForTopItem(keyState, keyItemStack, ItemDisplayContext.ON_SHELF, Minecraft.getInstance().player.level(), null, position.hashCode());
+        Minecraft.getInstance().getItemModelResolver().updateForTopItem(keyState, keyItemStack, ItemDisplayContext.FIXED, Minecraft.getInstance().player.level(), null, position.hashCode());
 
-        keyState.submit(poseStack, context.getSubmitNodeCollector(), light, OverlayTexture.NO_OVERLAY, 0);
+        keyState.render(poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
     }
 }

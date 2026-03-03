@@ -49,11 +49,11 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
-	modImplementation "maven.modrinth:sodium:sFfidWgd"
+	modImplementation "maven.modrinth:sodium:7pwil2dy"
 
 	localRuntime 'org.anarres:jcpp:1.4.14'
     localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
-	modImplementation "maven.modrinth:iris:1.9.7+1.21.10-fabric"
+	modImplementation "maven.modrinth:iris:1.9.6+1.21.8-fabric"
 }
 
 processResources {
