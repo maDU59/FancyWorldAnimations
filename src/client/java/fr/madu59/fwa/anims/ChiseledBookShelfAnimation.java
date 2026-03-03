@@ -5,11 +5,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
 
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -74,10 +75,11 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
 
         Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png")).apply(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
+        PoseStack poseStack = context.getPoseStack();
 
         PoseStack.Pose entry = poseStack.last();
 
@@ -87,7 +89,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
         float y = pos > 3 ? 4/16f : 12f/16f;
         float x = 3f/16f + ((pos - 1) % 3) * 5f/16f;
-        float z = getDistance(nowTick);
+        float z = getDistance(context.getNowTick());
 
         if(facing == Direction.EAST){
             x = 1-x;
@@ -115,7 +117,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         float v2 = v1 + h;
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.relative(facing));
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 

@@ -103,7 +103,7 @@ public class SettingsManager {
         "lever_easing",
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
-        Curves.Door.LINEAR
+        Curves.Door.DEFAULT
     );
 
     public static Option<Double> LEVER_SPEED = loadOptionWithDefaults(

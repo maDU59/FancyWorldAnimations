@@ -21,12 +21,11 @@ import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
@@ -49,11 +48,10 @@ import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
-	public static final Minecraft client = Minecraft.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
 
 	@Override
@@ -62,7 +60,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(context, tickDelta);
+				render(new AnimationRenderingContext(context.matrixStack(), context.camera().getPosition(), context.consumers(), tickDelta));
 			}
 		});
 	}
@@ -107,37 +105,22 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 	}
 
-	private static double getPartialTick() {
-		return client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+	public static double getPartialTick() {
+		return (double) client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
-	private static void render(WorldRenderContext context, double nowTick)
-	{
-		if(animations.isEmpty() || client.level == null) return;
-		PoseStack stack = context.matrixStack();
-		if (stack == null) {
-			stack = new PoseStack();
-		}
-		render(stack, context.camera().getPosition(), context.consumers(), nowTick, false);
-	}
-
-	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource)
-	{
-		render(poseStack, camPos, bufferSource, getPartialTick(), true);
-	}
-
-	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, double nowTick, boolean isShadow)
+	public static void render(AnimationRenderingContext context)
 	{
 		if(animations.isEmpty() || client.level == null) return;
 
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource);
-			if (bufferSource instanceof MultiBufferSource.BufferSource source) {
-				source.endBatch(); 
+			renderAnimation(animation, context);
+			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source) {
+				source.endBatch(); //Fixes weird rendering issues with multiple animations at the same time and PBR enabled. Might cause performance issues with shaders and shadows but that's the only fix I have
 			}
 		}
 
-		animations.clean(nowTick);
+		animations.clean(context.getNowTick());
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
@@ -156,13 +139,14 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource bufferSource)
+	private static void renderAnimation(Animation animation, AnimationRenderingContext context)
 	{
 		BlockPos pos = animation.getPos();
 
+		PoseStack poseStack = context.getPoseStack();
 		poseStack.pushPose();
-		poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		animation.render(poseStack, bufferSource, nowTick);
+		poseStack.translate(pos.getX() - context.getCameraPos().x, pos.getY() - context.getCameraPos().y, pos.getZ() - context.getCameraPos().z);
+		animation.render(context);
 		poseStack.popPose();
 	}
 

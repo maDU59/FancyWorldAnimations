@@ -4,10 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,8 +52,8 @@ public class DoorAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
-
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
         Direction facing = defaultState.getValue(DoorBlock.FACING);
         DoorHingeSide hinge = defaultState.getValue(DoorBlock.HINGE);
 
@@ -87,7 +88,7 @@ public class DoorAnimation extends Animation{
             default -> {}
         }
 
-        double angle = getAngle(nowTick, hinge);
+        double angle = getAngle(context.getNowTick(), hinge);
         double rad = Math.toRadians(angle);
         float cos = (float) Math.cos(rad);
         float sin = (float) Math.sin(rad);
@@ -102,6 +103,6 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
     }
 }

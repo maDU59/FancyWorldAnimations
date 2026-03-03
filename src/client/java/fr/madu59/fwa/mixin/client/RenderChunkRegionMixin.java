@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 @Mixin(RenderChunkRegion.class)
-public abstract class BlockRenderDispatcherMixin {
+public abstract class RenderChunkRegionMixin {
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
@@ -21,3 +21,5 @@ public abstract class BlockRenderDispatcherMixin {
         }
     }
 }
+
+// Does the same as ModelBlockRendererMixin

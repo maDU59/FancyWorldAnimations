@@ -5,12 +5,12 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ClientLevelMixin",
-		"BlockRenderDispatcherMixin",
 		"BlockEntityRenderDispatcherMixin",
 		"ChestLidControllerMixin",
 		"SetSectionDirtyInvoker",
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
+		"RenderChunkRegionMixin",
 		"sodium.LevelSliceMixin",
 		"iris.ShadowRendererMixin"
 	],

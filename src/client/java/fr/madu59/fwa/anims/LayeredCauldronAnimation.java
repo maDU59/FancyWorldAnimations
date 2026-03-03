@@ -7,11 +7,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
-import net.minecraft.client.Minecraft;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -79,11 +79,12 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
         BlockModelPart part = model.collectParts(random).get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
@@ -91,9 +92,9 @@ public class LayeredCauldronAnimation extends Animation{
             renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
         }
 
-        float dy = getPosition(nowTick, getHeight(newState), getHeight(oldState));
+        float dy = getPosition(context.getNowTick(), getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
-        buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
+        buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
