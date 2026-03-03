@@ -53,6 +53,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -70,10 +71,10 @@ public class FancyWorldAnimationsClient{
     }
 
 	@SubscribeEvent
-    public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
-		if(SettingsManager.MOD_TOGGLE.getValue()) {
+    public static void onRenderLevelStage(RenderLevelStageEvent event) {
+		if(SettingsManager.MOD_TOGGLE.getValue() && event.getStage() == Stage.AFTER_ENTITIES) {
 			double tickDelta = getPartialTick();
-			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), tickDelta));
+			render(new AnimationRenderingContext(event.getPoseStack(), event.getCamera().getPosition(), Minecraft.getInstance().renderBuffers().bufferSource(), tickDelta));
 		}
     }
 
@@ -118,7 +119,7 @@ public class FancyWorldAnimationsClient{
 	}
 
 	public static double getPartialTick() {
-		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -154,7 +155,6 @@ public class FancyWorldAnimationsClient{
 	private static void renderAnimation(Animation animation, AnimationRenderingContext context)
 	{
 		BlockPos pos = animation.getPos();
-
 		PoseStack poseStack = context.getPoseStack();
 		poseStack.pushPose();
 		poseStack.translate(pos.getX() - context.getCameraPos().x, pos.getY() - context.getCameraPos().y, pos.getZ() - context.getCameraPos().z);

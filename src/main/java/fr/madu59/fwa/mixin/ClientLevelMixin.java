@@ -2,7 +2,6 @@ package fr.madu59.fwa.mixin;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Block.UpdateFlags;
 import net.minecraft.world.level.block.state.BlockState;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,7 @@ import fr.madu59.fwa.config.SettingsManager;
 @Mixin(ClientLevel.class)
 public abstract class ClientLevelMixin {
 	@Inject(at = @At("HEAD"), method = "sendBlockUpdated")
-	private void fwa$sendBlockUpdated(BlockPos blockPos, BlockState oldState, BlockState newState, @UpdateFlags int i, CallbackInfo info) {
+	private void fwa$sendBlockUpdated(BlockPos blockPos, BlockState oldState, BlockState newState, int i, CallbackInfo info) {
 		if (SettingsManager.MOD_TOGGLE.getValue()) FancyWorldAnimationsClient.onBlockUpdate(blockPos.immutable(), oldState, newState);
 	}
 }

@@ -44,6 +44,10 @@ public class Animation {
         return (T) Curves.Classic.LINEAR;
     }
 
+    public boolean renderShadow(){
+        return true;
+    }
+
     public boolean isEnabled(){
         return true;
     }

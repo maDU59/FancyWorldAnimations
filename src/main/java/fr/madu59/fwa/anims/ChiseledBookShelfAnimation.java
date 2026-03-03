@@ -9,15 +9,17 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
+
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
@@ -74,9 +76,10 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     @Override
     public void render(AnimationRenderingContext context) {
+
+        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png")).apply(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
         PoseStack poseStack = context.getPoseStack();
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
-        Direction facing = defaultState.getValue(ChiseledBookShelfBlock.FACING);
 
         PoseStack.Pose entry = poseStack.last();
 
@@ -114,7 +117,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         float v2 = v1 + h;
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.relative(facing));
-        VertexConsumer buffer = context.getBufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 

@@ -81,7 +81,7 @@ runs {
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
-    clientData {
+    data {
         // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
         // workingDirectory project.file('run-data')
 
@@ -112,10 +112,9 @@ dependencies {
 
 	implementation 'org.anarres:jcpp:1.4.14'
     implementation 'io.github.douira:glsl-transformer:3.0.0-pre3'
-	implementation "maven.modrinth:iris:1.10.5+1.21.11-neoforge"
+	implementation "maven.modrinth:iris:1.8.8+1.21.1-neoforge"
 
-    compileOnly("net.caffeinemc:sodium-neoforge-mod:0.8.4+mc1.21.11")
-    runtimeOnly("net.caffeinemc:sodium-neoforge:0.8.4+mc1.21.11")
+    implementation("maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -149,6 +148,7 @@ tasks.withType(ProcessResources).configureEach {
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,

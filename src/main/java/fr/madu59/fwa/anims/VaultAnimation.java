@@ -8,8 +8,9 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Items;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class VaultAnimation extends Animation{
 
     BlockState newState;
-    private final ItemStackRenderState keyState = new ItemStackRenderState();
     
     public VaultAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -92,8 +92,9 @@ public class VaultAnimation extends Animation{
         poseStack.mulPose(Axis.XP.rotationDegrees(90f));
         poseStack.mulPose(Axis.YP.rotationDegrees(180f));
 
-        Minecraft.getInstance().getItemModelResolver().updateForTopItem(keyState, keyItemStack, ItemDisplayContext.ON_SHELF, Minecraft.getInstance().player.level(), null, position.hashCode());
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel model = itemRenderer.getModel(keyItemStack, Minecraft.getInstance().level, null, position.hashCode());
 
-        keyState.submit(poseStack, context.getSubmitNodeCollector(), light, OverlayTexture.NO_OVERLAY, 0);
+        itemRenderer.render(keyItemStack, ItemDisplayContext.FIXED, false, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, model);
     }
 }

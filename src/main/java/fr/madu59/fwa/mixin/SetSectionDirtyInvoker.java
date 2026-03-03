@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import net.minecraft.client.renderer.LevelRenderer;
 
 @Mixin(LevelRenderer.class)
-public interface SetSectionDirtyInvoker {
+public abstract interface SetSectionDirtyInvoker {
     @Invoker("setSectionDirty")
     void fwa$setSectionDirty(int x, int y, int z, boolean isImportant);
 }

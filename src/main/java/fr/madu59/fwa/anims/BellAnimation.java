@@ -7,21 +7,19 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.utils.FwaModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.object.bell.BellModel;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -33,15 +31,14 @@ import net.neoforged.fml.loading.FMLLoader;
 
 public class BellAnimation extends Animation{
 
+    private ModelPart bellBody;
     private final RandomSource random = RandomSource.create(42);
-    private final BellModel bellModel;
-    private final BlockStateModel model;
+    private final BakedModel model;
     private final float hash;
     private BellBlockEntity bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.bellModel = new BellModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
     }
@@ -62,7 +59,7 @@ public class BellAnimation extends Animation{
     }
 
     private boolean shouldUseFallbackRender() {
-        return FMLLoader.getCurrent().getLoadingModList().getModFileById("betterblockentities") != null;
+        return FMLLoader.getLoadingModList().getModFileById("betterblockentities") != null;
     }
 
     public static boolean hasInfiniteAnimation(){
@@ -86,7 +83,7 @@ public class BellAnimation extends Animation{
 
     private float animatePlacement(double nowTick){
         double progress = getProgress(nowTick);
-        return Mth.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
+        return (float)Math.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
     }
 
     private ModelPart rotateBell(ModelPart bellBody, float rot, Direction facing, BellAttachType attachment){
@@ -122,22 +119,19 @@ public class BellAnimation extends Animation{
 
     @Override
     public void render(AnimationRenderingContext context) {
-        if(bellBlockEntity == null){
+        ModelPart modelPart = Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL);
+        this.bellBody = modelPart.getChild("bell_body");
+        if (bellBlockEntity == null || this.bellBody == null) {
             bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
             return;
         }
-        PoseStack poseStack = context.getPoseStack();
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(ResourceLocation.tryParse("minecraft:entity/bell/bell_body"));        PoseStack poseStack = context.getPoseStack();
         Direction facing = defaultState.getValue(BellBlock.FACING);
         BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        float ticks = bellBlockEntity.ticks + Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
-        Direction shakeDirection = bellBlockEntity.shaking ? bellBlockEntity.clickDirection : null;
-        bellModel.setupAnim(new BellModel.State(ticks, shakeDirection));
-
-        ModelPart bellBody = ((FwaModel) bellModel).getChildPart("bell_body");
+        setupAnim(bellBlockEntity, Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f));
 
         if (bellBlockEntity.ticks == 0) {
             float time = (float)(context.getNowTick() - this.startTick);
@@ -147,16 +141,36 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        context.getSubmitNodeCollector().submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), light, OverlayTexture.NO_OVERLAY, sprite);
+        bellBody.render(poseStack, sprite.wrap(context.getBufferSource().getBuffer(RenderType.cutoutMipped())), light, OverlayTexture.NO_OVERLAY, -1);
 
         if(shouldUseFallbackRender()){
-            VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-            BlockModelPart part = model.collectParts(random).get(0);
-            renderQuads(poseStack, buffer, part.getQuads(null), light);
+            VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+            renderQuads(poseStack, buffer, model.getQuads(defaultState, null, random), light);
             for(Direction dir : Direction.values()){
-                renderQuads(poseStack, buffer, part.getQuads(dir), light);
+                renderQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), light);
             }
         }
+    }
+
+    public void setupAnim(BellBlockEntity bellBlockEntity, float f) {
+        float g = (float)bellBlockEntity.ticks + f;
+        float h = 0.0F;
+        float k = 0.0F;
+        if (bellBlockEntity.shaking) {
+            float l = Mth.sin(g / 3.1415927F) / (4.0F + g / 3.0F);
+            if (bellBlockEntity.clickDirection == Direction.NORTH) {
+                h = -l;
+            } else if (bellBlockEntity.clickDirection == Direction.SOUTH) {
+                h = l;
+            } else if (bellBlockEntity.clickDirection == Direction.EAST) {
+                k = -l;
+            } else if (bellBlockEntity.clickDirection == Direction.WEST) {
+                k = l;
+            }
+        }
+
+        this.bellBody.xRot = h;
+        this.bellBody.zRot = k;
     }
 
     private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {

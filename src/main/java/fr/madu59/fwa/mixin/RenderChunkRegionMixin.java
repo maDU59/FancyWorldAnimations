@@ -6,13 +6,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import net.minecraft.client.renderer.chunk.RenderSectionRegion;
+import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(RenderSectionRegion.class)
-public abstract class RenderSectionRegionMixin {
+@Mixin(RenderChunkRegion.class)
+public abstract class RenderChunkRegionMixin {
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {

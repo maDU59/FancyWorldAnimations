@@ -8,16 +8,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -74,16 +74,15 @@ public class FenceGateAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        BlockModelPart part = model.collectParts(random).get(0);
+        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
         List<BakedQuad> quads = new java.util.ArrayList<>();
         for (Direction dir : Direction.values()) {
-            quads.addAll(part.getQuads(dir));
+            quads.addAll(model.getQuads(defaultState, dir, random));
         }
-        quads.addAll(part.getQuads(null));
+        quads.addAll(model.getQuads(defaultState, null, random));
 
         FenceGate fenceGate = splitFenceGateQuads(quads, facing);
 
@@ -128,10 +127,10 @@ public class FenceGateAnimation extends Animation{
 
         for (BakedQuad quad : quads) {
             
-            Vector3fc pos1 = quad.position0();
-            Vector3fc pos2 = quad.position1();
-            Vector3fc pos3 = quad.position2();
-            Vector3fc pos4 = quad.position3();
+            Vector3fc pos1 = Backport.getPos(quad, 0);
+            Vector3fc pos2 = Backport.getPos(quad, 1);
+            Vector3fc pos3 = Backport.getPos(quad, 2);
+            Vector3fc pos4 = Backport.getPos(quad, 3);
 
             float min, max;
             if(facing.getAxis() == Axis.X){
