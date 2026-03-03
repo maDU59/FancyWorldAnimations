@@ -4,10 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -31,7 +32,7 @@ public class JukeBoxAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.JUKEBOX_SPEED.getValue();
+        return 10 / SettingsManager.JUKEBOX_SPEED.getValue();
     }
 
     @Override
@@ -66,7 +67,8 @@ public class JukeBoxAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         float scale = 0.67f;
 
@@ -84,13 +86,13 @@ public class JukeBoxAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
 
-        float dy = getDeltaY(nowTick);
+        float dy = getDeltaY(context.getNowTick());
         dy = newIsOpen? 1f - dy : dy;
 
         poseStack.mulPose(Axis.YP.rotationDegrees(90f));
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        itemRenderer.render(discItemStack, ItemDisplayContext.FIXED, false, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY, model);
+        itemRenderer.render(discItemStack, ItemDisplayContext.FIXED, false, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, model);
     }
 }

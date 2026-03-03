@@ -18,10 +18,11 @@ import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
+import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -44,20 +45,23 @@ import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
+import net.minecraft.world.level.block.VaultBlock;
+import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
-	public static final Minecraft client = Minecraft.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
 
 	@Override
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-			double tickDelta = getPartialTick();
-            render(context, tickDelta);
+			if(SettingsManager.MOD_TOGGLE.getValue()) {
+				double tickDelta = getPartialTick();
+				render(new AnimationRenderingContext(context.matrixStack(), context.camera().getPosition(), context.consumers(), tickDelta));
+			}
 		});
 	}
 
@@ -101,29 +105,22 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 	}
 
-	private static double getPartialTick() {
-		return client.level.getGameTime() + (double) Math.clamp(client.getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+	public static double getPartialTick() {
+		return (double)client.level.getGameTime() + (double) Math.clamp(client.getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
-	private static void render(WorldRenderContext context, double nowTick)
-	{
-		render(context.matrixStack(), context.camera().getPosition(), context.consumers(), nowTick);
-	}
-
-	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource)
-	{
-		render(poseStack, camPos, bufferSource, getPartialTick());
-	}
-
-	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, double nowTick)
+	public static void render(AnimationRenderingContext context)
 	{
 		if(animations.isEmpty() || client.level == null) return;
 
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource);
+			renderAnimation(animation, context);
+			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source) {
+				source.endBatch(); //Fixes weird rendering issues with multiple animations at the same time and PBR enabled. Might cause performance issues with shaders and shadows but that's the only fix I have
+			}
 		}
 
-		animations.clean(nowTick);
+		animations.clean(context.getNowTick());
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
@@ -142,13 +139,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource bufferSource)
+	private static void renderAnimation(Animation animation, AnimationRenderingContext context)
 	{
 		BlockPos pos = animation.getPos();
-
+		PoseStack poseStack = context.getPoseStack();
 		poseStack.pushPose();
-		poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		animation.render(poseStack, bufferSource, nowTick);
+		poseStack.translate(pos.getX() - context.getCameraPos().x, pos.getY() - context.getCameraPos().y, pos.getZ() - context.getCameraPos().z);
+		animation.render(context);
 		poseStack.popPose();
 	}
 
@@ -166,6 +163,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
 		if(block instanceof TripWireHookBlock) return state.getValue(TripWireHookBlock.ATTACHED);
+		if(block instanceof VaultBlock) return state.getValue(VaultBlock.STATE) == VaultState.UNLOCKING;
 		return false;
 	}
 
@@ -184,6 +182,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
 			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
 			case TRIPWIRE_HOOK -> state.setValue(TripWireHookBlock.ATTACHED, false);
+			case VAULT -> state.setValue(VaultBlock.STATE, VaultState.UNLOCKING);
 			default -> state;
 		};
 	}
@@ -207,6 +206,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case VAULT: return new VaultAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -228,6 +228,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
 		if(block instanceof ComposterBlock) return Type.COMPOSTER;
 		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
+		if(block instanceof VaultBlock) return Type.VAULT;
 		return Type.USELESS;
 	}
 
@@ -248,7 +249,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity() && !animation.isForRemoval();
+				return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
@@ -261,7 +262,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock() && !animation.isForRemoval();
+				return animation.hideOriginalBlock() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
@@ -286,6 +287,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		CAMPFIRE,
 		COMPOSTER,
 		TRIPWIRE_HOOK,
+		VAULT,
 		USELESS
 	}
 }
