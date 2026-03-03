@@ -12,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.BellModel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -146,7 +145,7 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        bellBody.render(poseStack, sprite.wrap(context.getBufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(defaultState))), light, OverlayTexture.NO_OVERLAY, -1);
+        bellBody.render(poseStack, sprite.wrap(context.getBufferSource().getBuffer(RenderType.cutoutMipped())), light, OverlayTexture.NO_OVERLAY, -1);
 
         if(shouldUseFallbackRender()){
             VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
