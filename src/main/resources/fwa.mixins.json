@@ -10,9 +10,7 @@
 		"SetSectionDirtyInvoker",
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
-		"RenderSectionRegionMixin",
-		"ModelMixin",
-		"ModelPartAccessor",
+		"RenderChunkRegionMixin",
 		"sodium.LevelSliceMixin",
 		"iris.ShadowRendererMixin"
 	],
