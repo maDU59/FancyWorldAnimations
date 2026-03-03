@@ -11,6 +11,8 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
+		"ModelMixin",
+		"ModelPartAccessor",
 		"sodium.LevelSliceMixin",
 		"iris.ShadowRendererMixin"
 	],
