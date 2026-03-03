@@ -6,12 +6,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -39,7 +40,7 @@ public class ComposterAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.COMPOSTER_SPEED.getValue();
+        return 10 / SettingsManager.COMPOSTER_SPEED.getValue();
     }
 
     @Override
@@ -62,18 +63,19 @@ public class ComposterAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(newState));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), false, light);
         for(Direction dir : Direction.values()){
             renderFilteredQuads(poseStack, buffer, model.getQuads(newState, dir, random), false, light);
         }
 
-        float dy = getPosition(nowTick, getHeight(newState), getHeight(oldState));
+        float dy = getPosition(context.getNowTick(), getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), true, light);

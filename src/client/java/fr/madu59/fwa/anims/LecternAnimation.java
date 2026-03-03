@@ -5,12 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -33,7 +34,7 @@ public class LecternAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5.0 * SettingsManager.LECTERN_SPEED.getValue();
+        return 5.0 / SettingsManager.LECTERN_SPEED.getValue();
     }
 
     @Override
@@ -82,11 +83,13 @@ public class LecternAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
+        Double nowTick = context.getNowTick();
 
         Direction facing = defaultState.getValue(LecternBlock.FACING);
 
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.tryParse("minecraft:textures/entity/enchanting_table_book.png")));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.tryParse("minecraft:textures/entity/enchanting_table_book.png")));
         
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         
