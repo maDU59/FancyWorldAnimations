@@ -21,6 +21,7 @@ import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -74,7 +75,7 @@ public class FancyWorldAnimationsClient{
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
-			render(event, tickDelta);
+			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), tickDelta));
 		}
     }
 
@@ -118,29 +119,22 @@ public class FancyWorldAnimationsClient{
 		}
 	}
 
-	private static double getPartialTick() {
-		return Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+	public static double getPartialTick() {
+		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
-	private static void render(RenderLevelStageEvent.AfterOpaqueBlocks context, double nowTick)
-	{
-		render(context.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), nowTick);
-	}
-
-	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector)
-	{
-		render(poseStack, camPos, bufferSource, submitNodeCollector, getPartialTick());
-	}
-
-	public static void render(PoseStack poseStack, Vec3 camPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick)
+	public static void render(AnimationRenderingContext context)
 	{
 		if(animations.isEmpty() || Minecraft.getInstance().level == null) return;
 
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, nowTick, camPos, poseStack, bufferSource, submitNodeCollector);
+			renderAnimation(animation, context);
+			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source) {
+				source.endBatch(); //Fixes weird rendering issues with multiple animations at the same time and PBR enabled. Might cause performance issues with shaders and shadows but that's the only fix I have
+			}
 		}
 
-		animations.clean(nowTick);
+		animations.clean(context.getNowTick());
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
@@ -159,13 +153,14 @@ public class FancyWorldAnimationsClient{
 		return oldIsOpen != newIsOpen;
 	}
 
-	private static void renderAnimation(Animation animation, double nowTick, Vec3 cameraPos, PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector)
+	private static void renderAnimation(Animation animation, AnimationRenderingContext context)
 	{
 		BlockPos pos = animation.getPos();
 
+		PoseStack poseStack = context.getPoseStack();
 		poseStack.pushPose();
-		poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-		animation.render(poseStack, bufferSource, submitNodeCollector, nowTick);
+		poseStack.translate(pos.getX() - context.getCameraPos().x, pos.getY() - context.getCameraPos().y, pos.getZ() - context.getCameraPos().z);
+		animation.render(context);
 		poseStack.popPose();
 	}
 

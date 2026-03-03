@@ -14,9 +14,9 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 
 @Mixin(ClientLevel.class)
-public class ClientLevelMixin {
+public abstract class ClientLevelMixin {
 	@Inject(at = @At("HEAD"), method = "sendBlockUpdated")
-	private void sendBlockUpdated(BlockPos blockPos, BlockState oldState, BlockState newState, @UpdateFlags int i, CallbackInfo info) {
+	private void fwa$sendBlockUpdated(BlockPos blockPos, BlockState oldState, BlockState newState, @UpdateFlags int i, CallbackInfo info) {
 		if (SettingsManager.MOD_TOGGLE.getValue()) FancyWorldAnimationsClient.onBlockUpdate(blockPos.immutable(), oldState, newState);
 	}
 }
