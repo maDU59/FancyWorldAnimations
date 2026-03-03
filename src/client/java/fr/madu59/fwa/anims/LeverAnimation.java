@@ -7,12 +7,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -35,7 +36,7 @@ public class LeverAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5 * SettingsManager.LEVER_SPEED.getValue();
+        return 5 / SettingsManager.LEVER_SPEED.getValue();
     }
 
     @Override
@@ -65,20 +66,21 @@ public class LeverAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         Direction facing = defaultState.getValue(LeverBlock.FACING);
         AttachFace face = defaultState.getValue(LeverBlock.FACE);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState, true));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
         renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), false, light);
         for(Direction dir : Direction.values()){
             renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), false, light);
         }
 
-        double angle = getAngle(nowTick, facing);
+        double angle = getAngle(context.getNowTick(), facing);
 
         float pivotX = 0.5f;
         float pivotY = 0.0625f;
@@ -132,7 +134,7 @@ public class LeverAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantHandle, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
-            if (path.contains("lever") == wantHandle) {
+            if ((path.contains("lever") && !path.contains("base") && !path.contains("cobblestone") && !path.contains("side")) == wantHandle) {
                 buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
             }
         }

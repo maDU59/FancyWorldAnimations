@@ -9,12 +9,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Backport;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class FenceGateAnimation extends Animation{
 
     private final RandomSource random = RandomSource.create(42);
-    private static final float EPSILON = 0.0001f;
+    private final float EPSILON = 0.0001f;
 
     public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -36,7 +37,7 @@ public class FenceGateAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.FENCEGATE_SPEED.getValue();
+        return 10 / SettingsManager.FENCEGATE_SPEED.getValue();
     }
 
     @Override
@@ -66,13 +67,14 @@ public class FenceGateAnimation extends Animation{
     }
     
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         Direction facing = defaultState.getValue(FenceGateBlock.FACING);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState, true));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
@@ -94,7 +96,7 @@ public class FenceGateAnimation extends Animation{
         float rightPivotX = onAxisZ ? (15.0f / 16.0f) : 0.5f;
         float rightPivotZ = onAxisZ ? 0.5f : (15.0f / 16.0f);
 
-        float angle = (float)getAngle(nowTick, facing);
+        float angle = (float)getAngle(context.getNowTick(), facing);
         float leftAngle = onAxisZ ? -angle : angle;
         float rightAngle = onAxisZ ? angle : -angle;
 

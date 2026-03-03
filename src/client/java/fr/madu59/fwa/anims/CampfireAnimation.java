@@ -6,12 +6,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -35,7 +36,7 @@ public class CampfireAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 15 * SettingsManager.CAMPFIRE_SPEED.getValue();
+        return 15 / SettingsManager.CAMPFIRE_SPEED.getValue();
     }
 
     @Override
@@ -55,7 +56,8 @@ public class CampfireAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
         BlockState state;
         if (oldIsOpen) state = oldState;
         else state = newState;
@@ -64,7 +66,7 @@ public class CampfireAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(state, true));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(state, null, random), false, light);
         for(Direction dir : Direction.values()){
@@ -73,10 +75,10 @@ public class CampfireAnimation extends Animation{
 
         float scaleY;
         if (newIsOpen) {
-            scaleY = (float) (1 + 2.70158 * Math.pow(getProgress(nowTick) - 1, 3) + 1.70158 * Math.pow(getProgress(nowTick) - 1, 2));
+            scaleY = (float) (1 + 2.70158 * Math.pow(getProgress(context.getNowTick()) - 1, 3) + 1.70158 * Math.pow(getProgress(context.getNowTick()) - 1, 2));
         }
         else {
-            scaleY = 1 - (float) Curves.ease(getProgress(nowTick), Curves.Door.DEFAULT);
+            scaleY = 1 - (float) Curves.ease(getProgress(context.getNowTick()), Curves.Door.DEFAULT);
         }
         float scaleXZ = Math.min(1.0f, scaleY);
 

@@ -7,12 +7,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Backport;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -40,7 +41,7 @@ public class RepeaterAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 10 * SettingsManager.REPEATER_SPEED.getValue();
+        return 10 / SettingsManager.REPEATER_SPEED.getValue();
     }
 
     @Override
@@ -60,19 +61,20 @@ public class RepeaterAnimation extends Animation{
 
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         Direction facing = defaultState.getValue(RepeaterBlock.FACING);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState, true));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, null, random), false, light);
         for(Direction dir : Direction.values()){
             renderFilteredQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), false, light);
         }
 
-        float dx = getPosition(nowTick, newState.getValue(RepeaterBlock.DELAY), oldState.getValue(RepeaterBlock.DELAY));
+        float dx = getPosition(context.getNowTick(), newState.getValue(RepeaterBlock.DELAY), oldState.getValue(RepeaterBlock.DELAY));
         dx = (dx-1)*2f/16f * facing.getAxisDirection().getStep();
         if (facing.getAxis() == Axis.X) poseStack.translate(dx,0,0);
         else poseStack.translate(0,0,dx);
