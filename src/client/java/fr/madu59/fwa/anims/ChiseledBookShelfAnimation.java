@@ -5,11 +5,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -24,7 +25,6 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     int pos;
     boolean isAdding;
-    TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(ResourceLocation.tryParse("minecraft:blocks")).getSprite(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
     
     public ChiseledBookShelfAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -41,7 +41,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
     @Override
     public double getAnimDuration() {
-        return 5 * SettingsManager.CHISELED_BOOKSHELF_SPEED.getValue();
+        return 5 / SettingsManager.CHISELED_BOOKSHELF_SPEED.getValue();
     }
 
     @Override
@@ -73,8 +73,9 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     @Override
-    public void render(PoseStack poseStack, BufferSource bufferSource, double nowTick) {
-
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
+        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(ResourceLocation.tryParse("minecraft:blocks")).getSprite(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
         Direction facing = defaultState.getValue(ChiseledBookShelfBlock.FACING);
 
         PoseStack.Pose entry = poseStack.last();
@@ -85,7 +86,7 @@ public class ChiseledBookShelfAnimation extends Animation{
 
         float y = pos > 3 ? 4/16f : 12f/16f;
         float x = 3f/16f + ((pos - 1) % 3) * 5f/16f;
-        float z = getDistance(nowTick);
+        float z = getDistance(context.getNowTick());
 
         if(facing == Direction.EAST){
             x = 1-x;
@@ -113,31 +114,31 @@ public class ChiseledBookShelfAnimation extends Animation{
         float v2 = v1 + h;
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.relative(facing));
-        VertexConsumer buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(defaultState));
 
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 
-            u1, v1, u2, v2, light, 0, 0, -1);
+            u1, v1, u2, v2, light, 0, 0, -1, sprite);
 
         writeQuad(entry, buffer, 
             w, 0, 0,  w, h, 0,  0, h, 0,  0, 0, 0, 
-            u1, v1, u2, v2, light, 0, 0, 1);
+            u1, v1, u2, v2, light, 0, 0, 1, sprite);
 
         writeQuad(entry, buffer, 
             0, h, d,  0, h, 0,  w, h, 0,  w, h, d, 
-            u1, v1, u2, v2, light, 0, -1, 0);
+            u1, v1, u2, v2, light, 0, -1, 0, sprite);
 
         writeQuad(entry, buffer, 
             0, 0, 0,  0, 0, d,  w, 0, d,  w, 0, 0, 
-            u1, v1, u2, v2, light, 0, 1, 0);
+            u1, v1, u2, v2, light, 0, 1, 0, sprite);
 
         writeQuad(entry, buffer, 
             w, 0, d,  w, h, d,  w, h, 0,  w, 0, 0, 
-            u1, v1, u2, v2, light, -1, 0, 0);
+            u1, v1, u2, v2, light, -1, 0, 0, sprite);
 
         writeQuad(entry, buffer, 
             0, 0, 0,  0, h, 0,  0, h, d,  0, 0, d, 
-            u1, v1, u2, v2, light, 1, 0, 0);
+            u1, v1, u2, v2, light, 1, 0, 0, sprite);
         
         poseStack.translate(0.0f, 0.0f, 0.0f);
 }
@@ -148,7 +149,7 @@ public class ChiseledBookShelfAnimation extends Animation{
                         float x3, float y3, float z3,
                         float x4, float y4, float z4,
                         float uMin, float vMin, float uMax, float vMax, 
-                        int light, float nx, float ny, float nz) {
+                        int light, float nx, float ny, float nz, TextureAtlasSprite sprite) {
 
         uMin = sprite.getU(uMin);
         uMax = sprite.getU(uMax);
