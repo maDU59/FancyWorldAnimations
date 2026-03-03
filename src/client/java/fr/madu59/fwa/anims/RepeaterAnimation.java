@@ -6,13 +6,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -63,12 +61,13 @@ public class RepeaterAnimation extends Animation{
 
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         Direction facing = defaultState.getValue(RepeaterBlock.FACING);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
         BlockModelPart part = model.collectParts(random).get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
@@ -76,7 +75,7 @@ public class RepeaterAnimation extends Animation{
             renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
         }
 
-        float dx = getPosition(nowTick, newState.getValue(RepeaterBlock.DELAY), oldState.getValue(RepeaterBlock.DELAY));
+        float dx = getPosition(context.getNowTick(), newState.getValue(RepeaterBlock.DELAY), oldState.getValue(RepeaterBlock.DELAY));
         dx = (dx-1)*2f/16f * facing.getAxisDirection().getStep();
         if (facing.getAxis() == Axis.X) poseStack.translate(dx,0,0);
         else poseStack.translate(0,0,dx);

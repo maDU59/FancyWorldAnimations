@@ -8,13 +8,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -69,13 +67,14 @@ public class FenceGateAnimation extends Animation{
     }
     
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick) {
+    public void render(AnimationRenderingContext context) {
+        PoseStack poseStack = context.getPoseStack();
 
         Direction facing = defaultState.getValue(FenceGateBlock.FACING);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
 
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         BlockModelPart part = model.collectParts(random).get(0);
@@ -98,7 +97,7 @@ public class FenceGateAnimation extends Animation{
         float rightPivotX = onAxisZ ? (15.0f / 16.0f) : 0.5f;
         float rightPivotZ = onAxisZ ? 0.5f : (15.0f / 16.0f);
 
-        float angle = (float)getAngle(nowTick, facing);
+        float angle = (float)getAngle(context.getNowTick(), facing);
         float leftAngle = onAxisZ ? -angle : angle;
         float rightAngle = onAxisZ ? angle : -angle;
 

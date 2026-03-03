@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.irisshaders.iris.mixin.LevelRendererAccessor;
 import net.irisshaders.iris.shadows.ShadowRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -27,6 +28,6 @@ public abstract class ShadowRendererMixin {
     
     @Inject(at = @At("HEAD"), method = "renderEntities")
     public void fwa$renderEntities(LevelRendererAccessor levelRenderer, EntityRenderDispatcher dispatcher, MultiBufferSource.BufferSource bufferSource, PoseStack modelView, float tickDelta, Frustum frustum, double cameraX, double cameraY, double cameraZ, CallbackInfoReturnable<Integer> ci){
-        FancyWorldAnimationsClient.render(modelView, new Vec3(cameraX, cameraY, cameraZ), bufferSource, submitNodeStorage);
+        FancyWorldAnimationsClient.render(new AnimationRenderingContext(modelView, new Vec3(cameraX, cameraY, cameraZ), bufferSource, submitNodeStorage, FancyWorldAnimationsClient.getPartialTick()));
     }
 }
