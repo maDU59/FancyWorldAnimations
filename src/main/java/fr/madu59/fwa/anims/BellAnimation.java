@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.FwaModel;
@@ -37,13 +38,19 @@ public class BellAnimation extends Animation{
     private final BellModel bellModel;
     private final BlockStateModel model;
     private final float hash;
-    private BellBlockEntity bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
+    private BellBlockEntity bellBlockEntity;
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.bellModel = new BellModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
+        if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
+            this.bellBlockEntity = bbe;
+        }
+        else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
+            FancyWorldAnimationsClient.removeAnimationAt(position);
+        }
     }
 
     @Override
@@ -123,7 +130,13 @@ public class BellAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         if(bellBlockEntity == null){
-            bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
+            if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
+                bellBlockEntity = bbe;
+            }
+            else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
+                FancyWorldAnimationsClient.removeAnimationAt(position);
+                System.out.println("[REMOVAL] Invalid block removed");
+            }
             return;
         }
         PoseStack poseStack = context.getPoseStack();
