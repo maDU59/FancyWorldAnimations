@@ -283,6 +283,10 @@ public class FancyWorldAnimationsClient{
 		}
 	}
 
+	public static void removeAnimationAt(BlockPos position){
+		animations.removeAt(position);
+	}
+
 	public static enum Type
 	{
 		DOOR,

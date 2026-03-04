@@ -71,10 +71,9 @@ public class JukeBoxAnimation extends Animation{
 
         float scale = 0.67f;
 
-        JukeboxBlockEntity jukeboxBlockEntity = (JukeboxBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
-        if(jukeboxBlockEntity != null){
+        if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
             discItemStack = jukeboxBlockEntity.getTheItem();
 
             if (discItemStack.isEmpty()) {
