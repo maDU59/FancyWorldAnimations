@@ -270,6 +270,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 	}
 
+	public static void removeAnimationAt(BlockPos position){
+		animations.removeAt(position);
+	}
+
 	public static enum Type
 	{
 		DOOR,

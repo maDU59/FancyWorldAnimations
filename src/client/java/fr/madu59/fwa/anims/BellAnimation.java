@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.fabricmc.loader.api.FabricLoader;
@@ -35,12 +36,18 @@ public class BellAnimation extends Animation{
     private final RandomSource random = RandomSource.create(42);
     private final BakedModel model;
     private final float hash;
-    private BellBlockEntity bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
+    private BellBlockEntity bellBlockEntity;
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
+        if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
+            this.bellBlockEntity = bbe;
+        }
+        else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
+            FancyWorldAnimationsClient.removeAnimationAt(position);
+        }
     }
 
     @Override
@@ -121,8 +128,17 @@ public class BellAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         ModelPart modelPart = Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL);
         this.bellBody = modelPart.getChild("bell_body");
-        if (bellBlockEntity == null || this.bellBody == null) {
-            bellBlockEntity = (BellBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
+        if (this.bellBody == null) {
+            return;
+        }
+        if(bellBlockEntity == null){
+            if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
+                bellBlockEntity = bbe;
+            }
+            else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
+                FancyWorldAnimationsClient.removeAnimationAt(position);
+                System.out.println("[REMOVAL] Invalid block removed");
+            }
             return;
         }
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(ResourceLocation.tryParse("minecraft:entity/bell/bell_body"));        PoseStack poseStack = context.getPoseStack();
