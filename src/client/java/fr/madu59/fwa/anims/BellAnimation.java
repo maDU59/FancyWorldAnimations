@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.fabricmc.loader.api.FabricLoader;
@@ -36,13 +37,19 @@ public class BellAnimation extends Animation{
     private final BellModel bellModel;
     private final BlockStateModel model;
     private final float hash;
-    private BellBlockEntity bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+    private BellBlockEntity bellBlockEntity;
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
+        if(client.level.getBlockEntity(position) instanceof BellBlockEntity bbe){
+            this.bellBlockEntity = bbe;
+        }
+        else if (client.level.getBlockEntity(position) != null){
+            FancyWorldAnimationsClient.removeAnimationAt(position);
+        }
     }
 
     @Override
@@ -122,7 +129,13 @@ public class BellAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         if(bellBlockEntity == null){
-            bellBlockEntity = (BellBlockEntity) client.level.getBlockEntity(position);
+            if(client.level.getBlockEntity(position) instanceof BellBlockEntity bbe){
+                bellBlockEntity = bbe;
+            }
+            else if (client.level.getBlockEntity(position) != null){
+                FancyWorldAnimationsClient.removeAnimationAt(position);
+                System.out.println("[REMOVAL] Invalid block removed");
+            }
             return;
         }
         PoseStack poseStack = context.getPoseStack();
