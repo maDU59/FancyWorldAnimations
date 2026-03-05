@@ -51,9 +51,8 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     private void fwa$onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
         if(Minecraft.getInstance().level == null) return;
         LevelChunkSection[] sections = this.getSections();
-        LevelChunk chunk = (LevelChunk) (Object) this;
-        BlockPos chunkPos = chunk.getPos().getWorldPosition();
-        int chunkMinY = chunk.getMinY();
+        BlockPos chunkPos = this.getPos().getWorldPosition();
+        int chunkMinY = this.getMinY();
         
         for (int i = 0; i < sections.length; i++) {
             LevelChunkSection section = sections[i];
