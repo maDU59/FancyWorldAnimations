@@ -19,6 +19,7 @@ import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
+import fr.madu59.fwa.blockentity.registry.BlockEntityTypes;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -57,6 +58,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
+		BlockEntityTypes.register();
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
