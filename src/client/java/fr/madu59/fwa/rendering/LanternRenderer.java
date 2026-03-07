@@ -68,7 +68,7 @@ public class LanternRenderer implements BlockEntityRenderer<LanternBlockEntity, 
     }
 
     public void extractRenderState(LanternBlockEntity lanternBlockEntity, LanternRenderState lanternRenderState, float tickDelta, Vec3 offset, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
-        if(!SettingsManager.LANTERN_STATE.getValue()) return;
+        if(!lanternBlockEntity.isEnabled()) return;
         BlockEntityRenderer.super.extractRenderState(lanternBlockEntity, lanternRenderState, tickDelta, offset, crumblingOverlay);
         Level level = lanternBlockEntity.getLevel();
         BlockPos blockPos = lanternBlockEntity.getBlockPos();
@@ -91,7 +91,7 @@ public class LanternRenderer implements BlockEntityRenderer<LanternBlockEntity, 
                 crumbleStage = Mth.clamp(crumblingOverlay.progress(), 0, maxCrumbleStage - 1);
                 if (level instanceof ClientLevel clientLevel) {
                     long time = clientLevel.getGameTime();
-                    if (crumbleStage != lastCrumbleStage || time - lanternRenderState.lastCrumbleParticleTime >= 4L) {
+                    if (crumbleStage != lastCrumbleStage || time - lanternRenderState.lastCrumbleParticleTime >= 10L) {
                         addBreakingBlockEffect(clientLevel, blockPos, Direction.getRandom(clientLevel.getRandom()));
                         lanternRenderState.lastCrumbleParticleTime = time;
                     }
