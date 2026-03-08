@@ -31,7 +31,7 @@ public abstract class LanternBlockMixin extends Block implements EntityBlock, La
     }
 
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState){
-        if (blockState.getValue(LanternBlock.HANGING) && SettingsManager.LANTERN_STATE.getValue()){
+        if (blockState.getValue(LanternBlock.HANGING)){
             return new LanternBlockEntity(blockPos, blockState);
         }
         else{

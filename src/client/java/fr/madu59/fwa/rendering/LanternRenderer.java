@@ -60,7 +60,7 @@ public class LanternRenderer implements BlockEntityRenderer<LanternBlockEntity, 
         poseStack.mulPose(Axis.YP.rotationDegrees(spin));
         poseStack.translate(-0.5F, -pivotY, -0.5F);
         if (lanternRenderState.hanging) {
-            poseStack.translate(0.0F, 0.03125F, 0.0F);
+            poseStack.translate(0.0F, 0.03F, 0.0F);
         }
         submitNodeCollector.submitMovingBlock(poseStack, lanternRenderState.movingState);
         this.renderCrumblingOverlay(submitNodeCollector, poseStack, lanternRenderState);
