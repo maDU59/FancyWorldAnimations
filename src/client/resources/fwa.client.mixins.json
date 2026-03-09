@@ -11,7 +11,7 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
-		"BlockEntityTypeMixin",
+		"LevelRendererAccessor",
 		"sodium.LevelSliceMixin",
 		"iris.ShadowRendererMixin",
 		"lanterns.LanternBlockMixin"

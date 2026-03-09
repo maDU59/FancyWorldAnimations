@@ -22,6 +22,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -36,7 +37,8 @@ public abstract class LevelChunkMixin extends ChunkAccess {
         Blocks.END_PORTAL_FRAME, 
         Blocks.LECTERN, 
         Blocks.JUKEBOX, 
-        Blocks.BELL
+        Blocks.BELL,
+        Blocks.LANTERN
     );
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory palettedContainerFactory, long l, LevelChunkSection @Nullable [] levelChunkSections, @Nullable BlendingData blendingData) {
@@ -62,13 +64,18 @@ public abstract class LevelChunkMixin extends ChunkAccess {
         if (section.getStates().maybeHas(state -> state.is(Blocks.END_PORTAL_FRAME) || 
                                               state.is(Blocks.LECTERN) || 
                                               state.is(Blocks.JUKEBOX) || 
-                                              state.is(Blocks.BELL))){
+                                              state.is(Blocks.BELL)    ||
+                                              state.getBlock() instanceof LanternBlock)){
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
                         
-                        if (fwa$TARGET_BLOCKS.contains(state.getBlock())) {
+                        if (state.is(Blocks.END_PORTAL_FRAME) || 
+                                              state.is(Blocks.LECTERN) || 
+                                              state.is(Blocks.JUKEBOX) || 
+                                              state.is(Blocks.BELL)    ||
+                                              state.getBlock() instanceof LanternBlock) {
                             BlockPos worldPos = pos.offset(x, minY + y, z);
                             FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
                         }
