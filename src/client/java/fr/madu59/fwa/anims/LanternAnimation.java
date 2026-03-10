@@ -39,11 +39,17 @@ public class LanternAnimation extends Animation{
     private float spin = 0f;
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
+    private int lastTick = 0;
     private BlockState state;
+    private final List<BlockModelPart> parts;
+    private PoseStack stack = new PoseStack();
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         state = newState;
+        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        RandomSource random = RandomSource.create(state.getSeed(position));
+        parts = model.collectParts(random);
     }
 
     @Override
@@ -97,7 +103,7 @@ public class LanternAnimation extends Animation{
 
         if(level != null){
             int lastCrumbleStage = this.crumbleStage;
-            int crumbleStage = getCrumblingStage(pos);
+            int crumbleStage = getCrumblingStage(pos, context.getNowTick());
             int maxCrumbleStage = ModelBakery.DESTROY_STAGE_COUNT;
             if (crumbleStage >= 0){
                 crumbleStage = Mth.clamp(crumbleStage, 0, maxCrumbleStage - 1);
@@ -111,7 +117,9 @@ public class LanternAnimation extends Animation{
         }
     }
 
-    public int getCrumblingStage(BlockPos pos){
+    public int getCrumblingStage(BlockPos pos, double nowTick){
+        if(lastTick - Mth.floor(nowTick) >= 0.5) return crumbleStage;
+        lastTick = Mth.floor(nowTick);
         Long2ObjectMap<SortedSet<BlockDestructionProgress>> progressMap = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).fwa$getDestructionProgress();
         SortedSet<BlockDestructionProgress> sortedSet = progressMap.get(pos.asLong());
         if (sortedSet != null && !sortedSet.isEmpty()) {
@@ -127,12 +135,8 @@ public class LanternAnimation extends Animation{
         BlockPos blockPos = position;
         BlockState blockState = state;
         submitNodeCollector.submitCustomGeometry(poseStack, renderType, (matrixEntry, vertexConsumer) -> {
-            PoseStack stack = new PoseStack();
             stack.last().pose().set(matrixEntry.pose());
             stack.last().normal().set(matrixEntry.normal());
-            BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState);
-            RandomSource random = RandomSource.create(blockState.getSeed(blockPos));
-            List<BlockModelPart> parts = model.collectParts(random);
             if (!parts.isEmpty()) {
                 Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, parts, blockState, blockPos, stack, new SheetedDecalTextureGenerator(vertexConsumer, stack.last(), 1.0F), true, OverlayTexture.NO_OVERLAY);
             }
