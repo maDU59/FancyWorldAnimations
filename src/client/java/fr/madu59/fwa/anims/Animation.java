@@ -80,6 +80,10 @@ public class Animation {
         return getAnimDuration();
     }
 
+    public boolean needEndBatch(){
+        return false;
+    }
+
     public double getProgress(double nowTick) {
         return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
     }

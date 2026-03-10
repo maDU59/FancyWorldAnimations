@@ -117,7 +117,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);
-			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source) {
+			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && animation.needEndBatch()) {
 				source.endBatch(); //Fixes weird rendering issues with multiple animations at the same time and PBR enabled. Might cause performance issues with shaders and shadows but that's the only fix I have
 			}
 		}
