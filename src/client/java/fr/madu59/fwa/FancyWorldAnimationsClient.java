@@ -24,9 +24,8 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
@@ -59,10 +58,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
-		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
+		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), tickDelta));
+				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), tickDelta));
 			}
 		});
 	}
@@ -117,11 +116,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);
-			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && animation.needEndBatch()) {
-				source.endBatch(); //Fixes weird rendering issues with multiple animations at the same time and PBR enabled. Might cause performance issues with shaders and shadows but that's the only fix I have
-			}
 		}
-
 		animations.clean(context.getNowTick());
 	}
 

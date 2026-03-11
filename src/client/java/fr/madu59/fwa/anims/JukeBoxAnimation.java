@@ -17,7 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -75,7 +75,6 @@ public class JukeBoxAnimation extends Animation{
         float scale = 0.67f;
 
         ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
-        System.out.println(client.level.getBlockEntity(position));
         if(client.level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
             discItemStack = jukeboxBlockEntity.getTheItem();
         }
@@ -95,7 +94,7 @@ public class JukeBoxAnimation extends Animation{
             discItemStack = new ItemStack(Items.MUSIC_DISC_13);
         }
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) client.level, position.above());
 
         float dy = getDeltaY(context.getNowTick());
         dy = newIsOpen? 1f - dy : dy;

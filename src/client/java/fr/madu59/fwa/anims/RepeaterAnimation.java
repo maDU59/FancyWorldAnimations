@@ -1,8 +1,10 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
@@ -11,16 +13,16 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -30,13 +32,14 @@ public class RepeaterAnimation extends Animation{
     private final BlockState newState;
     private final RandomSource random = RandomSource.create(42);
     private final BlockStateModel model;
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
 
         newState = newBlockState;
         oldState = oldBlockState;
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
     }
 
     @Override
@@ -65,10 +68,11 @@ public class RepeaterAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
 
         Direction facing = defaultState.getValue(RepeaterBlock.FACING);
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-        BlockModelPart part = model.collectParts(random).get(0);
+        model.collectParts(random, parts);
+        BlockStateModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
@@ -88,9 +92,12 @@ public class RepeaterAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantTorch, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.materialInfo().sprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f && quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f && quad.position0().z() > 5f/16f && quad.position0().z()  < 11f/16f && quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f) == wantTorch) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                QuadInstance quadInstance = new QuadInstance();
+                quadInstance.setLightCoords(light);
+                quadInstance.setColor(ARGB.colorFromFloat(1.0f,1.0f,1.0f,1.0f));
+                buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
             }
         }
     }

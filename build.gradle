@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -13,7 +13,7 @@ base {
 repositories {
 	maven {
 		name = "Terraformers"
-		url = "https://maven.terraformersmc.com/"
+		url = "https://maven.terraformersmc.com/releases"
 	}
 	maven {
         name = "Modrinth"
@@ -32,7 +32,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"modid" {
+		"id" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -43,17 +43,16 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
-	modImplementation "net.caffeinemc:sodium-fabric:0.8.3+mc1.21.11"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
+	// implementation "net.caffeinemc:sodium-fabric:0.8.3+mc1.21.11"
 
-	localRuntime 'org.anarres:jcpp:1.4.14'
-    localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
-	modImplementation "maven.modrinth:iris:1.10.5+1.21.11-fabric"
+	// localRuntime 'org.anarres:jcpp:1.4.14'
+    // localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
+	// implementation "maven.modrinth:iris:1.10.5+1.21.11-fabric"
 }
 
 processResources {
@@ -65,7 +64,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
@@ -74,8 +73,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {

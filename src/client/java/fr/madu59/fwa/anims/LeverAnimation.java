@@ -1,8 +1,10 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
@@ -12,27 +14,29 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 
 public class LeverAnimation extends Animation{
     
-    private final RandomSource random = RandomSource.create(42);
     private final BlockStateModel model;
+    private List<BlockStateModelPart> parts = new ArrayList<>();
 
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -73,10 +77,10 @@ public class LeverAnimation extends Animation{
         Direction facing = defaultState.getValue(LeverBlock.FACING);
         AttachFace face = defaultState.getValue(LeverBlock.FACE);
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-        BlockModelPart part = model.collectParts(random).get(0);
+        BlockStateModelPart part = parts.get(0);
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
             renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
@@ -135,9 +139,12 @@ public class LeverAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantHandle, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.materialInfo().sprite().contents().name().getPath();
             if ((path.contains("lever") && !path.contains("base") && !path.contains("cobblestone") && !path.contains("side")) == wantHandle) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                QuadInstance quadInstance = new QuadInstance();
+                quadInstance.setLightCoords(light);
+                quadInstance.setColor(ARGB.colorFromFloat(1.0f,1.0f,1.0f,1.0f));
+                buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
             }
         }
     }

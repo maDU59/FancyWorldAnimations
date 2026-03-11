@@ -1,8 +1,10 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
@@ -12,24 +14,35 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class EndPortalFrameAnimation extends Animation{
 
-    private final RandomSource random = RandomSource.create(42);
+    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final BlockStateModel model;
+    private List<BlockStateModelPart> eyeParts = new ArrayList<>();
+    private final BlockStateModel eyeModel;
     
     public EndPortalFrameAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, parts);
+        BlockState eyeState = defaultState.setValue(EndPortalFrameBlock.HAS_EYE, true);
+        RandomSource eyeRandom = RandomSource.create(eyeState.getSeed(position));
+        eyeModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(eyeState);
+        eyeModel.collectParts(eyeRandom, eyeParts);
     }
 
     @Override
@@ -66,17 +79,13 @@ public class EndPortalFrameAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
         MultiBufferSource bufferSource = context.getBufferSource();
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-
-        BlockState eyeState = defaultState.setValue(EndPortalFrameBlock.HAS_EYE, true);
-
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
-        BlockModelPart part = model.collectParts(random).get(0);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
+        BlockStateModelPart part = eyeParts.get(0);
 
         if(newIsOpen){
 
             VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
-            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
+            context.getSubmitNodeCollector().submitBlockModel(poseStack, RenderTypes.cutoutMovingBlock(), parts, new int[0], light, OverlayTexture.NO_OVERLAY, 0);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
             for(Direction dir : Direction.values()){
@@ -100,9 +109,12 @@ public class EndPortalFrameAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                buffer.putBulkData(poseStack.last(), quad, r, g, b, a, light, OverlayTexture.NO_OVERLAY);
+                QuadInstance quadInstance = new QuadInstance();
+                quadInstance.setLightCoords(light);
+                quadInstance.setColor(ARGB.colorFromFloat(a,r,g,b));
+                buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
             }
         }
     }

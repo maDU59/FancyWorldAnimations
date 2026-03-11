@@ -1,10 +1,10 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
@@ -17,9 +17,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -27,7 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -41,15 +41,16 @@ public class LanternAnimation extends Animation{
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
     private BlockState state;
-    private final List<BlockModelPart> parts;
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private PoseStack stack = new PoseStack();
+    private final BlockStateModel model;
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         state = newState;
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        RandomSource random = RandomSource.create(state.getSeed(position));
-        parts = model.collectParts(random);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class LanternAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         SubmitNodeCollector submitNodeCollector = context.getSubmitNodeCollector();
         extractRenderState(context);
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         float swingScale = 1;
         float yaw = this.yaw * Math.max(0.55F, swingScale);
         float tiltX = this.tiltX * swingScale;
@@ -85,8 +86,8 @@ public class LanternAnimation extends Animation{
         poseStack.mulPose(Axis.YP.rotationDegrees(spin));
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
-        this.renderCrumblingOverlay(submitNodeCollector, poseStack);
+        submitNodeCollector.submitBlockModel(poseStack, RenderTypes.cutoutMovingBlock(), parts, new int[0], light, OverlayTexture.NO_OVERLAY, 0);
+        //this.renderCrumblingOverlay(submitNodeCollector, poseStack);
         poseStack.popPose();
     }
 
@@ -130,17 +131,7 @@ public class LanternAnimation extends Animation{
 
     public void renderCrumblingOverlay(SubmitNodeCollector submitNodeCollector, PoseStack poseStack){
         if(this.crumbleStage < 0) return;
-        ClientLevel level = Minecraft.getInstance().level;
-        RenderType renderType = (RenderType) ModelBakery.DESTROY_TYPES.get(this.crumbleStage);
-        BlockPos blockPos = position;
-        BlockState blockState = state;
-        submitNodeCollector.submitCustomGeometry(poseStack, renderType, (matrixEntry, vertexConsumer) -> {
-            stack.last().pose().set(matrixEntry.pose());
-            stack.last().normal().set(matrixEntry.normal());
-            if (!parts.isEmpty()) {
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, parts, blockState, blockPos, stack, new SheetedDecalTextureGenerator(vertexConsumer, stack.last(), 1.0F), true, OverlayTexture.NO_OVERLAY);
-            }
-        });
+        submitNodeCollector.submitBreakingBlockModel(poseStack, model, defaultState.getSeed(position), crumbleStage);
     }
 
     public void addBreakingBlockEffect(ClientLevel clientLevel, BlockPos blockPos, Direction direction) {
@@ -149,9 +140,9 @@ public class LanternAnimation extends Animation{
             int j = blockPos.getY();
             int k = blockPos.getZ();
             AABB aABB = ((LanternBlockInterface)state.getBlock()).fwa$getShape().bounds();
-            double d = (double)i + clientLevel.random.nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
-            double e = (double)j + clientLevel.random.nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
-            double g = (double)k + clientLevel.random.nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
+            double d = (double)i + clientLevel.getRandom().nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
+            double e = (double)j + clientLevel.getRandom().nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
+            double g = (double)k + clientLevel.getRandom().nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
             if (direction == Direction.DOWN) {
                 e = (double)j + aABB.minY - (double)0.1F;
             }
