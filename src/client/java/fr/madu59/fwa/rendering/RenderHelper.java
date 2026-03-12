@@ -25,7 +25,6 @@ public class RenderHelper {
             float topShade = level.getShade(Direction.UP, true);
             float ZShade = level.getShade(Direction.NORTH, true);
             float XShade = level.getShade(Direction.EAST, true);
-            System.out.println(bottomShade);
             Vector3f normal = new Vector3f(bakedQuad.direction().getUnitVec3f());
             normal.mul(pose.normal());
             normal.normalize();  
