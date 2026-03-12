@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -84,7 +83,7 @@ public class EndPortalFrameAnimation extends Animation{
         if(newIsOpen){
 
             VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
-            context.getSubmitNodeCollector().submitBlockModel(poseStack, RenderTypes.cutoutMovingBlock(), parts, new int[0], light, OverlayTexture.NO_OVERLAY, 0);
+            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1f, 1f, 1f, 1f, light);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
             for(Direction dir : Direction.values()){
