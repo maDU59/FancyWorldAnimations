@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -25,7 +25,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
@@ -178,10 +177,7 @@ public class BellAnimation extends Animation{
 
     private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
         for (BakedQuad quad : quads) {
-            QuadInstance quadInstance = new QuadInstance();
-            quadInstance.setLightCoords(light);
-            quadInstance.setColor(ARGB.colorFromFloat(1.0f,1.0f,1.0f,1.0f));
-            buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
+            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 }

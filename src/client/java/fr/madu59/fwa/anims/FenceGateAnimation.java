@@ -6,11 +6,11 @@ import java.util.List;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.FenceGateBlock;
@@ -122,10 +121,7 @@ public class FenceGateAnimation extends Animation{
 
     private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
         for (BakedQuad quad : quads) {
-            QuadInstance quadInstance = new QuadInstance();
-            quadInstance.setLightCoords(light);
-            quadInstance.setColor(ARGB.colorFromFloat(1.0f,1.0f,1.0f,1.0f));
-            buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
+            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.RepeaterBlock;
@@ -94,10 +93,7 @@ public class RepeaterAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f && quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f && quad.position0().z() > 5f/16f && quad.position0().z()  < 11f/16f && quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f) == wantTorch) {
-                QuadInstance quadInstance = new QuadInstance();
-                quadInstance.setLightCoords(light);
-                quadInstance.setColor(ARGB.colorFromFloat(1.0f,1.0f,1.0f,1.0f));
-                buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

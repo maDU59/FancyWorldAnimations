@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -20,7 +20,6 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.CauldronBlock;
@@ -119,10 +118,7 @@ public class LayeredCauldronAnimation extends Animation{
                     b = (float) (color & 255) / 255.0F;
                 }
 
-                QuadInstance quadInstance = new QuadInstance();
-                quadInstance.setLightCoords(light);
-                quadInstance.setColor(ARGB.colorFromFloat(1.0f,r,g,b));
-                buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, r, g, b, light);
             }
         }
     }

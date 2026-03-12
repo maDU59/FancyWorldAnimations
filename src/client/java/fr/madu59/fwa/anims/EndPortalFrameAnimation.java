@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
@@ -111,10 +110,7 @@ public class EndPortalFrameAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                QuadInstance quadInstance = new QuadInstance();
-                quadInstance.setLightCoords(light);
-                quadInstance.setColor(ARGB.colorFromFloat(a,r,g,b));
-                buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, a, r, g, b, light);
             }
         }
     }
