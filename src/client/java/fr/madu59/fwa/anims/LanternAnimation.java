@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.SortedSet;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.LanternBlockInterface;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
@@ -20,7 +22,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -42,7 +43,6 @@ public class LanternAnimation extends Animation{
     private int lastTick = 0;
     private BlockState state;
     private List<BlockStateModelPart> parts = new ArrayList<>();
-    private PoseStack stack = new PoseStack();
     private final BlockStateModel model;
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
@@ -70,7 +70,6 @@ public class LanternAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        SubmitNodeCollector submitNodeCollector = context.getSubmitNodeCollector();
         extractRenderState(context);
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         float swingScale = 1;
@@ -86,8 +85,9 @@ public class LanternAnimation extends Animation{
         poseStack.mulPose(Axis.YP.rotationDegrees(spin));
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
-        submitNodeCollector.submitBlockModel(poseStack, RenderTypes.cutoutMovingBlock(), parts, new int[0], light, OverlayTexture.NO_OVERLAY, 0);
-        //this.renderCrumblingOverlay(submitNodeCollector, poseStack);
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        //this.renderCrumblingOverlay(context.getSubmitNodeCollector(), poseStack);
         poseStack.popPose();
     }
 

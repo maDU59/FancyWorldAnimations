@@ -18,7 +18,6 @@ import net.minecraft.client.model.object.bell.BellModel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -168,16 +167,7 @@ public class BellAnimation extends Animation{
 
         if(shouldUseFallbackRender()){
             VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-            renderQuads(poseStack, buffer, parts.get(0).getQuads(null), light);
-            for(Direction dir : Direction.values()){
-                renderQuads(poseStack, buffer, parts.get(0).getQuads(dir), light);
-            }
-        }
-    }
-
-    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
-        for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 }

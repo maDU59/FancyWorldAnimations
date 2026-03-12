@@ -1,5 +1,7 @@
 package fr.madu59.fwa.rendering;
 
+import java.util.List;
+
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -7,7 +9,7 @@ import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.QuadInstance;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockModelLighter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
@@ -15,8 +17,22 @@ import net.minecraft.world.level.CardinalLighting;
 
 public class RenderHelper {
 
-    private static final BlockModelLighter lighter = new BlockModelLighter();
     private static final CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
+
+    public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
+        for (BlockStateModelPart part : parts){
+            renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
+            for(Direction dir : Direction.values()){
+                renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
+            }
+        }
+    }
+
+    public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
+        for (BakedQuad bakedQuad : bakedQuads){
+            renderQuad(buffer, pose, bakedQuad, a, r, g, b, light);
+        }
+    }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
         renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, true);
