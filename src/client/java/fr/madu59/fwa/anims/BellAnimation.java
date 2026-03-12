@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,9 +16,8 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.bell.BellModel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -35,16 +35,18 @@ import net.minecraft.world.level.block.state.properties.BellAttachType;
 public class BellAnimation extends Animation{
 
     private final Minecraft client = Minecraft.getInstance();
-    private final RandomSource random = RandomSource.create(42);
     private final BellModel bellModel;
     private final BlockStateModel model;
     private final float hash;
     private BellBlockEntity bellBlockEntity;
+    private List<BlockModelPart> parts = new ArrayList<>();
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, parts);
         this.hash = position.hashCode();
         if(client.level.getBlockEntity(position) instanceof BellBlockEntity bbe){
             this.bellBlockEntity = bbe;
@@ -165,17 +167,7 @@ public class BellAnimation extends Animation{
 
         if(shouldUseFallbackRender()){
             VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-            BlockModelPart part = model.collectParts(random).get(0);
-            renderQuads(poseStack, buffer, part.getQuads(null), light);
-            for(Direction dir : Direction.values()){
-                renderQuads(poseStack, buffer, part.getQuads(dir), light);
-            }
-        }
-    }
-
-    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
-        for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 }

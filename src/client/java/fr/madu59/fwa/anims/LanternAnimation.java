@@ -1,15 +1,18 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.LanternBlockInterface;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
@@ -17,9 +20,10 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -41,15 +45,16 @@ public class LanternAnimation extends Animation{
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
     private BlockState state;
-    private final List<BlockModelPart> parts;
+    private List<BlockModelPart> parts = new ArrayList<>();
+    private final BlockStateModel model;
     private PoseStack stack = new PoseStack();
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         state = newState;
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        RandomSource random = RandomSource.create(state.getSeed(position));
-        parts = model.collectParts(random);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -69,7 +74,6 @@ public class LanternAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        SubmitNodeCollector submitNodeCollector = context.getSubmitNodeCollector();
         extractRenderState(context);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         float swingScale = 1;
@@ -85,8 +89,9 @@ public class LanternAnimation extends Animation{
         poseStack.mulPose(Axis.YP.rotationDegrees(spin));
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
-        this.renderCrumblingOverlay(submitNodeCollector, poseStack);
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        //this.renderCrumblingOverlay(context.getSubmitNodeCollector(), poseStack);
         poseStack.popPose();
     }
 
@@ -149,9 +154,9 @@ public class LanternAnimation extends Animation{
             int j = blockPos.getY();
             int k = blockPos.getZ();
             AABB aABB = ((LanternBlockInterface)state.getBlock()).fwa$getShape().bounds();
-            double d = (double)i + clientLevel.random.nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
-            double e = (double)j + clientLevel.random.nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
-            double g = (double)k + clientLevel.random.nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
+            double d = (double)i + clientLevel.getRandom().nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
+            double e = (double)j + clientLevel.getRandom().nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
+            double g = (double)k + clientLevel.getRandom().nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
             if (direction == Direction.DOWN) {
                 e = (double)j + aABB.minY - (double)0.1F;
             }

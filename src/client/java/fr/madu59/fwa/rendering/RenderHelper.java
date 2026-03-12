@@ -1,5 +1,7 @@
 package fr.madu59.fwa.rendering;
 
+import java.util.List;
+
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -8,10 +10,26 @@ import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 
 public class RenderHelper {
+
+    public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light){
+        for (BlockModelPart part : parts){
+            renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
+            for(Direction dir : Direction.values()){
+                renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
+            }
+        }
+    }
+
+    public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
+        for (BakedQuad bakedQuad : bakedQuads){
+            renderQuad(buffer, pose, bakedQuad, a, r, g, b, light);
+        }
+    }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
         renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, true);

@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Vector3fc;
@@ -14,9 +15,9 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,11 +29,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class FenceGateAnimation extends Animation{
 
-    private final RandomSource random = RandomSource.create(42);
     private final float EPSILON = 0.0001f;
+    private List<BlockModelPart> parts = new ArrayList<>();
+    private final BlockStateModel model;
+
 
     public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -76,8 +82,7 @@ public class FenceGateAnimation extends Animation{
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
 
-        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        BlockModelPart part = model.collectParts(random).get(0);
+        BlockModelPart part = parts.get(0);
 
         List<BakedQuad> quads = new java.util.ArrayList<>();
         for (Direction dir : Direction.values()) {

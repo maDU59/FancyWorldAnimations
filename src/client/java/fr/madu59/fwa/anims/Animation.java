@@ -3,11 +3,7 @@ package fr.madu59.fwa.anims;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class Animation {
@@ -89,7 +85,5 @@ public class Animation {
     }
 
     public void render(AnimationRenderingContext context) {
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, context.getPoseStack(), context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
     }
 }
