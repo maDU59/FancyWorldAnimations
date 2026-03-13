@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -8,6 +9,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -16,7 +18,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -31,8 +32,8 @@ public class LayeredCauldronAnimation extends Animation{
     private final BlockState oldState;
     private final BlockState newState;
     private final boolean isInverted;
-    private final RandomSource random = RandomSource.create(42);
     private final BlockStateModel model;
+    private List<BlockModelPart> parts = new ArrayList<>();
     
     public LayeredCauldronAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -48,7 +49,9 @@ public class LayeredCauldronAnimation extends Animation{
             isInverted = false;
         }
 
+        RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(newState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -85,7 +88,7 @@ public class LayeredCauldronAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
-        BlockModelPart part = model.collectParts(random).get(0);
+        BlockModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
@@ -116,7 +119,7 @@ public class LayeredCauldronAnimation extends Animation{
                     b = (float) (color & 255) / 255.0F;
                 }
 
-                buffer.putBulkData(poseStack.last(), quad, r, g, b, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, r, g, b, light);
             }
         }
     }
