@@ -1,26 +1,40 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 
 public class ButtonAnimation extends Animation{
+
+    private List<BlockModelPart> parts = new ArrayList<>();
+    private final BlockStateModel model;
     
     public ButtonAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -66,7 +80,10 @@ public class ButtonAnimation extends Animation{
 
         poseStack.translate(x, y, z);
 
+        model.collectParts(null, parts);
+
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

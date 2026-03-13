@@ -12,6 +12,7 @@ import fr.madu59.fwa.anims.DoorAnimation;
 import fr.madu59.fwa.anims.EndPortalFrameAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.JukeBoxAnimation;
+import fr.madu59.fwa.anims.LanternAnimation;
 import fr.madu59.fwa.anims.LayeredCauldronAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
@@ -26,6 +27,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
@@ -38,6 +40,7 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EndPortalFrameBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LavaCauldronBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LecternBlock;
@@ -60,7 +63,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.matrixStack(), context.gameRenderer().getMainCamera().position(), context.consumers(), tickDelta));
+				render(new AnimationRenderingContext(context.matrixStack(), context.gameRenderer().getMainCamera().position(), context.consumers(), tickDelta, false));
 			}
 		});
 	}
@@ -115,11 +118,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);
-			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source) {
-				source.endBatch(); //Fixes weird rendering issues with multiple animations at the same time and PBR enabled. Might cause performance issues with shaders and shadows but that's the only fix I have
+			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source){ // && Iris.PBR.enabled()
+				source.endBatch();
 			}
 		}
-
 		animations.clean(context.getNowTick());
 	}
 
@@ -135,6 +137,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
+		if(type == Type.LANTERN) return newState.getValue(LanternBlock.HANGING);
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
 		return oldIsOpen != newIsOpen;
 	}
@@ -208,6 +211,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case VAULT: return new VaultAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
+			case LANTERN: return new LanternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -230,6 +234,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof ComposterBlock) return Type.COMPOSTER;
 		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
 		if(block instanceof VaultBlock) return Type.VAULT;
+		if(block instanceof LanternBlock) return Type.LANTERN;
 		return Type.USELESS;
 	}
 
@@ -293,6 +298,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		COMPOSTER,
 		TRIPWIRE_HOOK,
 		VAULT,
+		LANTERN,
 		USELESS
 	}
 }

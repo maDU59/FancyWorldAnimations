@@ -17,6 +17,7 @@
     "fwa.config.category.composter":"COMPOSTERS",
     "fwa.config.category.tripwire_hook":"TRIPWIRE HOOKS",
     "fwa.config.category.vault":"VAULTS",
+    "fwa.config.category.lantern":"LANTERNS",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.state.name":"Animation state",
