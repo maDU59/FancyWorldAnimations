@@ -1,6 +1,7 @@
 package fr.madu59.fwa.mixin.client;
 
 import java.util.function.Consumer;
+import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,12 +20,9 @@ import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EndPortalFrameBlock;
-import net.minecraft.world.level.block.JukeboxBlock;
-import net.minecraft.world.level.block.LecternBlock;
+import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -36,7 +34,16 @@ import net.minecraft.world.level.levelgen.blending.BlendingData;
 public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
-    private final BlockState fwa$airState = Blocks.AIR.defaultBlockState();
+    private final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
+
+    @Unique
+    private static final Set<Block> fwa$TARGET_BLOCKS = Set.of(
+        Blocks.END_PORTAL_FRAME, 
+        Blocks.LECTERN, 
+        Blocks.JUKEBOX, 
+        Blocks.BELL,
+        Blocks.LANTERN
+    );
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, registry, l, levelChunkSections, blendingData);
@@ -46,48 +53,39 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     private void fwa$onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, CompoundTag compoundTag, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
         if(Minecraft.getInstance().level == null) return;
         LevelChunkSection[] sections = this.getSections();
+        BlockPos chunkPos = this.getPos().getWorldPosition();
+        int chunkMinY = this.getMinBuildHeight();
         
         for (int i = 0; i < sections.length; i++) {
             LevelChunkSection section = sections[i];
             if (section == null || section.hasOnlyAir()) continue;
-            fwa$scanSectionFor(section, (LevelChunk) (Object) this, i);
+            fwa$scanSectionFor(section, chunkPos, chunkMinY + i * 16);
         }
     }
 
     @Unique
-    private void fwa$scanSectionFor(LevelChunkSection section, LevelChunk chunk, int sectionIndex){
+    private void fwa$scanSectionFor(LevelChunkSection section, BlockPos pos, int minY){
         if (section.getStates().maybeHas(state -> state.is(Blocks.END_PORTAL_FRAME) || 
                                               state.is(Blocks.LECTERN) || 
                                               state.is(Blocks.JUKEBOX) || 
-                                              state.is(Blocks.BELL))){
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
+                                              state.is(Blocks.BELL)    ||
+                                              state.getBlock() instanceof LanternBlock)){
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
                         
-                        if (state.is(Blocks.END_PORTAL_FRAME) || state.is(Blocks.LECTERN) || state.is(Blocks.JUKEBOX) || state.is(Blocks.BELL)) {
-                            BlockPos worldPos = chunk.getPos().getWorldPosition().offset(x, chunk.getMinBuildHeight() + y + (sectionIndex * 16), z);
-                            fwa$init(state.getBlock(), state, worldPos);
+                        if (state.is(Blocks.END_PORTAL_FRAME) || 
+                                              state.is(Blocks.LECTERN) || 
+                                              state.is(Blocks.JUKEBOX) || 
+                                              state.is(Blocks.BELL)    ||
+                                              state.getBlock() instanceof LanternBlock) {
+                            BlockPos worldPos = pos.offset(x, minY + y, z);
+                            FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
                         }
                     }
                 }
             }
         }
     }
-
-	@Unique
-	private void fwa$init(Block block, BlockState state, BlockPos blockPos) {
-        if (block instanceof LecternBlock){
-            FancyWorldAnimationsClient.onBlockUpdate(blockPos, fwa$airState, state);
-        }
-        if (block instanceof EndPortalFrameBlock){
-            FancyWorldAnimationsClient.onBlockUpdate(blockPos, fwa$airState, state);
-        }
-        if (block instanceof JukeboxBlock){
-            FancyWorldAnimationsClient.onBlockUpdate(blockPos, fwa$airState, state);
-        }
-        if (block instanceof BellBlock){
-            FancyWorldAnimationsClient.onBlockUpdate(blockPos, fwa$airState, state);
-        }
-	}
 }

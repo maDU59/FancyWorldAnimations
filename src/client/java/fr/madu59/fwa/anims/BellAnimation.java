@@ -1,13 +1,12 @@
 package fr.madu59.fwa.anims;
 
-import java.util.List;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -33,13 +32,14 @@ import net.minecraft.world.level.block.state.properties.BellAttachType;
 public class BellAnimation extends Animation{
 
     private ModelPart bellBody;
-    private final RandomSource random = RandomSource.create(42);
     private final BakedModel model;
     private final float hash;
     private BellBlockEntity bellBlockEntity;
+    private final RandomSource random;
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
@@ -161,10 +161,7 @@ public class BellAnimation extends Animation{
 
         if(shouldUseFallbackRender()){
             VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
-            renderQuads(poseStack, buffer, model.getQuads(defaultState, null, random), light);
-            for(Direction dir : Direction.values()){
-                renderQuads(poseStack, buffer, model.getQuads(defaultState, dir, random), light);
-            }
+            RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
         }
     }
 
@@ -187,11 +184,5 @@ public class BellAnimation extends Animation{
 
         this.bellBody.xRot = h;
         this.bellBody.zRot = k;
-    }
-
-    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
-        for (BakedQuad quad : quads) {
-            buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
-        }
     }
 }

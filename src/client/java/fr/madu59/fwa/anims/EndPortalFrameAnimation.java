@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -15,7 +16,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -25,10 +25,19 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class EndPortalFrameAnimation extends Animation{
 
-    private final RandomSource random = RandomSource.create(42);
+    private final RandomSource random;
+    private final BakedModel model;
+    private final RandomSource eyeRandom;
+    private final BakedModel eyeModel;
+    private final BlockState eyeState;
     
     public EndPortalFrameAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        eyeState = defaultState.setValue(EndPortalFrameBlock.HAS_EYE, true);
+        eyeRandom = RandomSource.create(eyeState.getSeed(position));
+        eyeModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
     }
 
     @Override
@@ -67,18 +76,14 @@ public class EndPortalFrameAnimation extends Animation{
         MultiBufferSource bufferSource = context.getBufferSource();
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        BlockState eyeState = defaultState.setValue(EndPortalFrameBlock.HAS_EYE, true);
-
-        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
-
         if(newIsOpen){
 
             VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
-            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
+            RenderHelper.renderModel(buffer, poseStack.last(), model, 1f, 1f, 1f, 1f, light, random, defaultState);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
-            renderFilteredQuads(poseStack, buffer, model.getQuads(eyeState, null, random), true, light, 1f, 1f, 1f, 1f);
+            renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 1f, 1f, 1f, 1f);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, model.getQuads(eyeState, dir, random), true, light, 1f, 1f, 1f, 1f);
+                renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, dir, eyeRandom), true, light, 1f, 1f, 1f, 1f);
             }
 
         }
@@ -88,9 +93,9 @@ public class EndPortalFrameAnimation extends Animation{
             float time = (float)(context.getNowTick() - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
 
-            renderFilteredQuads(poseStack, buffer, model.getQuads(eyeState, null, random), true, light, 0f, 1f, 0f, alpha);
+            renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 0f, 1f, 0f, alpha);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, model.getQuads(eyeState, dir, random), true, light, 0f, 1f, 0f, alpha);
+                renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, dir, eyeRandom), true, light, 0f, 1f, 0f, alpha);
             }
 
         }
@@ -100,7 +105,7 @@ public class EndPortalFrameAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                buffer.putBulkData(poseStack.last(), quad, r, g, b, a, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, a, r, g, b, light);
             }
         }
     }
