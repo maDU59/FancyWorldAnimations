@@ -7,14 +7,21 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TripWireHookAnimation extends Animation{
+
+    private final BakedModel model;
+    private final RandomSource random;
     
     public TripWireHookAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
     @Override

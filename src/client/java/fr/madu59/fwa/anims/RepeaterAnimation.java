@@ -8,13 +8,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +28,7 @@ public class RepeaterAnimation extends Animation{
 
     private final BlockState oldState;
     private final BlockState newState;
-    private final RandomSource random = RandomSource.create(42);
+    private final RandomSource random;
     private final BakedModel model;
     
     public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
@@ -36,6 +36,7 @@ public class RepeaterAnimation extends Animation{
 
         newState = newBlockState;
         oldState = oldBlockState;
+        random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
@@ -89,7 +90,7 @@ public class RepeaterAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && Backport.getPos(quad, 0).x() > 5f/16f && Backport.getPos(quad, 0).x() < 11f/16f && Backport.getPos(quad, 2).x() > 5f/16f && Backport.getPos(quad, 2).x() < 11f/16f && Backport.getPos(quad, 0).z() > 5f/16f && Backport.getPos(quad, 0).z()  < 11f/16f && Backport.getPos(quad, 2).z() > 5f/16f && Backport.getPos(quad, 2).z() < 11f/16f) == wantTorch) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

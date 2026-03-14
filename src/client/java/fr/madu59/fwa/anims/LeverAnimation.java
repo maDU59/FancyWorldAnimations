@@ -8,13 +8,13 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,11 +26,12 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 
 public class LeverAnimation extends Animation{
     
-    private final RandomSource random = RandomSource.create(42);
+    private final RandomSource random;
     private final BakedModel model;
 
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
@@ -135,7 +136,7 @@ public class LeverAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if ((path.contains("lever") && !path.contains("base") && !path.contains("cobblestone") && !path.contains("side")) == wantHandle) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }
