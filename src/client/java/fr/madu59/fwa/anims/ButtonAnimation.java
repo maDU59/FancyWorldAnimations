@@ -1,26 +1,35 @@
 package fr.madu59.fwa.anims;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 
 public class ButtonAnimation extends Animation{
+
+    private final BakedModel model;
+    private final RandomSource random;
     
     public ButtonAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+        random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
     @Override
@@ -67,6 +76,7 @@ public class ButtonAnimation extends Animation{
         poseStack.translate(x, y, z);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(defaultState, poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
     }
 }
