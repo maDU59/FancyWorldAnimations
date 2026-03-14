@@ -54,6 +54,6 @@ public class RenderHelper {
             shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
         }
 
-        buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
+        buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, light, OverlayTexture.NO_OVERLAY);
     }
 }

@@ -33,7 +33,7 @@ public class SettingsManager {
         "max_shader_compat",
         "fwa.config.option.max_shader_compat.name",
         "fwa.config.option.max_shader_compat.description",
-        true
+        false
     );
 
     public static Option<Boolean> DOOR_STATE = loadOptionWithDefaults(

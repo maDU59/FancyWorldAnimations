@@ -143,7 +143,7 @@ public class LanternAnimation extends Animation{
     // }
 
     public void addBreakingBlockEffect(ClientLevel clientLevel, BlockPos blockPos, Direction direction) {
-        if (state.shouldSpawnTerrainParticles()) {
+        if (state.shouldSpawnParticlesOnBreak()) {
             int i = blockPos.getX();
             int j = blockPos.getY();
             int k = blockPos.getZ();

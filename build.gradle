@@ -37,6 +37,12 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+
+	runs{
+		client{
+			vmArgs "-Dsodium.checks.issue2561=false"
+		}
+	}
 }
 
 dependencies {
@@ -49,12 +55,12 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
 
-	modImplementation "maven.modrinth:sodium:mc1.21.1-0.6.13-fabric"
+	modImplementation "maven.modrinth:sodium:mc1.20.1-0.5.12-beta.2-fabric"
 
     modImplementation("org.antlr:antlr4-runtime:4.13.1")
     modImplementation("io.github.douira:glsl-transformer:2.0.1")
     modImplementation("org.anarres:jcpp:1.4.14")
-	modImplementation "maven.modrinth:iris:1.8.8+1.21.1-fabric"
+	modImplementation "maven.modrinth:iris:1.7.6+1.20.1-fabric"
 }
 
 processResources {
@@ -66,7 +72,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 17
 }
 
 java {
@@ -75,8 +81,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {

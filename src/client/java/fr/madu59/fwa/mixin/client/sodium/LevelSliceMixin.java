@@ -1,7 +1,7 @@
 package fr.madu59.fwa.mixin.client.sodium;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import me.jellysquid.mods.sodium.client.world.WorldSlice;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = LevelSlice.class, remap = false)
+@Mixin(value = WorldSlice.class, remap = false)
 public abstract class LevelSliceMixin {
 
     @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)

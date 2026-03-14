@@ -30,7 +30,7 @@ public class Animations{
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
                     if (animation.isForRemoval()){
-                        if(Minecraft.getInstance().levelRenderer.isSectionCompiled(animation.getPos())) it.remove();
+                        if(Minecraft.getInstance().levelRenderer.isChunkCompiled(animation.getPos())) it.remove();
                     }
                     else{
                         animation.markForRemoval();
