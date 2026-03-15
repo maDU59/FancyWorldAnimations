@@ -27,7 +27,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
@@ -55,10 +59,14 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
+	private static ResourceKey<Level> dimension;
 
 	@Override
 	public void onInitializeClient() {
 		FancyWorldAnimationsConfigScreen.registerCommand();
+		ClientPlayConnectionEvents.DISCONNECT.register((clientPacketListener, client) -> {
+            animations.animations.clear();
+        });
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
@@ -113,7 +121,16 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static void render(AnimationRenderingContext context)
 	{
-		if(animations.isEmpty() || client.level == null) return;
+		ClientLevel level = Minecraft.getInstance().level;
+		if(level == null){
+			animations.animations.clear();
+			return;
+		}
+		if(dimension != null && dimension != level.dimension()){
+			animations.animations.clear();
+			return;
+		}
+		if(animations.isEmpty()) return;
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);
@@ -121,6 +138,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 				source.endBatch();
 			}
 		}
+		dimension = level.dimension();
 		animations.clean(context.getNowTick());
 	}
 
