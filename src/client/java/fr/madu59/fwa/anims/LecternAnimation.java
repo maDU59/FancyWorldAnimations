@@ -89,7 +89,7 @@ public class LecternAnimation extends Animation{
 
         Direction facing = defaultState.getValue(LecternBlock.FACING);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.entityCutout(Identifier.tryParse("minecraft:textures/entity/enchanting_table_book.png")));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.entityCutout(Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png")));
         
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         BookModel.State bookState = new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));
