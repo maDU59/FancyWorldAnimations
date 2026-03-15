@@ -130,7 +130,6 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			return;
 		}
 		if(animations.isEmpty()) return;
-		System.out.println(animations.animations.size());
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);
