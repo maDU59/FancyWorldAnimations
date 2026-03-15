@@ -7,13 +7,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,12 +25,19 @@ public class CampfireAnimation extends Animation{
 
     private final BlockState oldState;
     private final BlockState newState;
-    private final RandomSource random = RandomSource.create(42);
+    private final BlockState state;
+    private final BakedModel model;
+    private final RandomSource random;
     
     public CampfireAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState, BlockState newBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         newState = newBlockState;
         oldState = oldBlockState;
+
+        if (oldIsOpen) state = oldState;
+        else state = newState;
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        random = RandomSource.create(state.getSeed(position));
     }
 
     @Override
@@ -57,11 +64,6 @@ public class CampfireAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        BlockState state;
-        if (oldIsOpen) state = oldState;
-        else state = newState;
-
-        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
@@ -95,7 +97,7 @@ public class CampfireAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

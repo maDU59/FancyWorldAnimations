@@ -40,6 +40,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         // Example: Add categories + buttons
         list.addCategory("fwa.config.category.general");
         list.addButton(SettingsManager.MOD_TOGGLE);
+        list.addButton(SettingsManager.MAX_SHADER_COMPAT);
         list.addCategory("fwa.config.category.door");
         list.addButton(SettingsManager.DOOR_STATE);
         list.addButton(SettingsManager.DOOR_EASING);
@@ -103,6 +104,8 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.VAULT_EASING);
         list.addCategory("fwa.config.category.chest");
         list.addButton(SettingsManager.CHEST_EASING);
+        list.addCategory("fwa.config.category.lantern");
+        list.addButton(SettingsManager.LANTERN_STATE);
         
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {

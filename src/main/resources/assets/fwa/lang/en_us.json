@@ -17,8 +17,10 @@
     "fwa.config.category.composter":"COMPOSTERS",
     "fwa.config.category.tripwire_hook":"TRIPWIRE HOOKS",
     "fwa.config.category.vault":"VAULTS",
+    "fwa.config.category.lantern":"LANTERNS",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
+    "fwa.config.option.max_shader_compat.name":"Ensure max shader compatibility [PERFORMANCE-HEAVY]",
     "fwa.config.option.state.name":"Animation state",
     "fwa.config.option.easing.name":"Animation type",
     "fwa.config.option.speed.name":"Animation speed multiplier",
