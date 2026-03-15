@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -7,15 +8,15 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -30,6 +31,7 @@ public class RepeaterAnimation extends Animation{
     private final BlockState newState;
     private final RandomSource random = RandomSource.create(42);
     private final BlockStateModel model;
+    private List<BlockModelPart> parts = new ArrayList<>();
     
     public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -68,7 +70,8 @@ public class RepeaterAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-        BlockModelPart part = model.collectParts(random).get(0);
+        model.collectParts(random, parts);
+        BlockModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
@@ -90,7 +93,7 @@ public class RepeaterAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f && quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f && quad.position0().z() > 5f/16f && quad.position0().z()  < 11f/16f && quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f) == wantTorch) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

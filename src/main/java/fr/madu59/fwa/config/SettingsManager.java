@@ -358,6 +358,13 @@ public class SettingsManager {
         Curves.Door.SPRINGY
     );
 
+    public static Option<Boolean> LANTERN_STATE = loadOptionWithDefaults(
+        "lantern_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {

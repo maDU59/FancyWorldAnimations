@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -7,14 +8,15 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -25,12 +27,20 @@ public class CampfireAnimation extends Animation{
 
     private final BlockState oldState;
     private final BlockState newState;
-    private final RandomSource random = RandomSource.create(42);
+    private final BlockStateModel model;
+    private List<BlockModelPart> parts = new ArrayList<>();
     
     public CampfireAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState, BlockState newBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         newState = newBlockState;
         oldState = oldBlockState;
+
+        BlockState state;
+        if (oldIsOpen) state = oldState;
+        else state = newState;
+        RandomSource random = RandomSource.create(state.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -57,12 +67,9 @@ public class CampfireAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        BlockState state;
-        if (oldIsOpen) state = oldState;
-        else state = newState;
 
-        BlockModelPart part = Minecraft.getInstance().getBlockRenderer().getBlockModel(state).collectParts(random).get(0);
-
+        BlockModelPart part = parts.get(0);
+        
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
@@ -95,7 +102,7 @@ public class CampfireAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
-                buffer.putBulkData(poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.NO_OVERLAY);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

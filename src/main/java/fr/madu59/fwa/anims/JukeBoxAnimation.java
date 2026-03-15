@@ -11,7 +11,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -74,10 +76,21 @@ public class JukeBoxAnimation extends Animation{
         ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
             discItemStack = jukeboxBlockEntity.getTheItem();
-
-            if (discItemStack.isEmpty()) {
-                discItemStack = new ItemStack(Items.MUSIC_DISC_13);
+        }
+        if (discItemStack.isEmpty()) {
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            if (server != null) {
+                ServerLevel serverLevel = server.getLevel(Minecraft.getInstance().level.dimension());
+        
+                if (serverLevel != null) {
+                    if (serverLevel.getChunkAt(position).getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity) {
+                        discItemStack = jukeboxBlockEntity.getTheItem();
+                    }
+                }
             }
+        }
+        if (discItemStack.isEmpty()) {
+            discItemStack = new ItemStack(Items.MUSIC_DISC_13);
         }
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.above());

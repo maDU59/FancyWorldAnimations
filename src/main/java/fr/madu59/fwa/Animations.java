@@ -7,6 +7,8 @@ import fr.madu59.fwa.mixin.SetSectionDirtyInvoker;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 
 public class Animations{
@@ -25,18 +27,23 @@ public class Animations{
 
     public void clean(double nowTick) {
         synchronized (this) {
+            ClientLevel level = Minecraft.getInstance().level;
+            LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
             Iterator<Animation> it = this.animations.values().iterator();
             while (it.hasNext()) {
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
                     if (animation.isForRemoval()){
-                        if(Minecraft.getInstance().levelRenderer.isSectionCompiledAndVisible(animation.getPos())) it.remove();
+                        if(levelRenderer.isSectionCompiledAndVisible(animation.getPos())) it.remove();
                     }
                     else{
                         animation.markForRemoval();
                         BlockPos pos = animation.getPos();
-                        ((SetSectionDirtyInvoker) Minecraft.getInstance().levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+                        ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
                     }
+                }
+                if(!level.isLoaded(animation.getPos())){
+                    it.remove();
                 }
             }
         }

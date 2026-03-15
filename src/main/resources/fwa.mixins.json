@@ -11,10 +11,12 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
+		"LevelRendererAccessor",
 		"ModelMixin",
 		"ModelPartAccessor",
 		"sodium.LevelSliceMixin",
-		"iris.ShadowRendererMixin"
+		"iris.ShadowRendererMixin",
+		"lanterns.LanternBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
