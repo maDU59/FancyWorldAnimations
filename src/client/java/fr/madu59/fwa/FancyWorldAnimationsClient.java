@@ -80,16 +80,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
-			synchronized (animations){
-				animations.removeAt(blockPos);
-			}
+			animations.removeAt(blockPos);
 			return;
 		}
 
 		if(!isSameType(type, newState)){
-			synchronized (animations){
-				animations.removeAt(blockPos);
-			}
+			animations.removeAt(blockPos);
 			return;
 		}
 
@@ -97,21 +93,19 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean newIsOpen = isOpen(newState);
 
 		double startTick = (double)client.level.getGameTime();
-		synchronized (animations){
 
-			if (animations.containsAt(blockPos)) {
-				Animation animation = animations.getAt(blockPos);
-				if (animation.isUnique()) {
-					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
-					animations.removeAt(blockPos);
-				}
+		if (animations.containsAt(blockPos)) {
+			Animation animation = animations.getAt(blockPos);
+			if (animation.isUnique()) {
+				startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				animations.removeAt(blockPos);
 			}
-
-			if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
-
-			Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
-			if (animation.isEnabled()) animations.add(blockPos, animation);
 		}
+
+		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
+
+		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
+		if (animation.isEnabled()) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
@@ -265,28 +259,24 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
 	{
-		synchronized (animations){
-			if (animations.containsAt(pos)) {
-				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
-			}
-			else{
-				return false;
-			}
+		if (animations.containsAt(pos)) {
+			Animation animation = animations.getAt(pos);
+			return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
+		}
+		else{
+			return false;
 		}
 	}
 
 	public static boolean shouldCancelBlockRendering(BlockPos pos)
 	{
-		synchronized (animations){
-			if (animations.containsAt(pos)) {
-				Animation animation = animations.getAt(pos);
-				if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
-				return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
-			}
-			else{
-				return false;
-			}
+		if (animations.containsAt(pos)) {
+			Animation animation = animations.getAt(pos);
+			if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
+			return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
+		}
+		else{
+			return false;
 		}
 	}
 
