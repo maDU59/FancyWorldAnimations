@@ -3,7 +3,6 @@ package fr.madu59.fwa.mixin.client.sodium;
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,12 +13,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = LevelSlice.class, remap = false)
 public abstract class LevelSliceMixin {
 
-    private static final ThreadLocal<MutableBlockPos> REUSABLE_POS = ThreadLocal.withInitial(MutableBlockPos::new);
-
     @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
     private void fwa$hideAnimatedBlocks(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
-        MutableBlockPos pos = REUSABLE_POS.get();
-        pos.set(x, y, z);
+        BlockPos pos = new BlockPos(x, y, z);
+        if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
+            cir.setReturnValue(Blocks.AIR.defaultBlockState());
+        }
+    }
+
+    @Inject(method = "getBlockState(Lnet/minecraftcore/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
+    private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
         if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
             cir.setReturnValue(Blocks.AIR.defaultBlockState());
         }
