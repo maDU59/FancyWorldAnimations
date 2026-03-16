@@ -20,11 +20,4 @@ public abstract class LevelSliceMixin {
             cir.setReturnValue(Blocks.AIR.defaultBlockState());
         }
     }
-
-    @Inject(method = "getBlockState(Lnet/minecraftcore/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
-    private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
-            cir.setReturnValue(Blocks.AIR.defaultBlockState());
-        }
-    }
 }
