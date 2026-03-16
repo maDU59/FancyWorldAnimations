@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 
 public class Animations{
 
@@ -35,8 +34,7 @@ public class Animations{
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
                     if (animation.isForRemoval()){
-                        if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || level.getBlockState(animation.getPos()) != Blocks.AIR.defaultBlockState()) {
-                            System.out.println("Erased: " + animation.toString());
+                        if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
                             it.remove();
                         }
                     }
