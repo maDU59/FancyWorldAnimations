@@ -277,7 +277,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		synchronized (animations){
 			if (animations.containsAt(pos)) {
 				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
+				if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
+				return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
 			}
 			else{
 				return false;
