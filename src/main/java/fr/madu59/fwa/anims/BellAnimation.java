@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
-import net.neoforged.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 public class BellAnimation extends Animation{
 
@@ -84,7 +84,7 @@ public class BellAnimation extends Animation{
 
         float fastWave = (float) Math.sin(time * 0.25f) * 0.02f;
 
-        return ((slowWave + fastWave) / 2f) * Math.clamp(time - (float)getAnimDuration(), 0f, 5f)/5f;
+        return ((slowWave + fastWave) / 2f) * Math.min(Math.max(time - (float)getAnimDuration(), 0f), 5f)/5f;
     }
 
     private float animatePlacement(double nowTick){
@@ -146,7 +146,7 @@ public class BellAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        setupAnim(bellBlockEntity, Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f));
+        setupAnim(bellBlockEntity, Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0f), 1.0f));
 
         if (bellBlockEntity.ticks == 0) {
             float time = (float)(context.getNowTick() - this.startTick);
@@ -156,7 +156,7 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        bellBody.render(poseStack, sprite.wrap(context.getBufferSource().getBuffer(RenderType.cutoutMipped())), light, OverlayTexture.NO_OVERLAY, -1);
+        bellBody.render(poseStack, sprite.wrap(context.getBufferSource().getBuffer(RenderType.cutoutMipped())), light, OverlayTexture.NO_OVERLAY);
 
         if(shouldUseFallbackRender()){
             VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());

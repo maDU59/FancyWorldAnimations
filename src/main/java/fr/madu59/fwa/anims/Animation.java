@@ -85,7 +85,7 @@ public class Animation {
     }
 
     public double getProgress(double nowTick) {
-        return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
+        return Math.min(Math.max((nowTick - this.startTick) / getAnimDuration(), 0.0), 1.0);
     }
 
     public void render(AnimationRenderingContext context) {

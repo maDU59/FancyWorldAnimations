@@ -76,7 +76,7 @@ public class JukeBoxAnimation extends Animation{
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
-            discItemStack = jukeboxBlockEntity.getTheItem();
+            discItemStack = jukeboxBlockEntity.getFirstItem();
         }
         if (discItemStack.isEmpty()) {
             IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
@@ -85,7 +85,7 @@ public class JukeBoxAnimation extends Animation{
         
                 if (serverLevel != null) {
                     if (serverLevel.getChunkAt(position).getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity) {
-                        discItemStack = jukeboxBlockEntity.getTheItem();
+                        discItemStack = jukeboxBlockEntity.getFirstItem();
                     }
                 }
             }

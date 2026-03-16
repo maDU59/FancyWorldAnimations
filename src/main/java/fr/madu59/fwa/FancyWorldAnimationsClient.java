@@ -19,7 +19,6 @@ import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
-import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -46,32 +45,33 @@ import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
-import net.minecraft.world.level.block.VaultBlock;
-import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-@Mod(value = FancyWorldAnimations.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = FancyWorldAnimations.MOD_ID, value = Dist.CLIENT)
 public class FancyWorldAnimationsClient{
 
 	private static final Animations animations = new Animations();
 
-	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
-        NeoForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
-        container.registerExtensionPoint(IConfigScreenFactory.class, (client, parent) -> {
-            return new FancyWorldAnimationsConfigScreen(parent);
-        });
+	public FancyWorldAnimationsClient(IEventBus bus){
+        MinecraftForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
+        ModLoadingContext.get().registerExtensionPoint(
+			ConfigScreenHandler.ConfigScreenFactory.class, 
+			() -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> (
+				new FancyWorldAnimationsConfigScreen(parent))
+			)
+		);
     }
 
 	@SubscribeEvent
@@ -128,7 +128,7 @@ public class FancyWorldAnimationsClient{
 	}
 
 	public static double getPartialTick() {
-		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return (double)Minecraft.getInstance().level.getGameTime() + (double) Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0f), 1.0f);
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -190,7 +190,6 @@ public class FancyWorldAnimationsClient{
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
 		if(block instanceof TripWireHookBlock) return state.getValue(TripWireHookBlock.ATTACHED);
-		if(block instanceof VaultBlock) return state.getValue(VaultBlock.STATE) == VaultState.UNLOCKING;
 		return false;
 	}
 
@@ -209,7 +208,6 @@ public class FancyWorldAnimationsClient{
 			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
 			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
 			case TRIPWIRE_HOOK -> state.setValue(TripWireHookBlock.ATTACHED, false);
-			case VAULT -> state.setValue(VaultBlock.STATE, VaultState.UNLOCKING);
 			default -> state;
 		};
 	}
@@ -233,7 +231,6 @@ public class FancyWorldAnimationsClient{
 			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case VAULT: return new VaultAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case LANTERN: return new LanternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
@@ -256,7 +253,6 @@ public class FancyWorldAnimationsClient{
 		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
 		if(block instanceof ComposterBlock) return Type.COMPOSTER;
 		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
-		if(block instanceof VaultBlock) return Type.VAULT;
 		if(block instanceof LanternBlock) return Type.LANTERN;
 		return Type.USELESS;
 	}
@@ -320,7 +316,6 @@ public class FancyWorldAnimationsClient{
 		CAMPFIRE,
 		COMPOSTER,
 		TRIPWIRE_HOOK,
-		VAULT,
 		LANTERN,
 		USELESS
 	}

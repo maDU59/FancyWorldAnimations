@@ -99,6 +99,6 @@ public class LecternAnimation extends Animation{
         poseStack.mulPose(Axis.ZP.rotationDegrees(67.5F));
         poseStack.translate(0.0F, -0.125F, 0.0F);
 
-        bookModel.renderToBuffer(poseStack, buffer, light, OverlayTexture.NO_OVERLAY);
+        bookModel.renderToBuffer(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
     }
 }

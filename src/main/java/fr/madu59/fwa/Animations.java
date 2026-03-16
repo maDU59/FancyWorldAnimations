@@ -34,7 +34,7 @@ public class Animations{
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
                     if (animation.isForRemoval()){
-                        if(levelRenderer.isSectionCompiled(animation.getPos())) it.remove();
+                        if(levelRenderer.isChunkCompiled(animation.getPos())) it.remove();
                     }
                     else{
                         animation.markForRemoval();

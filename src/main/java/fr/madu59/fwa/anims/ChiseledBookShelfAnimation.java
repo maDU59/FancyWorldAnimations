@@ -153,10 +153,10 @@ public class ChiseledBookShelfAnimation extends Animation{
                         float uMin, float vMin, float uMax, float vMax, 
                         int light, float nx, float ny, float nz, TextureAtlasSprite sprite) {
 
-        uMin = sprite.getU(uMin);
-        uMax = sprite.getU(uMax);
-        vMin = sprite.getV(vMin);
-        vMax = sprite.getV(vMax);
+        uMin = sprite.getU(uMin * 16);
+        uMax = sprite.getU(uMax * 16);
+        vMin = sprite.getV(vMin * 16);
+        vMax = sprite.getV(vMax * 16);
 
         vertex(pose, buffer, x1, y1, z1, uMin, vMax, light, nx, ny, nz);
         vertex(pose, buffer, x4, y4, z4, uMax, vMax, light, nx, ny, nz);
@@ -165,11 +165,12 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     private void vertex(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z, float u, float v, int light, float nx, float ny, float nz) {
-        buffer.addVertex(pose.pose(), x, y, z)
-            .setColor(255, 255, 255, 255)
-            .setUv(u, v)
-            .setOverlay(OverlayTexture.NO_OVERLAY)
-            .setLight(light)
-            .setNormal(nx, ny, nz);
+        buffer.vertex(pose.pose(), x, y, z)
+            .color(255, 255, 255, 255)
+            .uv(u, v)
+            .overlayCoords(OverlayTexture.NO_OVERLAY)
+            .uv2(light)
+            .normal(nx, ny, nz)
+            .endVertex();
     }
 }

@@ -1,7 +1,7 @@
 package fr.madu59.fwa.mixin.sodium;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import me.jellysquid.mods.sodium.client.world.WorldSlice;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,13 +10,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = LevelSlice.class, remap = false)
+@Mixin(value = WorldSlice.class, remap = false)
 public abstract class LevelSliceMixin {
 
-    @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true, remap = false)
     private void fwa$hideAnimatedBlocks(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         BlockPos pos = new BlockPos(x, y, z);
+        System.out.println("Mixin running");
         if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
+            System.out.println("Removed block at" + pos.toString());
             cir.setReturnValue(Blocks.AIR.defaultBlockState());
         }
     }

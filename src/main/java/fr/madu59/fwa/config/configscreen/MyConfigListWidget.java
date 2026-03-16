@@ -18,12 +18,12 @@ import net.minecraft.sounds.SoundEvents;
 public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
 
     public MyConfigListWidget(Minecraft client, int width, int height, int top, int itemHeight) {
-        super(client, width, height, top, itemHeight);
+        super(client, width, height, top, top + height, itemHeight);
     }
 
     @Override
 	protected int getScrollbarPosition() {
-		return this.getX() + this.getWidth() - 6;
+		return this.x0 + this.width - 6;
 	}
 
     @Override

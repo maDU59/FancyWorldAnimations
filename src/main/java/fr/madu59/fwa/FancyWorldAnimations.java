@@ -4,9 +4,13 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
+import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(FancyWorldAnimations.MOD_ID)
 public class FancyWorldAnimations {
@@ -17,10 +21,15 @@ public class FancyWorldAnimations {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LogUtils.getLogger();
 
-	public FancyWorldAnimations(IEventBus modEventBus, ModContainer modContainer) {
+	public FancyWorldAnimations(FMLJavaModLoadingContext context) {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+		IEventBus modEventBus = context.getModEventBus();
+		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            // This manually calls your client constructor!
+            new FancyWorldAnimationsClient(modEventBus);
+        });
 
 		LOGGER.info("[FWA] Fancy World Animations initialized!");
 	}

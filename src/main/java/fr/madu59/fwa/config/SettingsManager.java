@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -33,7 +33,7 @@ public class SettingsManager {
         "max_shader_compat",
         "fwa.config.option.max_shader_compat.name",
         "fwa.config.option.max_shader_compat.description",
-        true
+        false
     );
 
     public static Option<Boolean> DOOR_STATE = loadOptionWithDefaults(

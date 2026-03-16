@@ -2,14 +2,17 @@ package fr.madu59.fwa.config.configscreen;
 
 import static net.minecraft.commands.Commands.literal;
 import fr.madu59.fwa.config.SettingsManager;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.api.distmarker.Dist;
 
+@Mod.EventBusSubscriber(modid = "fwa", value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FancyWorldAnimationsConfigScreen extends Screen {
     
     private MyConfigListWidget list;
