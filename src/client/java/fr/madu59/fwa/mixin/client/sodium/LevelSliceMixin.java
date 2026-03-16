@@ -13,9 +13,12 @@
 // @Mixin(value = LevelSlice.class, remap = false)
 // public abstract class LevelSliceMixin {
 
+//     private static final ThreadLocal<MutableBlockPos> REUSABLE_POS = ThreadLocal.withInitial(MutableBlockPos::new);
+
 //     @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
 //     private void fwa$hideAnimatedBlocks(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
-//         BlockPos pos = new BlockPos(x, y, z);
+//         MutableBlockPos pos = REUSABLE_POS.get();
+//         pos.set(x, y, z);
 //         if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
 //             cir.setReturnValue(Blocks.AIR.defaultBlockState());
 //         }
