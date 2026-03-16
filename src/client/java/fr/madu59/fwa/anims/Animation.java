@@ -39,7 +39,7 @@ public class Animation {
     }
 
     public boolean isApprovedForRemoval(double nowTick){
-        return isForRemoval() && removalApproved && (nowTick - toRemoveTick) >= 1;
+        return isForRemoval() && removalApproved && (nowTick - toRemoveTick) >= .5;
     }
 
     public boolean isForRemoval(){
