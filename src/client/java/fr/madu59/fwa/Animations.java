@@ -3,7 +3,6 @@ package fr.madu59.fwa;
 import java.util.Iterator;
 
 import fr.madu59.fwa.anims.Animation;
-import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -35,12 +34,12 @@ public class Animations{
                 Animation animation = it.next();
                 if (animation.isFinished(nowTick)) {
                     if (animation.isForRemoval()){
-                        if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || (levelRenderer.isSectionCompiledAndVisible(animation.getPos()) && animation.getAfterLifeSpan(nowTick) > SettingsManager.ENDING_DELAY.getValue())) {
+                        if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
                             it.remove();
                         }
                     }
                     else{
-                        animation.markForRemoval(nowTick);
+                        animation.markForRemoval();
                         BlockPos pos = animation.getPos();
                         ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
                     }

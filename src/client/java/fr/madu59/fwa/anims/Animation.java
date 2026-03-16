@@ -15,6 +15,7 @@ public class Animation {
     protected final BlockState defaultState;
     protected double toRemoveTick = 0.0;
     protected boolean toRemove = false;
+    protected boolean removalApproved = false;
 
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         this.position = position;
@@ -28,14 +29,17 @@ public class Animation {
         return true;
     }
 
-    public void markForRemoval(double nowTick){
+    public void markForRemoval(){
         toRemove = true;
-        toRemoveTick = nowTick;
     }
 
-    public double getAfterLifeSpan(double nowTick){
-        if(!this.toRemove) return -1;
-        else return (nowTick - toRemoveTick)/20;
+    public void approveRemoval(double nowTick){
+        toRemoveTick = nowTick;
+        if(isForRemoval()) removalApproved = true;
+    }
+
+    public boolean isApprovedForRemoval(double nowTick){
+        return isForRemoval() && removalApproved && (nowTick - toRemoveTick) >= 1;
     }
 
     public boolean isForRemoval(){
