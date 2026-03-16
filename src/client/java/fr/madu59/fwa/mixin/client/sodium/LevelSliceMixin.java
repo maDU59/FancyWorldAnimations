@@ -14,10 +14,17 @@
 // public abstract class LevelSliceMixin {
 
 //     @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
-//     private void fwa$hideAnimatedBlocks(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
-//         BlockPos pos = new BlockPos(x, y, z);
-//         if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
-//             cir.setReturnValue(Blocks.AIR.defaultBlockState());
-//         }
-//     }
+    // private void fwa$hideAnimatedBlocks(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
+    //     BlockPos pos = new BlockPos(x, y, z);
+    //     if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
+    //         cir.setReturnValue(Blocks.AIR.defaultBlockState());
+    //     }
+    // }
+
+    // @Inject(method = "getBlockState(Lnet/minecraftcore/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
+    // private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
+    //     if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
+    //         cir.setReturnValue(Blocks.AIR.defaultBlockState());
+    //     }
+    // }
 // }
