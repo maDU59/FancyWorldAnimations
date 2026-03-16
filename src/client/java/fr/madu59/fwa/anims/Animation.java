@@ -13,6 +13,7 @@ public class Animation {
     protected final boolean oldIsOpen;
     protected final boolean newIsOpen;
     protected final BlockState defaultState;
+    protected double toRemoveTick = 0.0;
     protected boolean toRemove = false;
 
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
@@ -27,8 +28,14 @@ public class Animation {
         return true;
     }
 
-    public void markForRemoval(){
+    public void markForRemoval(double nowTick){
         toRemove = true;
+        toRemoveTick = nowTick;
+    }
+
+    public double getAfterLifeSpan(double nowTick){
+        if(!this.toRemove) return -1;
+        else return (nowTick - toRemoveTick)/20;
     }
 
     public boolean isForRemoval(){

@@ -29,6 +29,13 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Double> ENDING_DELAY = loadOptionWithDefaults(
+        "ending_delay",
+        "fwa.config.option.ending_delay.name",
+        "fwa.config.option.ending_delay.description",
+        0.05
+    );
+
     public static Option<Boolean> DOOR_STATE = loadOptionWithDefaults(
         "door_state",
         "fwa.config.option.state.name",

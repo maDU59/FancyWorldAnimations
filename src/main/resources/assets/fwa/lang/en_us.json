@@ -24,6 +24,7 @@
     "fwa.config.option.easing.name":"Animation type",
     "fwa.config.option.speed.name":"Animation speed multiplier",
     "fwa.config.option.infinite.name":"Idle animation",
+    "fwa.config.option.ending_delay.name":"How long the animation stays after it has ended",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",
