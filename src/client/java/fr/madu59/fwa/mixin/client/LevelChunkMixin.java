@@ -1,7 +1,6 @@
 package fr.madu59.fwa.mixin.client;
 
 import java.util.function.Consumer;
-import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,6 +21,7 @@ import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -35,15 +35,6 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
     private final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
-
-    @Unique
-    private static final Set<Block> fwa$TARGET_BLOCKS = Set.of(
-        Blocks.END_PORTAL_FRAME, 
-        Blocks.LECTERN, 
-        Blocks.JUKEBOX, 
-        Blocks.BELL,
-        Blocks.LANTERN
-    );
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, registry, l, levelChunkSections, blendingData);
@@ -69,7 +60,8 @@ public abstract class LevelChunkMixin extends ChunkAccess {
                                               state.is(Blocks.LECTERN) || 
                                               state.is(Blocks.JUKEBOX) || 
                                               state.is(Blocks.BELL)    ||
-                                              state.getBlock() instanceof LanternBlock)){
+                                              state.getBlock() instanceof LanternBlock ||
+                                              state.getBlock() instanceof ChainBlock)){
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
@@ -79,7 +71,8 @@ public abstract class LevelChunkMixin extends ChunkAccess {
                                               state.is(Blocks.LECTERN) || 
                                               state.is(Blocks.JUKEBOX) || 
                                               state.is(Blocks.BELL)    ||
-                                              state.getBlock() instanceof LanternBlock) {
+                                              state.getBlock() instanceof LanternBlock ||
+                                              state.getBlock() instanceof ChainBlock) {
                             BlockPos worldPos = pos.offset(x, minY + y, z);
                             FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
                         }
