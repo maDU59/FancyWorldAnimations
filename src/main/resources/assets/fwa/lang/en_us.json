@@ -18,6 +18,7 @@
     "fwa.config.category.tripwire_hook":"TRIPWIRE HOOKS",
     "fwa.config.category.vault":"VAULTS",
     "fwa.config.category.lantern":"LANTERNS",
+    "fwa.config.category.chain":"CHAINS",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.max_shader_compat.name":"Ensure max shader compatibility [PERFORMANCE-HEAVY]",
@@ -25,6 +26,7 @@
     "fwa.config.option.easing.name":"Animation type",
     "fwa.config.option.speed.name":"Animation speed multiplier",
     "fwa.config.option.infinite.name":"Idle animation",
+    "fwa.config.option.chain_grounded.name":"Don't animate chains lines linked to the ground",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",
