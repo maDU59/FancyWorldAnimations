@@ -94,7 +94,7 @@ public class ComposterAnimation extends Animation{
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantCompost, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
-            if ((path.contains("_compost") || path.contains("_ready")) == wantCompost) {
+            if ((path.endsWith("_compost") || path.contains("_ready")) == wantCompost) {
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }

@@ -6,6 +6,7 @@ import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.CampfireAnimation;
+import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.ComposterAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
@@ -29,6 +30,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BellBlock;
@@ -36,6 +38,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.CauldronBlock;
+import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DoorBlock;
@@ -80,16 +83,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
-			synchronized (animations){
-				animations.removeAt(blockPos);
-			}
+			animations.removeAt(blockPos);
 			return;
 		}
 
 		if(!isSameType(type, newState)){
-			synchronized (animations){
-				animations.removeAt(blockPos);
-			}
+			animations.removeAt(blockPos);
 			return;
 		}
 
@@ -97,21 +96,19 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean newIsOpen = isOpen(newState);
 
 		double startTick = (double)client.level.getGameTime();
-		synchronized (animations){
 
-			if (animations.containsAt(blockPos)) {
-				Animation animation = animations.getAt(blockPos);
-				if (animation.isUnique()) {
-					startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
-					animations.removeAt(blockPos);
-				}
+		if (animations.containsAt(blockPos)) {
+			Animation animation = animations.getAt(blockPos);
+			if (animation.isUnique()) {
+				startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				animations.removeAt(blockPos);
 			}
-
-			if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
-
-			Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
-			if (animation.isEnabled()) animations.add(blockPos, animation);
 		}
+
+		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
+
+		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
+		if (animation.isEnabled()) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
@@ -151,6 +148,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			return false;
 		}
 		if(type == Type.LANTERN) return newState.getValue(LanternBlock.HANGING);
+		if(type == Type.CHAIN) return newState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
 		return oldIsOpen != newIsOpen;
 	}
@@ -225,6 +223,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case VAULT: return new VaultAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case LANTERN: return new LanternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
+			case CHAIN: return new ChainAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -248,6 +247,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
 		if(block instanceof VaultBlock) return Type.VAULT;
 		if(block instanceof LanternBlock) return Type.LANTERN;
+		if(block instanceof ChainBlock) return Type.CHAIN;
 		return Type.USELESS;
 	}
 
@@ -265,28 +265,24 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
 	{
-		synchronized (animations){
-			if (animations.containsAt(pos)) {
-				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
-			}
-			else{
-				return false;
-			}
+		if (animations.containsAt(pos)) {
+			Animation animation = animations.getAt(pos);
+			return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
+		}
+		else{
+			return false;
 		}
 	}
 
 	public static boolean shouldCancelBlockRendering(BlockPos pos)
 	{
-		synchronized (animations){
-			if (animations.containsAt(pos)) {
-				Animation animation = animations.getAt(pos);
-				if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
-				return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
-			}
-			else{
-				return false;
-			}
+		if (animations.containsAt(pos)) {
+			Animation animation = animations.getAt(pos);
+			if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
+			return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
+		}
+		else{
+			return false;
 		}
 	}
 
@@ -313,6 +309,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		TRIPWIRE_HOOK,
 		VAULT,
 		LANTERN,
+		CHAIN,
 		USELESS
 	}
 }
