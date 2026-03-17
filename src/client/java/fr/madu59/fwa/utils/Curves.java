@@ -2,52 +2,56 @@ package fr.madu59.fwa.utils;
 
 public class Curves {
 
-    public static double ease(double progress, Enum<?> type, boolean isForward) {
-        return isForward? ease(progress, type):1-ease(1-progress, type);
+    public static double ease(double t, Enum<?> type, boolean isForward) {
+        return isForward? ease(t, type):1-ease(1-t, type);
     }
 
-    public static double ease(double progress, Enum<?> type) {
+    public static double ease(double t, Enum<?> type) {
         if (type instanceof Classic c) {
             switch (c) {
                 case EASE_IN_OUT_CUBIC:
-                    return progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                 default:
-                    return progress;
+                    return t;
             }
         }
         else if (type instanceof Door c) {
             switch (c) {
                 case SPRINGY:
-                    return wrap(1 + 2.70158 * Math.pow(progress - 1, 3) + 1.70158 * Math.pow(progress - 1, 2));
+                    return wrap(1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2));
                 // case ELASTIC:
-                //     if (progress == 0) return 0;
-                //     if (progress == 1) return 1;
-                //     return wrap(Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1);
+                //     if (t == 0) return 0;
+                //     if (t == 1) return 1;
+                //     return wrap(Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1);
                 case DEFAULT:
-                    return wrap(1 - Math.pow(1 - progress, 5));
+                    return wrap(1 - Math.pow(1 - t, 5));
                 default:
-                    return progress;
+                    return t;
             }
         }
-        else return progress;
+        else return t;
     }
 
-    public static double unease(double progress, Enum<?> type) {
+    public static double unease(double t, Enum<?> type) {
         if (type instanceof Classic c) {
             switch (c) {
                 default:
-                    return progress;
+                    return t;
             }
         }
         else if (type instanceof Door c) {
             switch (c) {
                 case DEFAULT:
-                    return 1 - Math.pow(1 - progress, 1/5);
+                    return 1 - Math.pow(1 - t, 1/5);
                 default:
-                    return progress;
+                    return t;
             }
         }
-        else return progress;
+        else return t;
+    }
+
+    public static float smooth(float t){
+        return t * t * (3.0F - 2.0F * t);
     }
 
     private static double wrap(double value){
