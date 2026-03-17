@@ -11,9 +11,9 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
-		"LevelRendererAccessor",
+		"LevelRendererAccessor"
 		
-		"lanterns.LanternBlockMixin"
+		
 	],
 	"injectors": {
 		"defaultRequire": 1
