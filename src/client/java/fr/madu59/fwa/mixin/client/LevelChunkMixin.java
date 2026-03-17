@@ -30,9 +30,10 @@ import net.minecraft.world.level.levelgen.Heightmap;
 public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
-    private final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
+    private static final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
 
-    public static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> 
+    @Unique
+    private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> 
     state.is(Blocks.END_PORTAL_FRAME) || 
     state.is(Blocks.LECTERN) || 
     state.is(Blocks.JUKEBOX) || 
