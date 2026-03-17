@@ -58,16 +58,11 @@ public class ChainAnimation extends Animation{
 
     @Override
     public double getLifeSpan(){
-        return SettingsManager.LANTERN_STATE.getValue()? Double.MAX_VALUE : 0;
+        return Double.MAX_VALUE;
     }
 
     public static boolean hasInfiniteAnimation(){
-        return SettingsManager.LANTERN_STATE.getValue();
-    }
-
-    @Override
-    public boolean isEnabled(){
-        return SettingsManager.LANTERN_STATE.getValue();
+        return true;
     }
 
     @Override
