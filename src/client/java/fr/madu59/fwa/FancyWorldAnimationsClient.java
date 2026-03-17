@@ -26,6 +26,7 @@ import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -62,6 +63,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
+	private static final boolean IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris");
 	private static ResourceKey<Level> dimension;
 
 	@Override
@@ -131,7 +133,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);
-			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue()){
+			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && IRIS_LOADED){
 				source.endBatch();
 			}
 		}

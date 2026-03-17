@@ -1,7 +1,5 @@
 package fr.madu59.fwa.anims;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedSet;
 
 import com.mojang.blaze3d.vertex.PoseStack;
