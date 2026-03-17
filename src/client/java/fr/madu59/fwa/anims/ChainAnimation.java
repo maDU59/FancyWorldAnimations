@@ -20,7 +20,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -45,7 +44,6 @@ public class ChainAnimation extends Animation{
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
     private BlockState state;
-    private List<BlockModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
     private PoseStack stack = new PoseStack();
     
@@ -100,12 +98,10 @@ public class ChainAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
-            parts = new ArrayList<>();
             BlockState chainState = level.getBlockState(mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
-            model.collectParts(random, parts);
-            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(buffer, poseStack.last(), model.collectParts(random), 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);

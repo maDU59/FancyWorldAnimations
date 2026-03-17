@@ -104,12 +104,10 @@ public class LanternAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             BlockState chainState = level.getBlockState(mutable);
-            List<BlockModelPart> chainParts = new ArrayList<>();
             BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
-            chainModel =Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
-            chainModel.collectParts(random, chainParts);
-            RenderHelper.renderModel(buffer, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            chainModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
+            RenderHelper.renderModel(buffer, poseStack.last(), chainModel.collectParts(random), 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);
