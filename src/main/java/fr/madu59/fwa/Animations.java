@@ -1,11 +1,11 @@
 package fr.madu59.fwa;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.mixin.SetSectionDirtyInvoker;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -13,54 +13,50 @@ import net.minecraft.core.BlockPos;
 
 public class Animations{
 
-    public final Long2ObjectMap<Animation> animations = new Long2ObjectOpenHashMap<>();
+    public final Map<BlockPos, Animation> animations = new ConcurrentHashMap<>();
 
     public Animations() {
         super();
     }
     
     public void removeAt(BlockPos blockPos) {
-        synchronized (this) {
-            this.animations.remove(blockPos.asLong());
-        }
+        this.animations.remove(blockPos);
     }
 
     public void clean(double nowTick) {
-        synchronized (this) {
-            ClientLevel level = Minecraft.getInstance().level;
-            LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
-            Iterator<Animation> it = this.animations.values().iterator();
-            while (it.hasNext()) {
-                Animation animation = it.next();
-                if (animation.isFinished(nowTick)) {
-                    if (animation.isForRemoval()){
-                        if(levelRenderer.isChunkCompiled(animation.getPos())) it.remove();
-                    }
-                    else{
-                        animation.markForRemoval();
-                        BlockPos pos = animation.getPos();
-                        ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+        ClientLevel level = Minecraft.getInstance().level;
+        LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+        Iterator<Animation> it = this.animations.values().iterator();
+        while (it.hasNext()) {
+            Animation animation = it.next();
+            if (animation.isFinished(nowTick)) {
+                if (animation.isForRemoval()){
+                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+                        it.remove();
                     }
                 }
-                if(!level.isLoaded(animation.getPos())){
-                    it.remove();
+                else{
+                    animation.markForRemoval();
+                    BlockPos pos = animation.getPos();
+                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
                 }
+            }
+            if(!level.isLoaded(animation.getPos())){
+                it.remove();
             }
         }
     }
 
     public boolean containsAt(BlockPos blockPos) {
-        return this.animations.containsKey(blockPos.asLong());
+        return this.animations.containsKey(blockPos);
     }
 
     public Animation getAt(BlockPos blockPos) {
-        return this.animations.getOrDefault(blockPos.asLong(), null);
+        return this.animations.getOrDefault(blockPos, null);
     }
 
     public void add(BlockPos pos, Animation anim) {
-        synchronized (this) {
-            animations.put(pos.asLong(), anim);
-        }
+        animations.put(pos, anim);
     }
 
     public boolean isEmpty(){

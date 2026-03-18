@@ -6,6 +6,7 @@ import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
 import fr.madu59.fwa.anims.CampfireAnimation;
+import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.ComposterAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
@@ -26,11 +27,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.CauldronBlock;
+import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DoorBlock;
@@ -46,9 +49,7 @@ import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
@@ -89,42 +90,37 @@ public class FancyWorldAnimationsClient{
 
 	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
 	{
-		if(Minecraft.getInstance().level == null) return;
+		ClientLevel level = Minecraft.getInstance().level;
+		if(level == null) return;
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
-			synchronized (animations){
-				animations.removeAt(blockPos);
-			}
+			animations.removeAt(blockPos);
 			return;
 		}
 
 		if(!isSameType(type, newState)){
-			synchronized (animations){
-				animations.removeAt(blockPos);
-			}
+			animations.removeAt(blockPos);
 			return;
 		}
 
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
 
-		double startTick = (double)Minecraft.getInstance().level.getGameTime();
-		synchronized (animations){
+		double startTick = (double)level.getGameTime();
 
-			if (animations.containsAt(blockPos)) {
-				Animation animation = animations.getAt(blockPos);
-				if (animation.isUnique()) {
-					startTick = (double)Minecraft.getInstance().level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
-					animations.removeAt(blockPos);
-				}
+		if (animations.containsAt(blockPos)) {
+			Animation animation = animations.getAt(blockPos);
+			if (animation.isUnique()) {
+				startTick = (double)level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				animations.removeAt(blockPos);
 			}
-
-			if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
-
-			Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
-			if (animation.isEnabled()) animations.add(blockPos, animation);
 		}
+
+		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
+
+		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
+		if (animation.isEnabled()) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
@@ -162,6 +158,7 @@ public class FancyWorldAnimationsClient{
 			return false;
 		}
 		if(type == Type.LANTERN) return newState.getValue(LanternBlock.HANGING);
+		if(type == Type.CHAIN) return newState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
 		return oldIsOpen != newIsOpen;
 	}
@@ -232,6 +229,7 @@ public class FancyWorldAnimationsClient{
 			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 			case LANTERN: return new LanternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
+			case CHAIN: return new ChainAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
 			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
 		}
 	}
@@ -254,6 +252,7 @@ public class FancyWorldAnimationsClient{
 		if(block instanceof ComposterBlock) return Type.COMPOSTER;
 		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
 		if(block instanceof LanternBlock) return Type.LANTERN;
+		if(block instanceof ChainBlock) return Type.CHAIN;
 		return Type.USELESS;
 	}
 
@@ -271,27 +270,24 @@ public class FancyWorldAnimationsClient{
 
 	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
 	{
-		synchronized (animations){
-			if (animations.containsAt(pos)) {
-				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
-			}
-			else{
-				return false;
-			}
+		if (animations.containsAt(pos)) {
+			Animation animation = animations.getAt(pos);
+			return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
+		}
+		else{
+			return false;
 		}
 	}
 
 	public static boolean shouldCancelBlockRendering(BlockPos pos)
 	{
-		synchronized (animations){
-			if (animations.containsAt(pos)) {
-				Animation animation = animations.getAt(pos);
-				return animation.hideOriginalBlock() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
-			}
-			else{
-				return false;
-			}
+		if (animations.containsAt(pos)) {
+			Animation animation = animations.getAt(pos);
+			if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
+			return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
+		}
+		else{
+			return false;
 		}
 	}
 
@@ -317,6 +313,7 @@ public class FancyWorldAnimationsClient{
 		COMPOSTER,
 		TRIPWIRE_HOOK,
 		LANTERN,
+		CHAIN,
 		USELESS
 	}
 }
