@@ -110,14 +110,6 @@ minecraft {
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
-
-        data {
-            // example of overriding the workingDirectory set in configureEach above
-            workingDirectory project.file('run-data')
-
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-        }
     }
 }
 
@@ -170,8 +162,8 @@ dependencies {
 
     implementation fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
 
-    // implementation 'org.anarres:jcpp:1.4.14'
-	// implementation fg.deobf("maven.modrinth:oculus:1.20.1-1.8.0")
+    implementation 'org.anarres:jcpp:1.4.14'
+	implementation fg.deobf("maven.modrinth:oculus:1.20.1-1.8.0")
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

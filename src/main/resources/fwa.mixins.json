@@ -14,8 +14,7 @@
 		"RenderChunkRegionMixin",
 		"LevelRendererAccessor",
 		"sodium.LevelSliceMixin",
-		
-		"lanterns.LanternBlockMixin"
+		"iris.ShadowRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
