@@ -39,6 +39,7 @@ public class RepeaterAnimation extends Animation{
         newState = newBlockState;
         oldState = oldBlockState;
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -70,7 +71,6 @@ public class RepeaterAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-        model.collectParts(random, parts);
         BlockModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
