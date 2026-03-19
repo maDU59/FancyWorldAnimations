@@ -3,6 +3,9 @@ package fr.madu59.fwa.anims;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -11,7 +14,8 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
-
+import fr.madu59.fwa.utils.ModelSplitHelper;
+import fr.madu59.fwa.utils.ModelSplitHelper.Lever;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -20,6 +24,7 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.LeverBlock;
@@ -80,15 +85,21 @@ public class LeverAnimation extends Animation{
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
         BlockStateModelPart part = parts.get(0);
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
-        for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+
+        List<BakedQuad> quads = new ArrayList<>();
+        for (Direction dir : Direction.values()) {
+            quads.addAll(part.getQuads(dir));
         }
+        quads.addAll(part.getQuads(null));
+
+        Lever lever = splitLeverQuads(quads, facing, face);
+
+        RenderHelper.renderQuads(buffer, poseStack.last(), lever.baseQuadList(), 1f, 1f, 1f, 1f, light);
 
         double angle = getAngle(context.getNowTick(), facing);
 
         float pivotX = 0.5f;
-        float pivotY = 0.0625f;
+        float pivotY = lever.pivot();
         float pivotZ = 0.5f;
         Axis axis = Axis.XP;
         if (face == AttachFace.FLOOR){
@@ -101,7 +112,7 @@ public class LeverAnimation extends Animation{
             }
         }
         else if (face == AttachFace.CEILING){
-            pivotY = 1f - 0.0625f;
+            pivotY = 1f - pivotY;
             switch (facing) {
                 case EAST, WEST:
                     axis = Axis.ZN;
@@ -112,19 +123,19 @@ public class LeverAnimation extends Animation{
             }
         }
         else if (face == AttachFace.WALL){
-            pivotY = 0.5f;
             switch (facing) {
                 case EAST, WEST:
                     axis = Axis.ZP;
-                    pivotX = (facing == Direction.WEST) ? 1f - 0.0625f : 0.0625f;
+                    pivotX = (facing == Direction.WEST) ? 1f - pivotY : pivotY;
                     pivotZ = 0.5f;
                     break;
                 default:
                     axis = Axis.XP;
                     pivotX = 0.5f;
-                    pivotZ = (facing == Direction.NORTH) ? 1f - 0.0625f : 0.0625f;
+                    pivotZ = (facing == Direction.NORTH) ? 1f - pivotY : pivotY;
                     break;
             }
+            pivotY = 0.5f;
         }
 
         poseStack.translate(pivotX, pivotY, pivotZ);
@@ -133,15 +144,146 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+        RenderHelper.renderQuads(buffer, poseStack.last(), lever.handleQuadList(), 1f, 1f, 1f, 1f, light);
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantHandle, int light) {
-        for (BakedQuad quad : quads) {
-            String path = quad.materialInfo().sprite().contents().name().getPath();
-            if ((path.contains("lever") && !path.contains("base") && !path.contains("cobblestone") && !path.contains("side")) == wantHandle) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+    public Lever splitLeverQuads(List<BakedQuad> quads, Direction facing, AttachFace face){
+
+        List<BakedQuad> base = new ArrayList<>();
+        List<BakedQuad> handle = new ArrayList<>();
+
+        if (SettingsManager.LEVER_SPLIT.getValue() == ModelSplitHelper.SPLIT_METHOD.MODEL){
+
+            for (BakedQuad quad : quads) {
+                
+                Vector3fc pos1 = quad.position0();
+                Vector3fc pos2 = quad.position1();
+
+                Vector3f edge1 = new Vector3f();
+
+                pos2.sub(pos1, edge1);
+
+                edge1.normalize();
+
+                if (ModelSplitHelper.isAxisAligned(edge1)){
+                    base.add(quad);
+                }
+                else{
+                    handle.add(quad);
+                }
             }
         }
+        else{
+            for (BakedQuad quad : quads) {
+                String path = quad.materialInfo().sprite().contents().name().getPath();
+                if ((path.contains("lever") && !path.contains("base") && !path.contains("cobblestone") && !path.contains("side")) || path.contains("handle")) {
+                    handle.add(quad);
+                }
+                else{
+                    base.add(quad);
+                }
+            }
+        }
+
+        float pivot = 0.0625f;
+
+        if (handle.size() > 4 && handle.size() < 7){
+
+            Vector3f middlePoint = null;
+            Vector3f handleVector = null;
+
+            for (BakedQuad quad : handle) {
+                Vector3f edge1 = new Vector3f();
+                Vector3f edge2 = new Vector3f();
+
+                quad.position1().sub(quad.position0(), edge1);
+                quad.position2().sub(quad.position1(), edge2);
+
+                if(Math.abs(edge1.lengthSquared() - edge2.lengthSquared()) < 0.001f){
+                    middlePoint = ModelSplitHelper.middlePoint(quad);
+                }
+                else{
+                    if (edge1.lengthSquared() > edge2.lengthSquared()) handleVector = edge1;
+                    else handleVector = edge2;
+                }
+            }
+
+            if (handleVector != null && middlePoint != null){
+
+                if (face == AttachFace.FLOOR){
+                    float t;
+                    if(Math.abs(handleVector.z()) < 0.001f){
+                        t = (0.5f - middlePoint.x()) / handleVector.x();
+                    }
+                    else{
+                        t = (0.5f - middlePoint.z()) / handleVector.z();
+                    }
+                    handleVector.mul(t).add(middlePoint);
+                    pivot = handleVector.y;
+                }
+                else if (face == AttachFace.CEILING){
+                    float t;
+                    if(Math.abs(handleVector.z()) < 0.001f){
+                        t = (0.5f - middlePoint.x()) / handleVector.x();
+                    }
+                    else{
+                        t = (0.5f - middlePoint.z()) / handleVector.z();
+                    }
+                    handleVector.mul(t).add(middlePoint);
+                    pivot = 1-handleVector.y;
+                }
+                else{
+                    if (facing.getAxis() == net.minecraft.core.Direction.Axis.X){
+                        float t;
+                        if(Math.abs(handleVector.z()) < 0.001f){
+                            t = (0.5f - middlePoint.y()) / handleVector.y();
+                        }
+                        else{
+                            t = (0.5f - middlePoint.z()) / handleVector.z();
+                        }
+                        handleVector.mul(t).add(middlePoint);
+                        if(facing == Direction.WEST) pivot = 1-handleVector.x;
+                        else pivot = handleVector.x;
+                    }
+                    else{
+                        float t;
+                        if(Math.abs(handleVector.y()) < 0.001f){
+                            t = (0.5f - middlePoint.x()) / handleVector.x();
+                        }
+                        else{
+                            t = (0.5f - middlePoint.y()) / handleVector.y();
+                        }
+                        handleVector.mul(t).add(middlePoint);
+                        if(facing == Direction.NORTH) pivot = 1-handleVector.z;
+                        else pivot = handleVector.z;
+                    }
+                }
+            }
+        }
+
+        return new Lever(base, handle, pivot);
+    }
+
+    public static Vector3f[] getFurthestPair(List<Vector3f> centers) {
+        Vector3f point1 = null;
+        Vector3f point2 = null;
+        float maxDistSq = 0f;
+
+        for (int i = 0; i < centers.size(); i++) {
+            for (int j = i + 1; j < centers.size(); j++) {
+                Vector3f pA = centers.get(i);
+                Vector3f pB = centers.get(j);
+                
+                float distSq = pA.distanceSquared(pB);
+                
+                if (distSq > maxDistSq) {
+                    maxDistSq = distSq;
+                    point1 = pA;
+                    point2 = pB;
+                }
+            }
+        }
+
+        return new Vector3f[]{point1, point2};
     }
 }
