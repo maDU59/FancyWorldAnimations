@@ -20,6 +20,8 @@ import fr.madu59.fwa.anims.LeverAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
+import fr.madu59.fwa.compat.Blacklist;
+import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -53,6 +55,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.common.MinecraftForge;
@@ -67,6 +70,7 @@ public class FancyWorldAnimationsClient{
 
 	public FancyWorldAnimationsClient(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
+		bus.addListener(this::onRegisterClientReloadListeners);
         ModLoadingContext.get().registerExtensionPoint(
 			ConfigScreenHandler.ConfigScreenFactory.class, 
 			() -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> (
@@ -74,6 +78,10 @@ public class FancyWorldAnimationsClient{
 			)
 		);
     }
+
+	public void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event){
+		event.registerReloadListener(new BlacklistReloadListener());
+	}
 
 	@SubscribeEvent
 	public static void onLevelUnload(LevelEvent.Unload event){
@@ -101,6 +109,10 @@ public class FancyWorldAnimationsClient{
 
 		if(!isSameType(type, newState)){
 			animations.removeAt(blockPos);
+			return;
+		}
+
+		if(Blacklist.isBlacklisted(newState)){
 			return;
 		}
 
