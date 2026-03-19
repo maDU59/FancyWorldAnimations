@@ -46,6 +46,7 @@ public class RenderHelper {
             float ZShade = cardinalLighting.byFace(Direction.NORTH);
             float XShade = cardinalLighting.byFace(Direction.EAST);
             Vector3f normal = new Vector3f(bakedQuad.direction().getUnitVec3f());
+            // TODO: Replace with the cross vector to get the normal
             normal.mul(pose.normal());
             normal.normalize();  
             float nx2 = normal.x() * normal.x();
