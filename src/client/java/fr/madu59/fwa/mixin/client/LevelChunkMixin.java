@@ -1,6 +1,7 @@
 package fr.madu59.fwa.mixin.client;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -33,7 +34,16 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
-    private final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
+    private static final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
+
+    @Unique
+    private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> 
+    state.is(Blocks.END_PORTAL_FRAME) || 
+    state.is(Blocks.LECTERN) || 
+    state.is(Blocks.JUKEBOX) || 
+    state.is(Blocks.BELL) ||
+    state.getBlock() instanceof LanternBlock ||
+    state.getBlock() instanceof ChainBlock;
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, LevelChunkSection @Nullable [] levelChunkSections, @Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, registry, l, levelChunkSections, blendingData);
@@ -55,23 +65,13 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
     private void fwa$scanSectionFor(LevelChunkSection section, BlockPos pos, int minY){
-        if (section.getStates().maybeHas(state -> state.is(Blocks.END_PORTAL_FRAME) || 
-                                              state.is(Blocks.LECTERN) || 
-                                              state.is(Blocks.JUKEBOX) || 
-                                              state.is(Blocks.BELL)    ||
-                                              state.getBlock() instanceof LanternBlock ||
-                                              state.getBlock() instanceof ChainBlock)){
+        if (section.getStates().maybeHas(IS_ANIMATED_BLOCK)){
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
                         
-                        if (state.is(Blocks.END_PORTAL_FRAME) || 
-                                              state.is(Blocks.LECTERN) || 
-                                              state.is(Blocks.JUKEBOX) || 
-                                              state.is(Blocks.BELL)    ||
-                                              state.getBlock() instanceof LanternBlock ||
-                                              state.getBlock() instanceof ChainBlock) {
+                        if (IS_ANIMATED_BLOCK.test(state)) {
                             BlockPos worldPos = pos.offset(x, minY + y, z);
                             FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
                         }
