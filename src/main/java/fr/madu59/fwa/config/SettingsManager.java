@@ -365,6 +365,20 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> CHAIN_STATE = loadOptionWithDefaults(
+        "chain_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    );
+
+    public static Option<Boolean> CHAIN_GROUNDED = loadOptionWithDefaults(
+        "chain_chain_grounded",
+        "fwa.config.option.chain_grounded.name",
+        "fwa.config.option.chain_grounded.description",
+        true
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {

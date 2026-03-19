@@ -3,7 +3,6 @@ package fr.madu59.fwa.compat;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-
 import net.neoforged.fml.loading.FMLLoader;
 
 import java.util.List;
