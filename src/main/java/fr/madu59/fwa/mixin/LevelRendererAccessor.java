@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.server.level.BlockDestructionProgress;
 
-@Mixin(LevelRenderer.class)
+@Mixin(value = LevelRenderer.class, remap = true)
 public interface LevelRendererAccessor {
     @Accessor("destructionProgress")
     Long2ObjectMap<SortedSet<BlockDestructionProgress>> fwa$getDestructionProgress();

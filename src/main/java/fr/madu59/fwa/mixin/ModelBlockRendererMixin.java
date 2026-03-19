@@ -17,7 +17,7 @@
 
 // import java.util.List;
 
-// @Mixin(ModelBlockRenderer.class)
+// @Mixin(value = ModelBlockRenderer.class, remap = true)
 // public class ModelBlockRendererMixin {
     
 //     @Inject(

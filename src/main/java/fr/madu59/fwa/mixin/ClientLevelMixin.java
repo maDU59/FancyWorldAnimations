@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 
-@Mixin(ClientLevel.class)
+@Mixin(value = ClientLevel.class, remap = true)
 public abstract class ClientLevelMixin {
 	@Inject(at = @At("HEAD"), method = "sendBlockUpdated")
 	private void fwa$sendBlockUpdated(BlockPos blockPos, BlockState oldState, BlockState newState, int i, CallbackInfo info) {

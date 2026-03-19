@@ -21,7 +21,7 @@ group = mod_group_id
 version = mod_version
 
 base {
-    archivesName = mod_id
+    archivesName = mod_id + "+" + minecraft_version + "-forge"
 }
 
 java {
@@ -109,6 +109,14 @@ minecraft {
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+            // example of overriding the workingDirectory set in configureEach above
+            workingDirectory project.file('run-data')
+
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
     }
 }

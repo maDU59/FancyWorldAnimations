@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-@Mixin(BlockEntityRenderDispatcher.class)
+@Mixin(value = BlockEntityRenderDispatcher.class, remap = true)
 public abstract class BlockEntityRenderDispatcherMixin {
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
 	private <E extends BlockEntity> void fwa$render(E blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, CallbackInfo info) {

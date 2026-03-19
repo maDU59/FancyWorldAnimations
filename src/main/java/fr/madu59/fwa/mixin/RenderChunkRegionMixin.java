@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(RenderChunkRegion.class)
+@Mixin(value = RenderChunkRegion.class, remap = true)
 public abstract class RenderChunkRegionMixin {
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {

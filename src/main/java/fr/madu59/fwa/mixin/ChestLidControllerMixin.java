@@ -10,7 +10,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 
-@Mixin(ChestLidController.class)
+@Mixin(value = ChestLidController.class, remap = true)
 public abstract class ChestLidControllerMixin {
 
 	@Shadow

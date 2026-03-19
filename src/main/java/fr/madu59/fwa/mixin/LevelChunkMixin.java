@@ -29,7 +29,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 
-@Mixin(LevelChunk.class)
+@Mixin(value = LevelChunk.class, remap = true)
 public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique

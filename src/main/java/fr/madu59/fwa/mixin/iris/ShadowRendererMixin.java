@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.phys.Vec3;
 
-@Mixin(ShadowRenderer.class)
+@Mixin(value = ShadowRenderer.class, remap = false)
 public abstract class ShadowRendererMixin {
     
     @Inject(at = @At("HEAD"), method = "renderEntities", remap = false)
