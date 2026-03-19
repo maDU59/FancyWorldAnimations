@@ -81,7 +81,7 @@ public class FancyWorldAnimationsClient{
 
 	@SubscribeEvent
     public static void onRegisterClientReloadListeners(AddClientReloadListenersEvent event) {
-        event.addListener(Identifier.tryParse("emojis:emojis"), new BlacklistReloadListener());
+        event.addListener(Identifier.tryParse("fwa:blacklist-loader"), new BlacklistReloadListener());
     }
 
 	@SubscribeEvent
