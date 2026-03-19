@@ -65,10 +65,7 @@ public class Blacklist {
 
     public static boolean isBlacklisted(BlockState state) {
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-        System.out.println(id);
         String mod = id.getNamespace();
-        System.out.println(mod);
-        System.out.println(BLOCKS_BLACKLIST);
         return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod);
     }
 }
