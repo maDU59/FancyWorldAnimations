@@ -63,7 +63,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
-	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
 	private static ResourceKey<Level> dimension;
 
@@ -84,7 +83,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
 	{
-		if(client.level == null) return;
+		ClientLevel level = Minecraft.getInstance().level;
+		if(level == null) return;
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
@@ -104,12 +104,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
 
-		double startTick = (double)client.level.getGameTime();
+		double startTick = (double)level.getGameTime();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = (double)level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
 				animations.removeAt(blockPos);
 			}
 		}
@@ -121,7 +121,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	public static double getPartialTick() {
-		return (double) client.level.getGameTime() + (double) Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
 	public static void render(AnimationRenderingContext context)
