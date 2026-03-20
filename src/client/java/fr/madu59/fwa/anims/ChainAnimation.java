@@ -61,10 +61,10 @@ public class ChainAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         if (!SwingingBlockHelper.isLast(position)) return;
         ClientLevel level = Minecraft.getInstance().level;
-        float swingScale = 0.7f;
+        float swingScale = 0.7F;
         float prevFactor = 0.0F;
         if ((SettingsManager.CHAIN_GROUNDED.getValue() && !level.getBlockState(position.below()).isAir()) || !SettingsManager.CHAIN_STATE.getValue()) {
-            swingScale = 0;
+            swingScale = 0.0F;
             prevFactor = 1.0F;
         }
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
@@ -86,7 +86,7 @@ public class ChainAnimation extends Animation{
             float deltaFactor = targetFactor - prevFactor;
             prevFactor = targetFactor;
             
-            if (deltaFactor != 0.0F) {
+            if (deltaFactor != 0.0F && swingScale != 0.0F) {
                 poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
                 poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
                 poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
