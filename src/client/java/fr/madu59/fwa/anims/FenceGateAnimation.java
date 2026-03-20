@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Vector3fc;
@@ -12,7 +13,8 @@ import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
-
+import fr.madu59.fwa.utils.ModelSplitHelper;
+import fr.madu59.fwa.utils.ModelSplitHelper.FenceGate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -28,7 +30,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class FenceGateAnimation extends Animation{
 
-    private final float EPSILON = 0.0001f;
     private final RandomSource random;
     private final BakedModel model;
 
@@ -80,7 +81,7 @@ public class FenceGateAnimation extends Animation{
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
-        List<BakedQuad> quads = new java.util.ArrayList<>();
+        List<BakedQuad> quads = new ArrayList<>();
         for (Direction dir : Direction.values()) {
             quads.addAll(model.getQuads(defaultState, dir, random));
         }
@@ -88,9 +89,7 @@ public class FenceGateAnimation extends Animation{
 
         FenceGate fenceGate = splitFenceGateQuads(quads, facing);
 
-        for (BakedQuad quad : fenceGate.postQuadList) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
-        }
+        renderQuads(poseStack, buffer, fenceGate.postQuadList(), light);
 
         boolean onAxisZ = (facing.getAxis() == Axis.Z);
         float leftPivotX = onAxisZ ? (1.0f / 16.0f) : 0.5f;
@@ -105,9 +104,8 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
-        for(BakedQuad quad : fenceGate.leftQuadList) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
-        }
+
+        renderQuads(poseStack, buffer, fenceGate.leftQuadList(), light);
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
@@ -116,16 +114,20 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(rightPivotX, 0.0f, rightPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
         poseStack.translate(-rightPivotX, 0.0f, -rightPivotZ);
-        for(BakedQuad quad : fenceGate.rightQuadList) {
+        renderQuads(poseStack, buffer, fenceGate.rightQuadList(), light);
+    }
+
+    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
+        for (BakedQuad quad : quads) {
             RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 
     public FenceGate splitFenceGateQuads(List<BakedQuad> quads, Direction facing){
 
-        List<BakedQuad> post = new java.util.ArrayList<>();
-        List<BakedQuad> left = new java.util.ArrayList<>();
-        List<BakedQuad> right = new java.util.ArrayList<>();
+        List<BakedQuad> post = new ArrayList<>();
+        List<BakedQuad> left = new ArrayList<>();
+        List<BakedQuad> right = new ArrayList<>();
 
         for (BakedQuad quad : quads) {
             
@@ -144,12 +146,12 @@ public class FenceGateAnimation extends Animation{
                 max = Math.max(pos1.x(), Math.max(pos2.x(), Math.max(pos3.x(), pos4.x())));
             }
 
-            if (gte(min, 0.125f) && lte(max, 0.875f) && !(is(max,min) && (lte(max,0.125f) || gte(max, 0.875f)))) {
-                if(is(min,0.5f) && is(max,0.5f)){
+            if (ModelSplitHelper.gte(min, 0.125f) && ModelSplitHelper.lte(max, 0.875f) && !(ModelSplitHelper.is(max,min) && (ModelSplitHelper.lte(max,0.125f) || ModelSplitHelper.gte(max, 0.875f)))) {
+                if(ModelSplitHelper.is(min,0.5f) && ModelSplitHelper.is(max,0.5f)){
                     right.add(quad);
                     left.add(quad);
                 }
-                else if(gte(min,0.5f) && gte(max,0.5f)){
+                else if(ModelSplitHelper.gte(min,0.5f) && ModelSplitHelper.gte(max,0.5f)){
                     right.add(quad);
                 }
                 else{
@@ -162,29 +164,5 @@ public class FenceGateAnimation extends Animation{
         }
 
         return new FenceGate(post, left, right);
-    }
-
-    private boolean is(float value, float target) {
-        return Math.abs(value - target) < EPSILON;
-    }
-
-    private boolean gte(float value, float target) {
-        return value > target - EPSILON;
-    }
-
-    private boolean lte(float value, float target) {
-        return value < target + EPSILON;
-    }
-
-    public class FenceGate{
-        List<BakedQuad> postQuadList;
-        List<BakedQuad> leftQuadList;
-        List<BakedQuad> rightQuadList;
-
-        public FenceGate(List<BakedQuad> postQuadList, List<BakedQuad> leftQuadList, List<BakedQuad> rightQuadList){
-            this.postQuadList = postQuadList;
-            this.leftQuadList = leftQuadList;
-            this.rightQuadList = rightQuadList;
-        }
     }
 }
