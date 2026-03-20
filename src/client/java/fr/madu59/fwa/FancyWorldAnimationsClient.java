@@ -36,6 +36,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.Level;
@@ -62,10 +63,10 @@ import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
-	private static final Minecraft client = Minecraft.getInstance();
 	private static final Animations animations = new Animations();
 	private static final boolean IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris");
 	private static ResourceKey<Level> dimension;
@@ -87,7 +88,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
 	{
-		if(client.level == null) return;
+		ClientLevel level = Minecraft.getInstance().level;
+		if(level == null) return;
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
@@ -107,12 +109,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
 
-		double startTick = (double)client.level.getGameTime();
+		double startTick = (double)level.getGameTime();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = (double)client.level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = (double)level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
 				animations.removeAt(blockPos);
 			}
 		}
@@ -124,7 +126,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	public static double getPartialTick() {
-		return (double)client.level.getGameTime() + (double) Math.clamp(client.getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -154,17 +156,17 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	{
 		if(type == Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_INFINITE.getValue()) return true;
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
-		if(type == Type.JUKEBOX) return newState.getValue(JukeboxBlock.HAS_RECORD);
-		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(RepeaterBlock.DELAY) != oldState.getValue(RepeaterBlock.DELAY);
+		if(type == Type.JUKEBOX) return newState.getValue(BlockStateProperties.HAS_RECORD);
+		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(BlockStateProperties.DELAY) != oldState.getValue(BlockStateProperties.DELAY);
 		if(type == Type.LAYERED_CAULDRON) {
-			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(LayeredCauldronBlock.LEVEL) != oldState.getValue(LayeredCauldronBlock.LEVEL)) return true;
+			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(BlockStateProperties.LEVEL) != oldState.getValue(BlockStateProperties.LEVEL)) return true;
 			if (oldState.getBlock() != newState.getBlock() && (newState.getBlock() instanceof LayeredCauldronBlock && oldState.getBlock() instanceof CauldronBlock)|| (oldState.getBlock() instanceof LayeredCauldronBlock && newState.getBlock() instanceof CauldronBlock)) return true;
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
-		if(type == Type.LANTERN) return newState.getValue(LanternBlock.HANGING);
-		if(type == Type.CHAIN) return newState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
-		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
+		if(type == Type.LANTERN) return newState.getValue(BlockStateProperties.HANGING);
+		if(type == Type.CHAIN) return newState.getValue(BlockStateProperties.AXIS) == Direction.Axis.Y;
+		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL) != oldState.getValue(BlockStateProperties.LEVEL);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -181,18 +183,18 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	private static boolean isOpen(BlockState state)
 	{
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock) return state.getValue(DoorBlock.OPEN);
-		if(block instanceof TrapDoorBlock) return state.getValue(TrapDoorBlock.OPEN);
-		if(block instanceof FenceGateBlock) return state.getValue(FenceGateBlock.OPEN);
-		if(block instanceof LeverBlock) return state.getValue(LeverBlock.POWERED);
-		if(block instanceof LecternBlock) return state.getValue(LecternBlock.HAS_BOOK);
-		if(block instanceof ButtonBlock) return state.getValue(ButtonBlock.POWERED);
-		if(block instanceof JukeboxBlock) return state.getValue(JukeboxBlock.HAS_RECORD);
-		if(block instanceof EndPortalFrameBlock) return state.getValue(EndPortalFrameBlock.HAS_EYE);
+		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof TrapDoorBlock) return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof FenceGateBlock) return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof LeverBlock) return state.getValue(BlockStateProperties.POWERED);
+		if(block instanceof LecternBlock) return state.getValue(BlockStateProperties.HAS_BOOK);
+		if(block instanceof ButtonBlock) return state.getValue(BlockStateProperties.POWERED);
+		if(block instanceof JukeboxBlock) return state.getValue(BlockStateProperties.HAS_RECORD);
+		if(block instanceof EndPortalFrameBlock) return state.getValue(BlockStateProperties.EYE);
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
-		if(block instanceof TripWireHookBlock) return state.getValue(TripWireHookBlock.ATTACHED);
-		if(block instanceof VaultBlock) return state.getValue(VaultBlock.STATE) == VaultState.UNLOCKING;
+		if(block instanceof TripWireHookBlock) return state.getValue(BlockStateProperties.ATTACHED);
+		if(block instanceof VaultBlock) return state.getValue(BlockStateProperties.VAULT_STATE) == VaultState.UNLOCKING;
 		return false;
 	}
 
@@ -200,18 +202,18 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	{
 		return switch (type)
 		{
-			case DOOR -> state.setValue(DoorBlock.OPEN, false);
-			case TRAPDOOR -> state.setValue(TrapDoorBlock.OPEN, false);
-			case FENCE_GATE -> state.setValue(FenceGateBlock.OPEN, false);
-			case LEVER -> state.setValue(LeverBlock.POWERED, false);
-			case LECTERN -> state.setValue(LecternBlock.HAS_BOOK, false);
-			case BUTTON -> state.setValue(ButtonBlock.POWERED, false);
-			case JUKEBOX -> state.setValue(JukeboxBlock.HAS_RECORD, false);
-			case END_PORTAL_FRAME -> state.setValue(EndPortalFrameBlock.HAS_EYE, false);
-			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
-			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
-			case TRIPWIRE_HOOK -> state.setValue(TripWireHookBlock.ATTACHED, false);
-			case VAULT -> state.setValue(VaultBlock.STATE, VaultState.UNLOCKING);
+			case DOOR -> state.setValue(BlockStateProperties.OPEN, false);
+			case TRAPDOOR -> state.setValue(BlockStateProperties.OPEN, false);
+			case FENCE_GATE -> state.setValue(BlockStateProperties.OPEN, false);
+			case LEVER -> state.setValue(BlockStateProperties.POWERED, false);
+			case LECTERN -> state.setValue(BlockStateProperties.HAS_BOOK, false);
+			case BUTTON -> state.setValue(BlockStateProperties.POWERED, false);
+			case JUKEBOX -> state.setValue(BlockStateProperties.HAS_RECORD, false);
+			case END_PORTAL_FRAME -> state.setValue(BlockStateProperties.EYE, false);
+			case REPEATER -> state.setValue(BlockStateProperties.DELAY, 1);
+			case CAMPFIRE -> state.setValue(BlockStateProperties.LIT, false);
+			case TRIPWIRE_HOOK -> state.setValue(BlockStateProperties.ATTACHED, false);
+			case VAULT -> state.setValue(BlockStateProperties.VAULT_STATE, VaultState.UNLOCKING);
 			default -> state;
 		};
 	}
@@ -244,7 +246,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static Type typeOf(BlockState state){
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock) return Type.DOOR;
+		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
 		if(block instanceof LeverBlock) return Type.LEVER;

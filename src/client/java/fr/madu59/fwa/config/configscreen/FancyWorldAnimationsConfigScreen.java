@@ -79,6 +79,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.LEVER_STATE);
         list.addButton(SettingsManager.LEVER_EASING);
         list.addSlider(SettingsManager.LEVER_SPEED, 0.5, 2.0, 0.1);
+        list.addButton(SettingsManager.LEVER_SPLIT);
         list.addCategory("fwa.config.category.button");
         list.addButton(SettingsManager.BUTTON_STATE);
         list.addButton(SettingsManager.BUTTON_EASING);

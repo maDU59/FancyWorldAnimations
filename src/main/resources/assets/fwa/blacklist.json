@@ -5,10 +5,13 @@
         "create:train_door",
         "create:copper_door",
         "create:brass_door",
-        "create:andhesite_door",
+        "create:andesite_door",
+        "create:framed_glass_door",
         "tfmg:aluminium_door",
         "tfmg:heavy_casing_door",
         "tfmg:heavy_plated_door",
-        "tfmg:steel_door"
+        "tfmg:steel_door",
+        "dawnoftimebuilder:spruce_paper_door", 
+        "dawnoftimebuilder:paper_door"
     ]
 }
