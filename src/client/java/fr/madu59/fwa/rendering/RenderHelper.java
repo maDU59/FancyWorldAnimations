@@ -3,6 +3,7 @@ package fr.madu59.fwa.rendering;
 import java.util.List;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
@@ -44,7 +45,6 @@ public class RenderHelper {
             float ZShade = level.getShade(Direction.NORTH, true);
             float XShade = level.getShade(Direction.EAST, true);
             Vector3f normal = new Vector3f(bakedQuad.direction().getUnitVec3f());
-            // TODO: Replace with the cross vector to get the normal
             normal.mul(pose.normal());
             normal.normalize();  
             float nx2 = normal.x() * normal.x();
