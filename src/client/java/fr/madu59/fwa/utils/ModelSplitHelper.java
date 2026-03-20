@@ -31,10 +31,10 @@ public class ModelSplitHelper {
     public static Vector3f middlePoint(BakedQuad quad){
         Vector3f result = new Vector3f();
     
-        result.add(quad.position0());
-        result.add(quad.position1());
-        result.add(quad.position2());
-        result.add(quad.position3());
+        result.add(Backport.getPos(quad, 0));
+        result.add(Backport.getPos(quad, 1));
+        result.add(Backport.getPos(quad, 2));
+        result.add(Backport.getPos(quad, 3));
         
         result.div(4.0f);
 

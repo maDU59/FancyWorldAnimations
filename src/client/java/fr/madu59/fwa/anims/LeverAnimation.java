@@ -13,6 +13,7 @@ import com.mojang.math.Axis;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper;
 import fr.madu59.fwa.utils.ModelSplitHelper.Lever;
@@ -155,8 +156,8 @@ public class LeverAnimation extends Animation{
 
             for (BakedQuad quad : quads) {
                 
-                Vector3fc pos1 = quad.position0();
-                Vector3fc pos2 = quad.position1();
+                Vector3fc pos1 = Backport.getPos(quad, 0);
+                Vector3fc pos2 = Backport.getPos(quad, 1);
 
                 Vector3f edge1 = new Vector3f();
 
@@ -195,8 +196,8 @@ public class LeverAnimation extends Animation{
                 Vector3f edge1 = new Vector3f();
                 Vector3f edge2 = new Vector3f();
 
-                quad.position1().sub(quad.position0(), edge1);
-                quad.position2().sub(quad.position1(), edge2);
+                Backport.getPos(quad, 1).sub(Backport.getPos(quad, 0), edge1);
+                Backport.getPos(quad, 2).sub(Backport.getPos(quad, 1), edge2);
 
                 if(Math.abs(edge1.lengthSquared() - edge2.lengthSquared()) < 0.001f){
                     middlePoint = ModelSplitHelper.middlePoint(quad);
