@@ -15,10 +15,13 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.phys.AABB;
 
@@ -26,11 +29,15 @@ public class DoorAnimation extends Animation{
 
     private final BakedModel model;
     private final RandomSource random;
+    private final RenderType renderType;
 
     public DoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         random = RandomSource.create(defaultState.getSeed(position));
+        String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
+        if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderType.translucent();
+        else renderType = RenderType.cutoutMipped();
     }
 
     @Override
@@ -63,8 +70,8 @@ public class DoorAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        Direction facing = defaultState.getValue(DoorBlock.FACING);
-        DoorHingeSide hinge = defaultState.getValue(DoorBlock.HINGE);
+        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
+        DoorHingeSide hinge = defaultState.getValue(BlockStateProperties.DOOR_HINGE);
 
         Direction hingeSide = (hinge == DoorHingeSide.RIGHT)
                 ? facing.getClockWise(Direction.Axis.Y)
@@ -112,7 +119,7 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(renderType);
         RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
     }
 }
