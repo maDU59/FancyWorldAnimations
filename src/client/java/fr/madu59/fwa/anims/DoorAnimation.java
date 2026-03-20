@@ -18,7 +18,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -36,7 +35,7 @@ public class DoorAnimation extends Animation{
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         random = RandomSource.create(defaultState.getSeed(position));
         String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
-        if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderType.translucent();
+        if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderType.translucentMovingBlock();
         else renderType = RenderType.cutoutMipped();
     }
 
