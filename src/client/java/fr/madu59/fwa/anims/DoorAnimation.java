@@ -17,8 +17,10 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.DoorBlock;
@@ -32,12 +34,16 @@ public class DoorAnimation extends Animation{
 
     private final BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final RenderType renderType;
 
     public DoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
+        String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
+        if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderTypes.translucentMovingBlock();
+        else renderType = RenderTypes.cutoutMovingBlock();
     }
 
     @Override
@@ -119,7 +125,7 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+        VertexConsumer buffer = context.getBufferSource().getBuffer(renderType);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }
