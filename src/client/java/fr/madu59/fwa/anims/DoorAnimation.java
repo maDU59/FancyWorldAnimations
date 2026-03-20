@@ -22,7 +22,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.phys.AABB;
 
@@ -68,8 +70,8 @@ public class DoorAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        Direction facing = defaultState.getValue(DoorBlock.FACING);
-        DoorHingeSide hinge = defaultState.getValue(DoorBlock.HINGE);
+        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
+        DoorHingeSide hinge = defaultState.getValue(BlockStateProperties.DOOR_HINGE);
 
         Direction hingeSide = (hinge == DoorHingeSide.RIGHT)
                 ? facing.getClockWise(Direction.Axis.Y)
