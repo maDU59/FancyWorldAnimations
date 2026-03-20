@@ -26,6 +26,7 @@
     "fwa.config.option.speed.name":"Animation speed multiplier",
     "fwa.config.option.infinite.name":"Idle animation",
     "fwa.config.option.chain_grounded.name":"Don't animate chains lines linked to the ground",
+    "fwa.config.option.split.name":"Model splitting method",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",
@@ -34,7 +35,9 @@
     "fwa.config.value.springy":"Springy",
     "fwa.config.value.elastic":"Elastic",
     "fwa.config.value.slow":"Slow",
-    "fwa.config.value.fast":"Fastc",
+    "fwa.config.value.fast":"Fast",
+    "fwa.config.value.model":"Model",
+    "fwa.config.value.texture":"Texture",
 
     "fwa.config.done":"Done"
 }

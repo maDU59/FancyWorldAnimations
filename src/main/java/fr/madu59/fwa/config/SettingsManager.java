@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
+import fr.madu59.fwa.utils.ModelSplitHelper.SPLIT_METHOD;
 import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.*;
@@ -112,6 +113,13 @@ public class SettingsManager {
         "fwa.config.option.speed.description",
         1.0
     );
+
+    public static Option<SPLIT_METHOD> LEVER_SPLIT = loadOptionWithDefaults(
+        "lever_split",
+        "fwa.config.option.split.name",
+        "fwa.config.option.split.description",
+        SPLIT_METHOD.MODEL
+    ); 
 
     public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(
         "lectern_state",
