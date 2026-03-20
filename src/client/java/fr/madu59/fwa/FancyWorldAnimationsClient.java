@@ -123,7 +123,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	public static double getPartialTick() {
-		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.min(Math.max(Minecraft.getInstance().getFrameTime, 0.0f), 1.0f);
+		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0.0f), 1.0f);
 	}
 
 	public static void render(AnimationRenderingContext context)
