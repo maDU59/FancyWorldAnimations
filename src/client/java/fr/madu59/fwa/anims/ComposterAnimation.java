@@ -21,8 +21,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ComposterAnimation extends Animation{
 
@@ -64,7 +64,7 @@ public class ComposterAnimation extends Animation{
     }
 
     private double getHeight(BlockState state){
-        return Math.min((state.getValue(ComposterBlock.LEVEL) * 2.0 + 1.0) / 16.0, 15.0/16.0);
+        return Math.min((state.getValue(BlockStateProperties.LEVEL_COMPOSTER) * 2.0 + 1.0) / 16.0, 15.0/16.0);
     }
 
     @Override
