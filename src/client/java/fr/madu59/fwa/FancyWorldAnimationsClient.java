@@ -159,14 +159,14 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.JUKEBOX) return newState.getValue(BlockStateProperties.HAS_RECORD);
 		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(BlockStateProperties.DELAY) != oldState.getValue(BlockStateProperties.DELAY);
 		if(type == Type.LAYERED_CAULDRON) {
-			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(BlockStateProperties.LEVEL) != oldState.getValue(BlockStateProperties.LEVEL)) return true;
+			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(BlockStateProperties.LEVEL_CAULDRON) != oldState.getValue(BlockStateProperties.LEVEL_CAULDRON)) return true;
 			if (oldState.getBlock() != newState.getBlock() && (newState.getBlock() instanceof LayeredCauldronBlock && oldState.getBlock() instanceof CauldronBlock)|| (oldState.getBlock() instanceof LayeredCauldronBlock && newState.getBlock() instanceof CauldronBlock)) return true;
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
 		if(type == Type.LANTERN) return newState.getValue(BlockStateProperties.HANGING);
 		if(type == Type.CHAIN) return newState.getValue(BlockStateProperties.AXIS) == Direction.Axis.Y;
-		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL) != oldState.getValue(BlockStateProperties.LEVEL);
+		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		return oldIsOpen != newIsOpen;
 	}
 
