@@ -42,6 +42,8 @@ public class BellAnimation extends Animation{
     private List<BlockModelPart> parts = new ArrayList<>();
     private final Direction facing;
     private final BellAttachType attachment;
+    private final Identifier atlasId = Identifier.tryParse("minecraft:blocks");
+    private final Identifier textureId = Identifier.tryParse("minecraft:entity/bell/bell_body");
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -148,7 +150,7 @@ public class BellAnimation extends Animation{
             return;
         }
         PoseStack poseStack = context.getPoseStack();
-        TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
+        TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(atlasId).getSprite(textureId);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position);
 
