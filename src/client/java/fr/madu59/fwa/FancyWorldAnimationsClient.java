@@ -140,9 +140,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(animations.isEmpty()) return;
 
-		if(!context.isShadow()){
-			RenderHelper.prepareFrame();
-		}
+		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);

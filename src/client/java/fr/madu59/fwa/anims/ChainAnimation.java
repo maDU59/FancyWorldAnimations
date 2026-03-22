@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -75,7 +74,7 @@ public class ChainAnimation extends Animation{
             swingScale = 0.0F;
             prevFactor = 1.0F;
         }
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+        VertexConsumer buffer = RenderHelper.getBuffer();
         int chainCount = SwingingBlockHelper.getChainCount(position);
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);

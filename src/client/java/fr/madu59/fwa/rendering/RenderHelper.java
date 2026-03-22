@@ -12,21 +12,36 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 
 public class RenderHelper {
 
+    private static MultiBufferSource bufferSource;
     private static float bottomShade = 0;
     private static float topShade = 0;
     private static float ZShade = 0;
     private static float XShade = 0;
 
-    public static void prepareFrame(){
-        ClientLevel level = Minecraft.getInstance().level;
+    public static void prepareFrame(MultiBufferSource source, boolean isShadow){
+        if(!isShadow){
+            ClientLevel level = Minecraft.getInstance().level;
         bottomShade = level.getShade(Direction.DOWN, true);
         topShade = level.getShade(Direction.UP, true);
         ZShade = level.getShade(Direction.NORTH, true);
         XShade = level.getShade(Direction.EAST, true);
+        }
+        bufferSource = source;
+    }
+
+    public static VertexConsumer getBuffer(){
+        return getBuffer(RenderTypes.cutoutMovingBlock());
+    }
+
+    public static VertexConsumer getBuffer(RenderType renderType){
+        return bufferSource.getBuffer(renderType);
     }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light){

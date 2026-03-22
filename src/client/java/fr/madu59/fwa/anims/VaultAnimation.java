@@ -16,8 +16,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class VaultAnimation extends Animation{
 
@@ -74,12 +74,12 @@ public class VaultAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(VaultBlock.FACING);
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         float scale = 1;
 
         //VaultBlockEntity vaultBlockEntity = (VaultBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
         ItemStack keyItemStack = new ItemStack(Items.TRIAL_KEY);
-        if(defaultState.getValue(VaultBlock.OMINOUS)) keyItemStack = new ItemStack(Items.OMINOUS_TRIAL_KEY);
+        if(defaultState.getValue(BlockStateProperties.OMINOUS)) keyItemStack = new ItemStack(Items.OMINOUS_TRIAL_KEY);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.above());
 
