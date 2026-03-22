@@ -27,6 +27,10 @@ public class SwingingBlockHelper {
         return blockState.getBlock() instanceof ChainBlock && blockState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
     }
 
+    public static boolean isVerticalChain(Animation animation){
+        return animation instanceof ChainAnimation;
+    }
+
     public static boolean isHangingLantern(BlockState blockState){
         return blockState.getBlock() instanceof LanternBlock && blockState.getValue(LanternBlock.HANGING);
     }

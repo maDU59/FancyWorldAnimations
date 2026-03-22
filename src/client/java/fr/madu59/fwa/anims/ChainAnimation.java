@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -70,6 +71,7 @@ public class ChainAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         if (!isLast) return;
         ClientLevel level = Minecraft.getInstance().level;
+        if (SettingsManager.CHAIN_GROUNDED.getValue() && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);;
         float swingScale = 0.7F;
         float prevFactor = 0.0F;
         VertexConsumer buffer = RenderHelper.getBuffer();

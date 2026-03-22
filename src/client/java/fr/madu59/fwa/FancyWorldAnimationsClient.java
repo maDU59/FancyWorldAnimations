@@ -320,11 +320,15 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		animations.removeAt(position);
 	}
 
+	public static void safeRemoveAnimationAt(BlockPos position){
+		animations.removeSafeAt(position);
+	}
+
 	public static void propagateChain(ClientLevel level, BlockPos blockPos, BlockState newState){
 		if(SettingsManager.CHAIN_STATE.getValue()){
 			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
+				while(SwingingBlockHelper.isVerticalChain(animations.animations.getOrDefault(abovePos, null))){
 					animations.animations.get(abovePos).markForRemoval();
 					abovePos = abovePos.above();
 				}
