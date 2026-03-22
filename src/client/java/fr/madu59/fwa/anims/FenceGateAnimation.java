@@ -25,8 +25,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FenceGateAnimation extends Animation{
 
@@ -42,7 +42,7 @@ public class FenceGateAnimation extends Animation{
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
 
-        facing = defaultState.getValue(FenceGateBlock.FACING);
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         BlockModelPart part = parts.get(0);
 
         List<BakedQuad> quads = new ArrayList<>();

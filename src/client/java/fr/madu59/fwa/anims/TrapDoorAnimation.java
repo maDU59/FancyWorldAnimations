@@ -31,12 +31,43 @@ public class TrapDoorAnimation extends Animation{
 
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
+    private final float pivotX;
+    private final float pivotY;
+    private final float pivotZ;
+    private final Direction hingeSide;
+    private final Half half;
+    private final float dY;
     
     public TrapDoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
+
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        half = defaultState.getValue(BlockStateProperties.HALF);
+        hingeSide = facing.getOpposite();
+
+        VoxelShape collShape = defaultState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
+        AABB boundingBox = collShape.isEmpty() ? defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
+
+        float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
+        float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
+
+        switch (hingeSide) {
+            case EAST -> pivotX = (float) boundingBox.maxX;
+            case WEST -> pivotX = (float) boundingBox.minX;
+            case SOUTH -> pivotZ = (float) boundingBox.maxZ;
+            case NORTH -> pivotZ = (float) boundingBox.minZ;
+            default -> {}
+        }
+        this.pivotX = pivotX;
+        this.pivotZ = pivotZ;
+        pivotY = (half == Half.TOP) ? (float) boundingBox.maxY : (float) boundingBox.minY;
+
+        float thickness = (float) (boundingBox.maxY - boundingBox.minY);
+        float halfThickness = thickness > 0.0f ? thickness * 0.5f : (3.0f / 32.0f);
+        dY = (half == Half.TOP) ? -halfThickness : halfThickness;
     }
 
     @Override
@@ -70,31 +101,8 @@ public class TrapDoorAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-        Half half = defaultState.getValue(BlockStateProperties.HALF);
-
-        VoxelShape collShape = defaultState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
-        AABB boundingBox = collShape.isEmpty() ? defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
-
-        Direction hingeSide = facing.getOpposite();
         double angle = getAngle(context.getNowTick(), hingeSide);
         if (half == Half.BOTTOM) angle = -angle;
-
-        float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
-        float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
-
-        switch (hingeSide) {
-            case EAST -> pivotX = (float) boundingBox.maxX;
-            case WEST -> pivotX = (float) boundingBox.minX;
-            case SOUTH -> pivotZ = (float) boundingBox.maxZ;
-            case NORTH -> pivotZ = (float) boundingBox.minZ;
-            default -> {}
-        }
-        float pivotY = (half == Half.TOP) ? (float) boundingBox.maxY : (float) boundingBox.minY;
-
-        float thickness = (float) (boundingBox.maxY - boundingBox.minY);
-        float halfThickness = thickness > 0.0f ? thickness * 0.5f : (3.0f / 32.0f);
-        float dY = (half == Half.TOP) ? -halfThickness : halfThickness;
 
         double rad = Math.toRadians(angle);
         float cos = (float) Math.cos(rad);
