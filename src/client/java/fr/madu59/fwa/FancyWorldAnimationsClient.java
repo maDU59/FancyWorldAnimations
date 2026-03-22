@@ -34,6 +34,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -68,6 +69,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
 	private static ResourceKey<Level> dimension;
+	private static Frustum frustum;
 
 	@Override
 	public void onInitializeClient() {
@@ -76,10 +78,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPacketListener, client) -> {
             animations.animations.clear();
         });
+		WorldRenderEvents.END_EXTRACTION.register(listener -> {
+			frustum = listener.frustum();
+		});
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), context.worldRenderer().getCapturedFrustum(), tickDelta, false));
+				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), frustum, tickDelta, false));
 			}
 		});
 	}
