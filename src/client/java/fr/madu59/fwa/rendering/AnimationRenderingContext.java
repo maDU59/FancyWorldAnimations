@@ -15,23 +15,26 @@ public class AnimationRenderingContext {
     private final double nowTick;
     private final Camera camera;
     private final Vec3 cameraPos;
+    private final boolean isShadow;
 
-    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick) {
+    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick, boolean isShadow) {
         this.poseStack = poseStack;
         this.bufferSource = bufferSource;
         this.submitNodeCollector = submitNodeCollector;
         this.nowTick = nowTick;
         this.camera = camera;
         this.cameraPos = camera.position();
+        this.isShadow = isShadow;
     }
 
-    public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick) {
+    public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, double nowTick, boolean isShadow) {
         this.poseStack = poseStack;
         this.bufferSource = bufferSource;
         this.submitNodeCollector = submitNodeCollector;
         this.nowTick = nowTick;
         this.camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         this.cameraPos = cameraPos;
+        this.isShadow = isShadow;
     }
 
     public PoseStack getPoseStack() {
@@ -52,5 +55,9 @@ public class AnimationRenderingContext {
 
     public Vec3 getCameraPos() {
         return cameraPos;
+    }
+
+    public boolean isShadow(){
+        return isShadow;
     }
 }
