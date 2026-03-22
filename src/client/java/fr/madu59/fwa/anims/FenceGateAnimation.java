@@ -32,6 +32,8 @@ public class FenceGateAnimation extends Animation{
 
     private List<BlockModelPart> parts = new ArrayList<>();
     private final BlockStateModel model;
+    private final FenceGate fenceGate;
+    private final Direction facing;
 
 
     public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
@@ -39,6 +41,16 @@ public class FenceGateAnimation extends Animation{
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
+
+        facing = defaultState.getValue(FenceGateBlock.FACING);
+        BlockModelPart part = parts.get(0);
+
+        List<BakedQuad> quads = new ArrayList<>();
+        for (Direction dir : Direction.values()) {
+            quads.addAll(part.getQuads(dir));
+        }
+        quads.addAll(part.getQuads(null));
+        fenceGate = splitFenceGateQuads(quads, facing);
     }
 
     @Override
@@ -76,21 +88,9 @@ public class FenceGateAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(FenceGateBlock.FACING);
-
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-
-        BlockModelPart part = parts.get(0);
-
-        List<BakedQuad> quads = new ArrayList<>();
-        for (Direction dir : Direction.values()) {
-            quads.addAll(part.getQuads(dir));
-        }
-        quads.addAll(part.getQuads(null));
-
-        FenceGate fenceGate = splitFenceGateQuads(quads, facing);
 
         renderQuads(poseStack, buffer, fenceGate.postQuadList(), light);
 

@@ -21,8 +21,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -70,8 +70,8 @@ public class TrapDoorAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(TrapDoorBlock.FACING);
-        Half half = defaultState.getValue(TrapDoorBlock.HALF);
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        Half half = defaultState.getValue(BlockStateProperties.HALF);
 
         VoxelShape collShape = defaultState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
         AABB boundingBox = collShape.isEmpty() ? defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
