@@ -37,7 +37,6 @@ public class LanternAnimation extends Animation{
 
     private float tiltX = 0f;
     private float tiltZ = 0f;
-    private float yaw = 0f;
     private float spin = 0f;
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
@@ -77,7 +76,6 @@ public class LanternAnimation extends Animation{
         extractRenderState(context);
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         float swingScale = 0.7f;
-        float yaw = this.yaw * Math.max(0.55F, swingScale);
         float tiltX = this.tiltX * swingScale;
         float tiltZ = this.tiltZ * swingScale;
         float spin = this.spin * Math.max(0.55F, swingScale);
@@ -93,7 +91,6 @@ public class LanternAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F) {
-                poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
                 poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
                 poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
                 poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
@@ -113,7 +110,6 @@ public class LanternAnimation extends Animation{
         }
         float deltaFactor = 1f - prevFactor;
         if (deltaFactor != 0.0F) {
-            poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
             poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
             poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
             poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
@@ -134,7 +130,6 @@ public class LanternAnimation extends Animation{
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
 
         if(level != null){
