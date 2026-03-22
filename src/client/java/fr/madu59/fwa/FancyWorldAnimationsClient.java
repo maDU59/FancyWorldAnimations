@@ -35,15 +35,12 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockPos.MutableBlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.CauldronBlock;
@@ -82,7 +79,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), tickDelta, false));
+				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), context.worldRenderer().getCapturedFrustum(), tickDelta, false));
 			}
 		});
 	}
@@ -157,7 +154,9 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
 
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, context);
+			if(context.geFrustum() == null || context.geFrustum().isVisible(animation.getBoundingBox())){
+				renderAnimation(animation, context);
+			}
 		}
 		dimension = level.dimension();
 		animations.clean(context.getNowTick());

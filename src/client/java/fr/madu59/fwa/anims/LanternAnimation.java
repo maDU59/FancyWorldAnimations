@@ -48,6 +48,7 @@ public class LanternAnimation extends Animation{
     private List<BlockModelPart> parts = new ArrayList<>();
     private final BlockStateModel model;
     private PoseStack stack = new PoseStack();
+    private int chainCount;
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -55,6 +56,7 @@ public class LanternAnimation extends Animation{
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
+        chainCount = SwingingBlockHelper.getChainCount(position);
     }
 
     @Override
@@ -72,9 +74,27 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
+    public AABB getBoundingBox(){
+        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    }
+
+    @Override
+    public void setLast(boolean isLast){
+        if(this.isLast == null || this.isLast != isLast){
+            super.setLast(isLast);
+            if (isLast) needUpdate();
+        }
+    }
+
+    public void update(){
+        chainCount = SwingingBlockHelper.getChainCount(position);
+        needUpdate = false;
+    }
+
+    @Override
     public void render(AnimationRenderingContext context) {
+        if (needUpdate) update();
         VertexConsumer buffer = RenderHelper.getBuffer();
-        int chainCount = SwingingBlockHelper.getChainCount(position);
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);

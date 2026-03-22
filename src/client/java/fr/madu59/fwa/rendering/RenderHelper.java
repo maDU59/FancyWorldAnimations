@@ -24,6 +24,7 @@ public class RenderHelper {
     private static float topShade = 0;
     private static float ZShade = 0;
     private static float XShade = 0;
+    private static Vector3f normal = new Vector3f();
 
     public static void prepareFrame(MultiBufferSource source, boolean isShadow){
         if(!isShadow){
@@ -66,7 +67,7 @@ public class RenderHelper {
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
         Float shade = 1f;
         if(isShaded){
-            Vector3f normal = new Vector3f(bakedQuad.direction().getUnitVec3f());
+            normal.set(bakedQuad.direction().getUnitVec3f());
             normal.mul(pose.normal());
             normal.normalize();  
             float nx2 = normal.x() * normal.x();
