@@ -65,7 +65,7 @@ public class AnimationRenderingContext {
         return isShadow;
     }
 
-    public Frustum geFrustum(){
+    public Frustum getFrustum(){
         return frustum;
     }
 }
