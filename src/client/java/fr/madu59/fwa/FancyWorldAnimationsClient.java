@@ -82,7 +82,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), context.gameRenderer().getMainCamera().getCapturedFrustum(), tickDelta, false));
+				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), context.gameRenderer().getMainCamera().getCullFrustum(), tickDelta, false));
 			}
 		});
 	}
