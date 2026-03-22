@@ -357,7 +357,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
-			if (animations.animations.containsKey(lastPos)) animations.animations.get(lastPos).update();
+			if (animations.animations.containsKey(lastPos)) animations.animations.get(lastPos).needUpdate();
 		}
 	}
 

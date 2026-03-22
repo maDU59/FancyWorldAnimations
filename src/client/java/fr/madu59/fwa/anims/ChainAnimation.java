@@ -46,6 +46,7 @@ public class ChainAnimation extends Animation{
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
+    private int chainCount = 0;
     private BlockState state;
     private List<BlockModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
@@ -54,7 +55,6 @@ public class ChainAnimation extends Animation{
     public ChainAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         state = newState;
-        isLast = SwingingBlockHelper.isLast(position);
     }
 
     @Override
@@ -72,14 +72,35 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
-    public void render(AnimationRenderingContext context) {
-        if (!isLast) return;
+    public void setLast(boolean isLast){
+        if(this.isLast == null || this.isLast != isLast){
+            super.setLast(isLast);
+            if (isLast) needUpdate();
+        }
+    }
+
+    public void update(){
         ClientLevel level = Minecraft.getInstance().level;
-        if (SettingsManager.CHAIN_GROUNDED.getValue() && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);;
+        if(isLast == null && !Minecraft.getInstance().level.getBlockState(position).isAir()){
+            isLast = SwingingBlockHelper.isLast(position);
+            if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
+        }
+        chainCount = SwingingBlockHelper.getChainCount(position);
+        needUpdate = false;
+    }
+
+    @Override
+    public void render(AnimationRenderingContext context) {
+        if(isLast == null){
+            update();
+            return;
+        }
+        if (!isLast) return;
+        if (needUpdate) update();
+        ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
         float prevFactor = 0.0F;
         VertexConsumer buffer = RenderHelper.getBuffer();
-        int chainCount = SwingingBlockHelper.getChainCount(position);
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);

@@ -17,7 +17,8 @@ public class Animation {
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
 
-    protected boolean isLast = false;
+    protected Boolean isLast;
+    protected boolean needUpdate = true;
 
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         this.position = position;
@@ -97,8 +98,8 @@ public class Animation {
         this.isLast = isLast;
     }
 
-    public void update(){
-
+    public void needUpdate(){
+        needUpdate = true;
     }
 
     public double getProgress(double nowTick) {
