@@ -23,7 +23,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
@@ -49,7 +48,7 @@ public class DoorAnimation extends Animation{
         if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderTypes.translucentMovingBlock();
         else renderType = RenderTypes.cutoutMovingBlock();
 
-        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         hinge = defaultState.getValue(BlockStateProperties.DOOR_HINGE);
 
         Direction hingeSide = (hinge == DoorHingeSide.RIGHT)

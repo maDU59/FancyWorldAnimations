@@ -44,7 +44,7 @@ public class LeverAnimation extends Animation{
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
 
-        facing = defaultState.getValue(BlockStateProperties.FACING);
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         face = defaultState.getValue(BlockStateProperties.ATTACH_FACE);
 
         BlockStateModelPart part = parts.get(0);
