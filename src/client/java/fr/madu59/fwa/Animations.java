@@ -29,17 +29,15 @@ public class Animations{
         Iterator<Animation> it = this.animations.values().iterator();
         while (it.hasNext()) {
             Animation animation = it.next();
-            if (animation.isFinished(nowTick)) {
-                if (animation.isForRemoval()){
-                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-                        it.remove();
-                    }
+            if (animation.isForRemoval()){
+                if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+                    it.remove();
                 }
-                else{
-                    animation.markForRemoval();
-                    BlockPos pos = animation.getPos();
-                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
-                }
+            }
+            else if (animation.isFinished(nowTick)) {
+                animation.markForRemoval();
+                BlockPos pos = animation.getPos();
+                ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
             }
             if(!level.isLoaded(animation.getPos())){
                 it.remove();

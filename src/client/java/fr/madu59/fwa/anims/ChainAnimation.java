@@ -52,6 +52,7 @@ public class ChainAnimation extends Animation{
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
+        isLast = SwingingBlockHelper.isLast(position);
     }
 
     @Override
@@ -59,20 +60,21 @@ public class ChainAnimation extends Animation{
         return Double.MAX_VALUE;
     }
 
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
+    }
+
     public static boolean hasInfiniteAnimation(){
-        return true;
+        return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
     }
 
     @Override
     public void render(AnimationRenderingContext context) {
-        if (!SwingingBlockHelper.isLast(position)) return;
+        if (!isLast) return;
         ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
         float prevFactor = 0.0F;
-        if ((SettingsManager.CHAIN_GROUNDED.getValue() && !level.getBlockState(position.below()).isAir()) || !SettingsManager.CHAIN_STATE.getValue()) {
-            swingScale = 0.0F;
-            prevFactor = 1.0F;
-        }
         VertexConsumer buffer = RenderHelper.getBuffer();
         int chainCount = SwingingBlockHelper.getChainCount(position);
         PoseStack poseStack = context.getPoseStack();

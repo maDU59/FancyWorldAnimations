@@ -17,6 +17,8 @@ public class Animation {
     protected double toRemoveTick = 0;
     protected boolean removalApproved = false;
 
+    protected boolean isLast = false;
+
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         this.position = position;
         this.defaultState = defaultState;
@@ -89,6 +91,14 @@ public class Animation {
 
     public boolean needEndBatch(){
         return false;
+    }
+
+    public void setLast(boolean isLast){
+        this.isLast = isLast;
+    }
+
+    public void update(){
+
     }
 
     public double getProgress(double nowTick) {
