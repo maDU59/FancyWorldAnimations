@@ -26,6 +26,7 @@ public class LecternAnimation extends Animation{
     
     private final BookModel bookModel;
     private final float hash;
+    private final Identifier textureId = Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png");
 
     public LecternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -90,7 +91,7 @@ public class LecternAnimation extends Animation{
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 
-        VertexConsumer buffer = RenderHelper.getBuffer(RenderTypes.entityCutout(Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png")));
+        VertexConsumer buffer = RenderHelper.getBuffer(RenderTypes.entityCutout(textureId));
         
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         BookModel.State bookState = new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));
