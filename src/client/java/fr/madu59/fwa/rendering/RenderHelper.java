@@ -9,7 +9,10 @@ import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.QuadInstance;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
@@ -17,17 +20,29 @@ import net.minecraft.world.level.CardinalLighting;
 
 public class RenderHelper {
 
+    private static MultiBufferSource bufferSource;
     private static float bottomShade = 0;
     private static float topShade = 0;
     private static float ZShade = 0;
     private static float XShade = 0;
 
-    public static void prepareFrame(){
-        CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
-        bottomShade = cardinalLighting.byFace(Direction.DOWN);
-        topShade = cardinalLighting.byFace(Direction.UP);
-        ZShade = cardinalLighting.byFace(Direction.NORTH);
-        XShade = cardinalLighting.byFace(Direction.EAST);
+    public static void prepareFrame(MultiBufferSource source, boolean isShadow){
+        if(!isShadow){
+            CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
+            bottomShade = cardinalLighting.byFace(Direction.DOWN);
+            topShade = cardinalLighting.byFace(Direction.UP);
+            ZShade = cardinalLighting.byFace(Direction.NORTH);
+            XShade = cardinalLighting.byFace(Direction.EAST);
+        }
+        bufferSource = source;
+    }
+
+    public static VertexConsumer getBuffer(){
+        return getBuffer(RenderTypes.cutoutMovingBlock());
+    }
+
+    public static VertexConsumer getBuffer(RenderType renderType){
+        return bufferSource.getBuffer(renderType);
     }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){

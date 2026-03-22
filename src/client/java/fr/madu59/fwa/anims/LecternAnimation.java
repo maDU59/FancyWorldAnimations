@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -18,8 +19,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockAndLightGetter;
-import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LecternAnimation extends Animation{
     
@@ -87,9 +88,9 @@ public class LecternAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         Double nowTick = context.getNowTick();
 
-        Direction facing = defaultState.getValue(LecternBlock.FACING);
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.entityCutout(Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png")));
+        VertexConsumer buffer = RenderHelper.getBuffer(RenderTypes.entityCutout(Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png")));
         
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         BookModel.State bookState = new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));

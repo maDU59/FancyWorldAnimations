@@ -27,10 +27,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
-import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class BellAnimation extends Animation{
 
@@ -57,8 +57,8 @@ public class BellAnimation extends Animation{
             FancyWorldAnimationsClient.removeAnimationAt(position);
         }
 
-        facing = defaultState.getValue(BellBlock.FACING);
-        attachment = defaultState.getValue(BellBlock.ATTACHMENT);
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        attachment = defaultState.getValue(BlockStateProperties.BELL_ATTACHMENT);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class BellAnimation extends Animation{
         context.getSubmitNodeCollector().submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), light, OverlayTexture.NO_OVERLAY, sprite);
 
         if(shouldUseFallbackRender()){
-            VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+            VertexConsumer buffer = RenderHelper.getBuffer();
             RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
