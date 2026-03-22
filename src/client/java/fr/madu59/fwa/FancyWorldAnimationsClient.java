@@ -26,6 +26,7 @@ import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -78,7 +79,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), tickDelta));
+				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), tickDelta, false));
 			}
 		});
 	}
@@ -138,6 +139,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			return;
 		}
 		if(animations.isEmpty()) return;
+
+		if(!context.isShadow()){
+			RenderHelper.prepareFrame();
+		}
 
 		for (Animation animation : animations.animations.values()) {
 			renderAnimation(animation, context);

@@ -17,7 +17,18 @@ import net.minecraft.world.level.CardinalLighting;
 
 public class RenderHelper {
 
-    private static final CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
+    private static float bottomShade = 0;
+    private static float topShade = 0;
+    private static float ZShade = 0;
+    private static float XShade = 0;
+
+    public static void prepareFrame(){
+        CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
+        bottomShade = cardinalLighting.byFace(Direction.DOWN);
+        topShade = cardinalLighting.byFace(Direction.UP);
+        ZShade = cardinalLighting.byFace(Direction.NORTH);
+        XShade = cardinalLighting.byFace(Direction.EAST);
+    }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
         for (BlockStateModelPart part : parts){
@@ -41,10 +52,6 @@ public class RenderHelper {
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
         Float shade = 1f;
         if(isShaded){
-            float bottomShade = cardinalLighting.byFace(Direction.DOWN);
-            float topShade = cardinalLighting.byFace(Direction.UP);
-            float ZShade = cardinalLighting.byFace(Direction.NORTH);
-            float XShade = cardinalLighting.byFace(Direction.EAST);
             Vector3f normal = new Vector3f(bakedQuad.direction().getUnitVec3f());
             normal.mul(pose.normal());
             normal.normalize();  
