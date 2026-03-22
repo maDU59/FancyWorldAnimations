@@ -40,6 +40,8 @@ public class BellAnimation extends Animation{
     private final float hash;
     private BellBlockEntity bellBlockEntity;
     private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final Direction facing;
+    private final BellAttachType attachment;
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -54,6 +56,9 @@ public class BellAnimation extends Animation{
         else if (client.level.getBlockEntity(position) != null){
             FancyWorldAnimationsClient.removeAnimationAt(position);
         }
+
+        facing = defaultState.getValue(BellBlock.FACING);
+        attachment = defaultState.getValue(BellBlock.ATTACHMENT);
     }
 
     @Override
@@ -144,8 +149,6 @@ public class BellAnimation extends Animation{
         }
         PoseStack poseStack = context.getPoseStack();
         TextureAtlasSprite sprite = client.getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
-        Direction facing = defaultState.getValue(BellBlock.FACING);
-        BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) client.level, position);
 
