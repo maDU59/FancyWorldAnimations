@@ -5,6 +5,7 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class Animation {
 
@@ -104,6 +105,10 @@ public class Animation {
 
     public double getProgress(double nowTick) {
         return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
+    }
+
+    public AABB getBoundingBox(){
+        return new AABB(position);
     }
 
     public void render(AnimationRenderingContext context) {

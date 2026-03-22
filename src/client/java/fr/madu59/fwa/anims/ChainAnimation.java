@@ -33,6 +33,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class ChainAnimation extends Animation{
 
@@ -75,9 +76,14 @@ public class ChainAnimation extends Animation{
         }
     }
 
+    @Override
+    public AABB getBoundingBox(){
+        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    }
+
     public void update(){
         ClientLevel level = Minecraft.getInstance().level;
-        if(isLast == null && !Minecraft.getInstance().level.getBlockState(position).isAir()){
+        if(isLast == null && !level.getBlockState(position).isAir()){
             isLast = SwingingBlockHelper.isLast(position);
             if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
         }
@@ -143,7 +149,6 @@ public class ChainAnimation extends Animation{
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
 
         if(level != null){

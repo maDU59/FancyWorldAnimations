@@ -82,7 +82,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), tickDelta, false));
+				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), context.gameRenderer().getMainCamera().getCapturedFrustum(), tickDelta, false));
 			}
 		});
 	}
@@ -157,7 +157,9 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
 
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, context);
+			if(context.geFrustum() == null || context.geFrustum().isVisible(animation.getBoundingBox())){
+				renderAnimation(animation, context);
+			}
 		}
 		dimension = level.dimension();
 		animations.clean(context.getNowTick());
