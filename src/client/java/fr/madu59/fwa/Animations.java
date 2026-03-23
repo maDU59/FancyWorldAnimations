@@ -23,23 +23,30 @@ public class Animations{
         this.animations.remove(blockPos);
     }
 
+    public void removeSafeAt(BlockPos blockPos) {
+        Animation animation = getAt(blockPos);
+        if(animation == null) return;
+        LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+        animation.markForRemoval();
+        BlockPos pos = animation.getPos();
+        ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+    }
+
     public void clean(double nowTick) {
         ClientLevel level = Minecraft.getInstance().level;
         LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
         Iterator<Animation> it = this.animations.values().iterator();
         while (it.hasNext()) {
             Animation animation = it.next();
-            if (animation.isFinished(nowTick)) {
-                if (animation.isForRemoval()){
-                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-                        it.remove();
-                    }
+            if (animation.isForRemoval()){
+                if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+                    it.remove();
                 }
-                else{
-                    animation.markForRemoval();
-                    BlockPos pos = animation.getPos();
-                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
-                }
+            }
+            else if (animation.isFinished(nowTick)) {
+                animation.markForRemoval();
+                BlockPos pos = animation.getPos();
+                ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
             }
             if(!level.isLoaded(animation.getPos())){
                 it.remove();

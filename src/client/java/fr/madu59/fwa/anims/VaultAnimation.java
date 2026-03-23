@@ -16,17 +16,20 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
 
 public class VaultAnimation extends Animation{
 
     BlockState newState;
     private final ItemStackRenderState keyState = new ItemStackRenderState();
+    private final Direction facing;
     
     public VaultAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.newState = newState;
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Override
@@ -56,6 +59,11 @@ public class VaultAnimation extends Animation{
         return false;
     }
 
+    @Override
+    public AABB getBoundingBox(){
+        return new AABB(position.getCenter().add(-1.5, -1.5, -1.5), position.getCenter().add(1.5, 1.5, 1.5));
+    }
+
     private float getDistance(double nowTick) {
         float max = 3f/16f;
         float min = -3f/16f;
@@ -74,12 +82,11 @@ public class VaultAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(VaultBlock.FACING);
         float scale = 1;
 
         //VaultBlockEntity vaultBlockEntity = (VaultBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
         ItemStack keyItemStack = new ItemStack(Items.TRIAL_KEY);
-        if(defaultState.getValue(VaultBlock.OMINOUS)) keyItemStack = new ItemStack(Items.OMINOUS_TRIAL_KEY);
+        if(defaultState.getValue(BlockStateProperties.OMINOUS)) keyItemStack = new ItemStack(Items.OMINOUS_TRIAL_KEY);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.above());
 

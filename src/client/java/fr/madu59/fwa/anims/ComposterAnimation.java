@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -73,7 +72,7 @@ public class ComposterAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = RenderHelper.getBuffer();
         
         for(BlockModelPart part: parts){
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
