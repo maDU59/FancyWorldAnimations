@@ -15,15 +15,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ButtonAnimation extends Animation{
 
@@ -56,8 +55,8 @@ public class ButtonAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        Direction facing = defaultState.getValue(ButtonBlock.FACING);
-        AttachFace face = defaultState.getValue(ButtonBlock.FACE);
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        AttachFace face = defaultState.getValue(BlockStateProperties.ATTACH_FACE);
 
         float x = 0f;
         float y = (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/16f;
@@ -83,7 +82,7 @@ public class ButtonAnimation extends Animation{
         model.collectParts(null, parts);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = RenderHelper.getBuffer();
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }
