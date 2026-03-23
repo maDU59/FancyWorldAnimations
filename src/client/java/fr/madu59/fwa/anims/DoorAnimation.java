@@ -22,7 +22,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
@@ -33,6 +32,11 @@ public class DoorAnimation extends Animation{
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
     private final RenderType renderType;
+    private final float dX;
+    private final float dZ;
+    private final float pivotX;
+    private final float pivotZ;
+    private final DoorHingeSide hinge;
 
     public DoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -42,6 +46,44 @@ public class DoorAnimation extends Animation{
         String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
         if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderType.translucentMovingBlock();
         else renderType = RenderType.cutoutMipped();
+
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        hinge = defaultState.getValue(BlockStateProperties.DOOR_HINGE);
+
+        Direction hingeSide = (hinge == DoorHingeSide.RIGHT)
+                ? facing.getClockWise(Direction.Axis.Y)
+                : facing.getCounterClockWise(Direction.Axis.Y);
+
+        AABB boundingBox = defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds();
+
+        float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
+        float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
+
+        switch (hingeSide) {
+            case EAST -> pivotX = (float) boundingBox.maxX;
+            case WEST -> pivotX = (float) boundingBox.minX;
+            case SOUTH -> pivotZ = (float) boundingBox.maxZ;
+            case NORTH -> pivotZ = (float) boundingBox.minZ;
+            default -> {}
+        }
+        this.pivotX = pivotX;
+        this.pivotZ = pivotZ;
+
+        float thickness = (facing == Direction.NORTH || facing == Direction.SOUTH)
+                ? (float) (boundingBox.maxZ - boundingBox.minZ)
+                : (float) (boundingBox.maxX - boundingBox.minX);
+
+        float dX = 0.0f;
+        float dZ = 0.0f;
+        switch (facing) {
+            case NORTH -> dZ = thickness * 0.5f;
+            case SOUTH -> dZ = -thickness * 0.5f;
+            case WEST -> dX = thickness * 0.5f;
+            case EAST -> dX = -thickness * 0.5f;
+            default -> {}
+        }
+        this.dX = dX;
+        this.dZ = dZ;
     }
 
     @Override
@@ -74,39 +116,6 @@ public class DoorAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
-        DoorHingeSide hinge = defaultState.getValue(BlockStateProperties.DOOR_HINGE);
-
-        Direction hingeSide = (hinge == DoorHingeSide.RIGHT)
-                ? facing.getClockWise(Direction.Axis.Y)
-                : facing.getCounterClockWise(Direction.Axis.Y);
-
-        AABB boundingBox = defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds();
-
-        float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
-        float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
-
-        switch (hingeSide) {
-            case EAST -> pivotX = (float) boundingBox.maxX;
-            case WEST -> pivotX = (float) boundingBox.minX;
-            case SOUTH -> pivotZ = (float) boundingBox.maxZ;
-            case NORTH -> pivotZ = (float) boundingBox.minZ;
-            default -> {}
-        }
-
-        float thickness = (facing == Direction.NORTH || facing == Direction.SOUTH)
-                ? (float) (boundingBox.maxZ - boundingBox.minZ)
-                : (float) (boundingBox.maxX - boundingBox.minX);
-
-        float dX = 0.0f;
-        float dZ = 0.0f;
-        switch (facing) {
-            case NORTH -> dZ = thickness * 0.5f;
-            case SOUTH -> dZ = -thickness * 0.5f;
-            case WEST -> dX = thickness * 0.5f;
-            case EAST -> dX = -thickness * 0.5f;
-            default -> {}
-        }
 
         double angle = getAngle(context.getNowTick(), hinge);
         double rad = Math.toRadians(angle);
@@ -123,7 +132,7 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = context.getBufferSource().getBuffer(renderType);
+        VertexConsumer buffer = RenderHelper.getBuffer(renderType);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

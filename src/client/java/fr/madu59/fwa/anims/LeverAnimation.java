@@ -22,25 +22,40 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LeverAnimation extends Animation{
     
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
+    private final Lever lever;
+    private final Direction facing;
+    private final AttachFace face;
 
     public LeverAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
+
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        face = defaultState.getValue(BlockStateProperties.ATTACH_FACE);
+
+        BlockModelPart part = parts.get(0);
+
+        List<BakedQuad> quads = new ArrayList<>();
+        for (Direction dir : Direction.values()) {
+            quads.addAll(part.getQuads(dir));
+        }
+        quads.addAll(part.getQuads(null));
+
+        lever = splitLeverQuads(quads, facing, face);
     }
 
     @Override
@@ -78,21 +93,9 @@ public class LeverAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(LeverBlock.FACING);
-        AttachFace face = defaultState.getValue(LeverBlock.FACE);
-
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
-        BlockModelPart part = parts.get(0);
-
-        List<BakedQuad> quads = new ArrayList<>();
-        for (Direction dir : Direction.values()) {
-            quads.addAll(part.getQuads(dir));
-        }
-        quads.addAll(part.getQuads(null));
-
-        Lever lever = splitLeverQuads(quads, facing, face);
+        VertexConsumer buffer = RenderHelper.getBuffer();
 
         RenderHelper.renderQuads(buffer, poseStack.last(), lever.baseQuadList(), 1f, 1f, 1f, 1f, light);
 
