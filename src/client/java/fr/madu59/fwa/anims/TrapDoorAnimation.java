@@ -1,5 +1,7 @@
 package fr.madu59.fwa.anims;
 
+import java.util.ArrayList;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -11,14 +13,13 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -27,11 +28,42 @@ public class TrapDoorAnimation extends Animation{
 
     private final BakedModel model;
     private final RandomSource random;
+    private final float pivotX;
+    private final float pivotY;
+    private final float pivotZ;
+    private final Direction hingeSide;
+    private final Half half;
+    private final float dY;
     
     public TrapDoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        half = defaultState.getValue(BlockStateProperties.HALF);
+        hingeSide = facing.getOpposite();
+
+        VoxelShape collShape = defaultState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
+        AABB boundingBox = collShape.isEmpty() ? defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
+
+        float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
+        float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
+
+        switch (hingeSide) {
+            case EAST -> pivotX = (float) boundingBox.maxX;
+            case WEST -> pivotX = (float) boundingBox.minX;
+            case SOUTH -> pivotZ = (float) boundingBox.maxZ;
+            case NORTH -> pivotZ = (float) boundingBox.minZ;
+            default -> {}
+        }
+        this.pivotX = pivotX;
+        this.pivotZ = pivotZ;
+        pivotY = (half == Half.TOP) ? (float) boundingBox.maxY : (float) boundingBox.minY;
+
+        float thickness = (float) (boundingBox.maxY - boundingBox.minY);
+        float halfThickness = thickness > 0.0f ? thickness * 0.5f : (3.0f / 32.0f);
+        dY = (half == Half.TOP) ? -halfThickness : halfThickness;
     }
 
     @Override
@@ -65,31 +97,8 @@ public class TrapDoorAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(TrapDoorBlock.FACING);
-        Half half = defaultState.getValue(TrapDoorBlock.HALF);
-
-        VoxelShape collShape = defaultState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
-        AABB boundingBox = collShape.isEmpty() ? defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
-
-        Direction hingeSide = facing.getOpposite();
         double angle = getAngle(context.getNowTick(), hingeSide);
         if (half == Half.BOTTOM) angle = -angle;
-
-        float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
-        float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
-
-        switch (hingeSide) {
-            case EAST -> pivotX = (float) boundingBox.maxX;
-            case WEST -> pivotX = (float) boundingBox.minX;
-            case SOUTH -> pivotZ = (float) boundingBox.maxZ;
-            case NORTH -> pivotZ = (float) boundingBox.minZ;
-            default -> {}
-        }
-        float pivotY = (half == Half.TOP) ? (float) boundingBox.maxY : (float) boundingBox.minY;
-
-        float thickness = (float) (boundingBox.maxY - boundingBox.minY);
-        float halfThickness = thickness > 0.0f ? thickness * 0.5f : (3.0f / 32.0f);
-        float dY = (half == Half.TOP) ? -halfThickness : halfThickness;
 
         double rad = Math.toRadians(angle);
         float cos = (float) Math.cos(rad);
@@ -121,7 +130,7 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = RenderHelper.getBuffer();
         RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
     }
 }

@@ -12,7 +12,6 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.RenderType;
@@ -20,8 +19,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.EndPortalFrameBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class EndPortalFrameAnimation extends Animation{
 
@@ -35,7 +34,7 @@ public class EndPortalFrameAnimation extends Animation{
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        eyeState = defaultState.setValue(EndPortalFrameBlock.HAS_EYE, true);
+        eyeState = defaultState.setValue(BlockStateProperties.EYE, true);
         eyeRandom = RandomSource.create(eyeState.getSeed(position));
         eyeModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
     }
@@ -73,12 +72,11 @@ public class EndPortalFrameAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
-        MultiBufferSource bufferSource = context.getBufferSource();
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         if(newIsOpen){
 
-            VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
+            VertexConsumer buffer = RenderHelper.getBuffer();
             RenderHelper.renderModel(buffer, poseStack.last(), model, 1f, 1f, 1f, 1f, light, random, defaultState);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 1f, 1f, 1f, 1f);
@@ -89,7 +87,7 @@ public class EndPortalFrameAnimation extends Animation{
         }
         else{
 
-            VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucentMovingBlock());
+            VertexConsumer buffer = RenderHelper.getBuffer(RenderType.translucentMovingBlock());
             float time = (float)(context.getNowTick() - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
 

@@ -18,26 +18,36 @@ import fr.madu59.fwa.utils.ModelSplitHelper.FenceGate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FenceGateAnimation extends Animation{
 
     private final RandomSource random;
     private final BakedModel model;
+    private final FenceGate fenceGate;
+    private final Direction facing;
 
 
     public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+
+        List<BakedQuad> quads = new ArrayList<>();
+        for (Direction dir : Direction.values()) {
+            quads.addAll(model.getQuads(defaultState, dir, random));
+        }
+        quads.addAll(model.getQuads(defaultState, null, random));
+        fenceGate = splitFenceGateQuads(quads, facing);
     }
 
     @Override
@@ -75,19 +85,9 @@ public class FenceGateAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        Direction facing = defaultState.getValue(FenceGateBlock.FACING);
-
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
-
-        List<BakedQuad> quads = new ArrayList<>();
-        for (Direction dir : Direction.values()) {
-            quads.addAll(model.getQuads(defaultState, dir, random));
-        }
-        quads.addAll(model.getQuads(defaultState, null, random));
-
-        FenceGate fenceGate = splitFenceGateQuads(quads, facing);
+        VertexConsumer buffer = RenderHelper.getBuffer();
 
         renderQuads(poseStack, buffer, fenceGate.postQuadList(), light);
 
