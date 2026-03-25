@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
-import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
