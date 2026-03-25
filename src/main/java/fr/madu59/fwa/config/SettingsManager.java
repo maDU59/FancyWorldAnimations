@@ -8,6 +8,7 @@ import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraftforge.fml.loading.FMLPaths;
+import fr.madu59.fwa.utils.ModelSplitHelper.SPLIT_METHOD;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -26,6 +27,7 @@ public class SettingsManager {
         "mod_toggle",
         "fwa.config.option.mod_toggle.name",
         "fwa.config.option.toggle_name.description",
+        true,
         true
     );
 
@@ -120,6 +122,13 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<SPLIT_METHOD> LEVER_SPLIT = loadOptionWithDefaults(
+        "lever_split",
+        "fwa.config.option.split.name",
+        "fwa.config.option.split.description",
+        SPLIT_METHOD.MODEL
+    ); 
+
     public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(
         "lectern_state",
         "fwa.config.option.state.name",
@@ -145,6 +154,7 @@ public class SettingsManager {
         "lectern_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
+        true,
         true
     );
 
@@ -173,6 +183,7 @@ public class SettingsManager {
         "lectern_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
+        true,
         true
     );
 
@@ -194,6 +205,7 @@ public class SettingsManager {
         "bell_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
+        true,
         true
     );
 
@@ -369,6 +381,7 @@ public class SettingsManager {
         "lantern_state",
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
+        true,
         true
     );
 
@@ -376,6 +389,7 @@ public class SettingsManager {
         "chain_state",
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
+        true,
         true
     );
 
@@ -383,6 +397,7 @@ public class SettingsManager {
         "chain_chain_grounded",
         "fwa.config.option.chain_grounded.name",
         "fwa.config.option.chain_grounded.description",
+        true,
         true
     );
 
@@ -436,6 +451,10 @@ public class SettingsManager {
     }
 
     private static <T> Option<T> loadOptionWithDefaults(String id, String name, String description, T defaultValue) {
+        return loadOptionWithDefaults(id, name, description, defaultValue, false);
+    }
+
+    private static <T> Option<T> loadOptionWithDefaults(String id, String name, String description, T defaultValue, boolean reload) {
         T optionValue= getOptionValue(id, defaultValue);
         if (optionValue == null) optionValue = defaultValue;
         Option<T> option = new Option<T>(
@@ -443,7 +462,8 @@ public class SettingsManager {
                 name,
                 description,
                 optionValue,
-                defaultValue
+                defaultValue,
+                reload
         );
         return option;
     }

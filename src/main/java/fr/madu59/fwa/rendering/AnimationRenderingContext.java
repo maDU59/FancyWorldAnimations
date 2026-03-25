@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimationRenderingContext {
@@ -14,8 +15,9 @@ public class AnimationRenderingContext {
     private final Camera camera;
     private final Vec3 cameraPos;
     private final boolean isShadow;
+    private final Frustum frustum;
 
-    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, double nowTick, boolean isShadow) {
+    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, Frustum frustum, double nowTick, boolean isShadow) {
         if (poseStack == null) {
 			poseStack = new PoseStack();
 		}
@@ -25,9 +27,10 @@ public class AnimationRenderingContext {
         this.camera = camera;
         this.cameraPos = camera.getPosition();
         this.isShadow = isShadow;
+        this.frustum = frustum;
     }
 
-    public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, double nowTick, boolean isShadow) {
+    public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, Frustum frustum, double nowTick, boolean isShadow) {
         if (poseStack == null) {
 			poseStack = new PoseStack();
 		}
@@ -37,6 +40,7 @@ public class AnimationRenderingContext {
         this.camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         this.cameraPos = cameraPos;
         this.isShadow = isShadow;
+        this.frustum = frustum;
     }
 
     public PoseStack getPoseStack() {
@@ -55,7 +59,11 @@ public class AnimationRenderingContext {
         return cameraPos;
     }
 
-    public boolean isShadowPass(){
+    public boolean isShadow(){
         return isShadow;
+    }
+
+    public Frustum getFrustum(){
+        return frustum;
     }
 }

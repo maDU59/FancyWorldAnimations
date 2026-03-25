@@ -21,6 +21,6 @@ public abstract class ShadowRendererMixin {
     
     @Inject(at = @At("HEAD"), method = "renderEntities", remap = false)
     public void fwa$renderEntities(LevelRendererAccessor levelRenderer, EntityRenderDispatcher dispatcher, MultiBufferSource.BufferSource bufferSource, PoseStack modelView, float tickDelta, Frustum frustum, double cameraX, double cameraY, double cameraZ, CallbackInfoReturnable<Integer> ci){
-        FancyWorldAnimationsClient.render(new AnimationRenderingContext(modelView, new Vec3(cameraX, cameraY, cameraZ), bufferSource, FancyWorldAnimationsClient.getPartialTick(), true));
+        FancyWorldAnimationsClient.render(new AnimationRenderingContext(modelView, new Vec3(cameraX, cameraY, cameraZ), bufferSource, frustum, FancyWorldAnimationsClient.getPartialTick(), true));
     }
 }

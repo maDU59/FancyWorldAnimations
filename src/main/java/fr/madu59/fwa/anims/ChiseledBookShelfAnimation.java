@@ -6,11 +6,11 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -18,14 +18,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class ChiseledBookShelfAnimation extends Animation{
 
     int pos;
     boolean isAdding;
+    private final ResourceLocation atlasId = ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png");
+    private final ResourceLocation textureId = ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied");
     
     public ChiseledBookShelfAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -76,8 +78,8 @@ public class ChiseledBookShelfAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
 
-        Direction facing = defaultState.getValue(HorizontalDirectionalBlock.FACING);
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png")).apply(ResourceLocation.tryParse("minecraft:block/chiseled_bookshelf_occupied"));
+        Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(atlasId).apply(textureId);
         PoseStack poseStack = context.getPoseStack();
 
         PoseStack.Pose entry = poseStack.last();
@@ -116,7 +118,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         float v2 = v1 + h;
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.relative(facing));
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = RenderHelper.getBuffer();
 
         writeQuad(entry, buffer, 
             0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 

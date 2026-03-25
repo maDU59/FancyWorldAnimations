@@ -25,11 +25,13 @@ import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
@@ -62,11 +64,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 @EventBusSubscriber(modid = FancyWorldAnimations.MOD_ID, value = Dist.CLIENT)
 public class FancyWorldAnimationsClient{
 
-	private static final Animations animations = new Animations();
+	public static final Animations animations = new Animations();
 
 	public FancyWorldAnimationsClient(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
@@ -92,14 +95,25 @@ public class FancyWorldAnimationsClient{
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
 		if(SettingsManager.MOD_TOGGLE.getValue() && event.getStage() == Stage.AFTER_ENTITIES) {
 			double tickDelta = getPartialTick();
-			render(new AnimationRenderingContext(event.getPoseStack(), event.getCamera().getPosition(), Minecraft.getInstance().renderBuffers().bufferSource(), tickDelta, false));
+			render(new AnimationRenderingContext(event.getPoseStack(), event.getCamera().getPosition(), Minecraft.getInstance().renderBuffers().bufferSource(), event.getFrustum(), tickDelta, false));
 		}
     }
 
-	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
+	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState){
+		onBlockUpdate(blockPos, oldState, newState, true);
+	}
+
+	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState, boolean propagateChain)
 	{
 		ClientLevel level = Minecraft.getInstance().level;
 		if(level == null) return;
+
+		if(SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue()){
+			if(propagateChain){
+				propagateChain(level, blockPos, newState);
+			}
+		}
+
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
@@ -129,14 +143,14 @@ public class FancyWorldAnimationsClient{
 			}
 		}
 
-		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
+		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
 		if (animation.isEnabled()) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
-		return (double)Minecraft.getInstance().level.getGameTime() + (double) Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0f), 1.0f);
+		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0.0f), 1.0f);
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -148,30 +162,36 @@ public class FancyWorldAnimationsClient{
 		}
 		if(animations.isEmpty()) return;
 
+		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
+
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, context);
-			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue()){
-				source.endBatch();
+			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
+				renderAnimation(animation, context);
+				if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue()){
+					source.endBatch();
+				}
 			}
 		}
 		animations.clean(context.getNowTick());
 	}
 
-	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
+	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
 	{
 		if(type == Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_INFINITE.getValue()) return true;
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
-		if(type == Type.JUKEBOX) return newState.getValue(JukeboxBlock.HAS_RECORD);
-		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(RepeaterBlock.DELAY) != oldState.getValue(RepeaterBlock.DELAY);
+		if(type == Type.JUKEBOX) return newState.getValue(BlockStateProperties.HAS_RECORD);
+		if(type == Type.REPEATER) return oldState.getBlock() == newState.getBlock() && newState.getValue(BlockStateProperties.DELAY) != oldState.getValue(BlockStateProperties.DELAY);
 		if(type == Type.LAYERED_CAULDRON) {
-			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(LayeredCauldronBlock.LEVEL) != oldState.getValue(LayeredCauldronBlock.LEVEL)) return true;
+			if (oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof LayeredCauldronBlock && newState.getValue(BlockStateProperties.LEVEL_CAULDRON) != oldState.getValue(BlockStateProperties.LEVEL_CAULDRON)) return true;
 			if (oldState.getBlock() != newState.getBlock() && (newState.getBlock() instanceof LayeredCauldronBlock && oldState.getBlock() instanceof CauldronBlock)|| (oldState.getBlock() instanceof LayeredCauldronBlock && newState.getBlock() instanceof CauldronBlock)) return true;
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
-		if(type == Type.LANTERN) return newState.getValue(LanternBlock.HANGING);
-		if(type == Type.CHAIN) return newState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
-		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(ComposterBlock.LEVEL) != oldState.getValue(ComposterBlock.LEVEL);
+		if(type == Type.LANTERN) return SwingingBlockHelper.isHangingLantern(newState);
+		if(type == Type.CHAIN) {
+			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos));
+		}
+		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -188,17 +208,17 @@ public class FancyWorldAnimationsClient{
 	private static boolean isOpen(BlockState state)
 	{
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock) return state.getValue(DoorBlock.OPEN);
-		if(block instanceof TrapDoorBlock) return state.getValue(TrapDoorBlock.OPEN);
-		if(block instanceof FenceGateBlock) return state.getValue(FenceGateBlock.OPEN);
-		if(block instanceof LeverBlock) return state.getValue(LeverBlock.POWERED);
-		if(block instanceof LecternBlock) return state.getValue(LecternBlock.HAS_BOOK);
-		if(block instanceof ButtonBlock) return state.getValue(ButtonBlock.POWERED);
-		if(block instanceof JukeboxBlock) return state.getValue(JukeboxBlock.HAS_RECORD);
-		if(block instanceof EndPortalFrameBlock) return state.getValue(EndPortalFrameBlock.HAS_EYE);
+		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof TrapDoorBlock) return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof FenceGateBlock) return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof LeverBlock) return state.getValue(BlockStateProperties.POWERED);
+		if(block instanceof LecternBlock) return state.getValue(BlockStateProperties.HAS_BOOK);
+		if(block instanceof ButtonBlock) return state.getValue(BlockStateProperties.POWERED);
+		if(block instanceof JukeboxBlock) return state.getValue(BlockStateProperties.HAS_RECORD);
+		if(block instanceof EndPortalFrameBlock) return state.getValue(BlockStateProperties.EYE);
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
-		if(block instanceof TripWireHookBlock) return state.getValue(TripWireHookBlock.ATTACHED);
+		if(block instanceof TripWireHookBlock) return state.getValue(BlockStateProperties.ATTACHED);
 		return false;
 	}
 
@@ -206,17 +226,17 @@ public class FancyWorldAnimationsClient{
 	{
 		return switch (type)
 		{
-			case DOOR -> state.setValue(DoorBlock.OPEN, false);
-			case TRAPDOOR -> state.setValue(TrapDoorBlock.OPEN, false);
-			case FENCE_GATE -> state.setValue(FenceGateBlock.OPEN, false);
-			case LEVER -> state.setValue(LeverBlock.POWERED, false);
-			case LECTERN -> state.setValue(LecternBlock.HAS_BOOK, false);
-			case BUTTON -> state.setValue(ButtonBlock.POWERED, false);
-			case JUKEBOX -> state.setValue(JukeboxBlock.HAS_RECORD, false);
-			case END_PORTAL_FRAME -> state.setValue(EndPortalFrameBlock.HAS_EYE, false);
-			case REPEATER -> state.setValue(RepeaterBlock.DELAY, 1);
-			case CAMPFIRE -> state.setValue(CampfireBlock.LIT, false);
-			case TRIPWIRE_HOOK -> state.setValue(TripWireHookBlock.ATTACHED, false);
+			case DOOR -> state.setValue(BlockStateProperties.OPEN, false);
+			case TRAPDOOR -> state.setValue(BlockStateProperties.OPEN, false);
+			case FENCE_GATE -> state.setValue(BlockStateProperties.OPEN, false);
+			case LEVER -> state.setValue(BlockStateProperties.POWERED, false);
+			case LECTERN -> state.setValue(BlockStateProperties.HAS_BOOK, false);
+			case BUTTON -> state.setValue(BlockStateProperties.POWERED, false);
+			case JUKEBOX -> state.setValue(BlockStateProperties.HAS_RECORD, false);
+			case END_PORTAL_FRAME -> state.setValue(BlockStateProperties.EYE, false);
+			case REPEATER -> state.setValue(BlockStateProperties.DELAY, 1);
+			case CAMPFIRE -> state.setValue(BlockStateProperties.LIT, false);
+			case TRIPWIRE_HOOK -> state.setValue(BlockStateProperties.ATTACHED, false);
 			default -> state;
 		};
 	}
@@ -248,7 +268,7 @@ public class FancyWorldAnimationsClient{
 
 	private static Type typeOf(BlockState state){
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock) return Type.DOOR;
+		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
 		if(block instanceof LeverBlock) return Type.LEVER;
@@ -305,6 +325,47 @@ public class FancyWorldAnimationsClient{
 
 	public static void removeAnimationAt(BlockPos position){
 		animations.removeAt(position);
+	}
+
+	public static void safeRemoveAnimationAt(BlockPos position){
+		animations.removeSafeAt(position);
+	}
+
+	public static void propagateChain(ClientLevel level, BlockPos blockPos, BlockState newState){
+		if(SettingsManager.CHAIN_STATE.getValue()){
+			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
+				BlockPos abovePos = blockPos.above();
+				while(SwingingBlockHelper.isVerticalChain(animations.animations.getOrDefault(abovePos, null))){
+					animations.animations.get(abovePos).markForRemoval();
+					abovePos = abovePos.above();
+				}
+			}
+			if(newState.isAir() || (SwingingBlockHelper.isSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
+				BlockPos abovePos = blockPos.above();
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+					BlockState aboveState = level.getBlockState(abovePos);
+					onBlockUpdate(abovePos, aboveState, aboveState, false);
+					abovePos = abovePos.above();
+				}
+			}
+		}
+		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
+			BlockPos abovePos = blockPos.above();
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
+				animations.animations.get(abovePos).setLast(false);
+			}
+		}
+		else{
+			BlockPos abovePos = blockPos.above();
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
+				animations.animations.get(abovePos).setLast(true);
+			}
+		}
+		BlockPos belowPos = blockPos.below();
+		if(SwingingBlockHelper.isSwingingBlock(level.getBlockState(belowPos))){
+			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
+			if (animations.animations.containsKey(lastPos)) animations.animations.get(lastPos).needUpdate();
+		}
 	}
 
 	public static enum Type

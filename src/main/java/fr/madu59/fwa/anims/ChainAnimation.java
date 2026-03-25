@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -40,6 +41,7 @@ public class ChainAnimation extends Animation{
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
+    private int chainCount = 0;
     private BlockState state;
     private PoseStack stack = new PoseStack();
     
@@ -53,22 +55,50 @@ public class ChainAnimation extends Animation{
         return Double.MAX_VALUE;
     }
 
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
+    }
+
     public static boolean hasInfiniteAnimation(){
-        return true;
+        return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
+    }
+
+    @Override
+    public void setLast(boolean isLast){
+        if(this.isLast == null || this.isLast != isLast){
+            super.setLast(isLast);
+            if (isLast) needUpdate();
+        }
+    }
+
+    @Override
+    public AABB getBoundingBox(){
+        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    }
+
+    public void update(){
+        ClientLevel level = Minecraft.getInstance().level;
+        if(isLast == null && !level.getBlockState(position).isAir()){
+            isLast = SwingingBlockHelper.isLast(position);
+            if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
+        }
+        chainCount = SwingingBlockHelper.getChainCount(position);
+        needUpdate = false;
     }
 
     @Override
     public void render(AnimationRenderingContext context) {
-        if (!SwingingBlockHelper.isLast(position)) return;
-        ClientLevel level = Minecraft.getInstance().level;
-        float swingScale = 0.7f;
-        float prevFactor = 0.0F;
-        if ((SettingsManager.CHAIN_GROUNDED.getValue() && !level.getBlockState(position.below()).isAir()) || !SettingsManager.CHAIN_STATE.getValue()) {
-            swingScale = 0;
-            prevFactor = 1.0F;
+        if(isLast == null){
+            update();
+            return;
         }
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
-        int chainCount = SwingingBlockHelper.getChainCount(position);
+        if (!isLast) return;
+        if (needUpdate) update();
+        ClientLevel level = Minecraft.getInstance().level;
+        float swingScale = 0.7F;
+        float prevFactor = 0.0F;
+        VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
@@ -86,7 +116,7 @@ public class ChainAnimation extends Animation{
             float deltaFactor = targetFactor - prevFactor;
             prevFactor = targetFactor;
             
-            if (deltaFactor != 0.0F) {
+            if (deltaFactor != 0.0F && swingScale != 0.0F) {
                 poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
                 poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
                 poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
@@ -112,7 +142,6 @@ public class ChainAnimation extends Animation{
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
 
         if(level != null){
