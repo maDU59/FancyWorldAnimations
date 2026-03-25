@@ -49,7 +49,7 @@ public class LanternAnimation extends Animation{
     private final BlockStateModel model;
     private PoseStack stack = new PoseStack();
     private int chainCount;
-    private List<BlockStateModelPart> chainParts = new ArrayList<>();
+    private List<BlockModelPart> chainParts = new ArrayList<>();
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
