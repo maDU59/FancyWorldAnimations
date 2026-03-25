@@ -17,6 +17,7 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.CardinalLighting;
+import net.minecraft.world.phys.Vec3;
 
 public class RenderHelper {
 
@@ -27,15 +28,15 @@ public class RenderHelper {
     private static float XShade = 0;
     private static Vector3f normal = new Vector3f();
 
-    public static void prepareFrame(MultiBufferSource source, boolean isShadow){
-        if(!isShadow){
+    public static void prepareFrame(AnimationRenderingContext context){
+        if(!context.isShadow()){
             CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
             bottomShade = cardinalLighting.byFace(Direction.DOWN);
             topShade = cardinalLighting.byFace(Direction.UP);
             ZShade = cardinalLighting.byFace(Direction.NORTH);
             XShade = cardinalLighting.byFace(Direction.EAST);
         }
-        bufferSource = source;
+        bufferSource = context.getBufferSource();
     }
 
     public static VertexConsumer getBuffer(){
@@ -54,6 +55,17 @@ public class RenderHelper {
             }
         }
     }
+
+    // Does not seem to make any difference
+    // public static void renderModelVisibleOnly(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, BlockPos pos){
+    //     Vec3 dirV = camPos.subtract(pos.getCenter());
+    //     for (BlockStateModelPart part : parts){
+    //         renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
+    //         for(Direction dir : Direction.values()){
+    //             if(dirV.dot(dir.getUnitVec3()) >= 0) renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
+    //         }
+    //     }
+    // }
 
     public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
         for (BakedQuad bakedQuad : bakedQuads){
