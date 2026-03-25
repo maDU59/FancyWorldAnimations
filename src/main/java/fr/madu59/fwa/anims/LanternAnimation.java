@@ -18,8 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -36,7 +34,6 @@ public class LanternAnimation extends Animation{
 
     private float tiltX = 0f;
     private float tiltZ = 0f;
-    private float yaw = 0f;
     private float spin = 0f;
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
@@ -45,12 +42,14 @@ public class LanternAnimation extends Animation{
     private final RandomSource random;
     private final BakedModel model;
     private PoseStack stack = new PoseStack();
+    private int chainCount;
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         state = newState;
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        chainCount = SwingingBlockHelper.getChainCount(position);
     }
 
     @Override
@@ -68,15 +67,32 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
+    public AABB getBoundingBox(){
+        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    }
+
+    @Override
+    public void setLast(boolean isLast){
+        if(this.isLast == null || this.isLast != isLast){
+            super.setLast(isLast);
+            if (isLast) needUpdate();
+        }
+    }
+
+    public void update(){
+        chainCount = SwingingBlockHelper.getChainCount(position);
+        needUpdate = false;
+    }
+
+    @Override
     public void render(AnimationRenderingContext context) {
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
-        int chainCount = SwingingBlockHelper.getChainCount(position);
+        if (needUpdate) update();
+        VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         float swingScale = 0.7f;
-        float yaw = this.yaw * Math.max(0.55F, swingScale);
         float tiltX = this.tiltX * swingScale;
         float tiltZ = this.tiltZ * swingScale;
         float spin = this.spin * Math.max(0.55F, swingScale);
@@ -92,7 +108,6 @@ public class LanternAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F) {
-                poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
                 poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
                 poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
                 poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
@@ -108,7 +123,6 @@ public class LanternAnimation extends Animation{
         }
         float deltaFactor = 1f - prevFactor;
         if (deltaFactor != 0.0F) {
-            poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
             poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
             poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
             poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
@@ -129,7 +143,6 @@ public class LanternAnimation extends Animation{
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
 
         if(level != null){
