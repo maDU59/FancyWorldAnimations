@@ -26,6 +26,8 @@ import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -35,7 +37,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
@@ -67,7 +68,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
-	private static final Animations animations = new Animations();
+	public static final Animations animations = new Animations();
 	private static final boolean IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris");
 	private static ResourceKey<Level> dimension;
 
@@ -81,15 +82,26 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.matrixStack(), context.camera().getPosition(), context.consumers(), tickDelta, false));
+				render(new AnimationRenderingContext(context.matrixStack(), context.camera().getPosition(), context.consumers(), context.frustum(), tickDelta, false));
 			}
 		});
 	}
 
-	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState)
+	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState){
+		onBlockUpdate(blockPos, oldState, newState, true);
+	}
+
+	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState, boolean propagateChain)
 	{
 		ClientLevel level = Minecraft.getInstance().level;
 		if(level == null) return;
+
+		if(SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue()){
+			if(propagateChain){
+				propagateChain(level, blockPos, newState);
+			}
+		}
+
 		Type type = typeOf(oldState, newState);
 
 		if(type == Type.USELESS){
@@ -119,7 +131,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			}
 		}
 
-		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState)) return;
+		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
 		if (animation.isEnabled()) animations.add(blockPos, animation);
@@ -142,17 +154,21 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(animations.isEmpty()) return;
 
+		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
+
 		for (Animation animation : animations.animations.values()) {
-			renderAnimation(animation, context);
-			if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && IRIS_LOADED){
-				source.endBatch();
+			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
+				renderAnimation(animation, context);
+				if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && IRIS_LOADED){
+					source.endBatch();
+				}
 			}
 		}
 		dimension = level.dimension();
 		animations.clean(context.getNowTick());
 	}
 
-	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState)
+	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
 	{
 		if(type == Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_INFINITE.getValue()) return true;
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
@@ -164,8 +180,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
-		if(type == Type.LANTERN) return newState.getValue(BlockStateProperties.HANGING);
-		if(type == Type.CHAIN) return newState.getValue(BlockStateProperties.AXIS) == Direction.Axis.Y;
+		if(type == Type.LANTERN) return SwingingBlockHelper.isHangingLantern(newState);
+		if(type == Type.CHAIN) {
+			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos));
+		}
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		return oldIsOpen != newIsOpen;
 	}
@@ -305,6 +323,47 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static void removeAnimationAt(BlockPos position){
 		animations.removeAt(position);
+	}
+
+	public static void safeRemoveAnimationAt(BlockPos position){
+		animations.removeSafeAt(position);
+	}
+
+	public static void propagateChain(ClientLevel level, BlockPos blockPos, BlockState newState){
+		if(SettingsManager.CHAIN_STATE.getValue()){
+			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
+				BlockPos abovePos = blockPos.above();
+				while(SwingingBlockHelper.isVerticalChain(animations.animations.getOrDefault(abovePos, null))){
+					animations.animations.get(abovePos).markForRemoval();
+					abovePos = abovePos.above();
+				}
+			}
+			if(newState.isAir() || (SwingingBlockHelper.isSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
+				BlockPos abovePos = blockPos.above();
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+					BlockState aboveState = level.getBlockState(abovePos);
+					onBlockUpdate(abovePos, aboveState, aboveState, false);
+					abovePos = abovePos.above();
+				}
+			}
+		}
+		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
+			BlockPos abovePos = blockPos.above();
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
+				animations.animations.get(abovePos).setLast(false);
+			}
+		}
+		else{
+			BlockPos abovePos = blockPos.above();
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
+				animations.animations.get(abovePos).setLast(true);
+			}
+		}
+		BlockPos belowPos = blockPos.below();
+		if(SwingingBlockHelper.isSwingingBlock(level.getBlockState(belowPos))){
+			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
+			if (animations.animations.containsKey(lastPos)) animations.animations.get(lastPos).needUpdate();
+		}
 	}
 
 	public static enum Type

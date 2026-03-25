@@ -14,7 +14,6 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -84,7 +83,7 @@ public class LayeredCauldronAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
+        VertexConsumer buffer = RenderHelper.getBuffer();
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), false, light);
         for(Direction dir : Direction.values()){
@@ -93,7 +92,6 @@ public class LayeredCauldronAnimation extends Animation{
 
         float dy = getPosition(context.getNowTick(), getHeight(newState), getHeight(oldState));
         poseStack.translate(0,dy,0);
-        buffer = context.getBufferSource().getBuffer(RenderType.cutoutMipped());
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), true, light);
         for(Direction dir : Direction.values()){

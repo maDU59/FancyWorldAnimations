@@ -12,11 +12,39 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderHelper {
+
+    private static MultiBufferSource bufferSource;
+    private static float bottomShade = 0;
+    private static float topShade = 0;
+    private static float ZShade = 0;
+    private static float XShade = 0;
+    private static Vector3f normal = new Vector3f();
+
+    public static void prepareFrame(MultiBufferSource source, boolean isShadow){
+        if(!isShadow){
+            ClientLevel level = Minecraft.getInstance().level;
+            bottomShade = level.getShade(Direction.DOWN, true);
+            topShade = level.getShade(Direction.UP, true);
+            ZShade = level.getShade(Direction.NORTH, true);
+            XShade = level.getShade(Direction.EAST, true);
+        }
+        bufferSource = source;
+    }
+
+    public static VertexConsumer getBuffer(){
+        return getBuffer(RenderType.cutoutMipped());
+    }
+
+    public static VertexConsumer getBuffer(RenderType renderType){
+        return bufferSource.getBuffer(renderType);
+    }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, BakedModel model, float a, float r, float g, float b, int light, RandomSource random, BlockState blockState){
         renderQuads(buffer, pose, model.getQuads(blockState, null, random), a, r, g, b, light);
@@ -38,12 +66,7 @@ public class RenderHelper {
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
         Float shade = 1f;
         if(isShaded){
-            ClientLevel level = Minecraft.getInstance().level;
-            float bottomShade = level.getShade(Direction.DOWN, true);
-            float topShade = level.getShade(Direction.UP, true);
-            float ZShade = level.getShade(Direction.NORTH, true);
-            float XShade = level.getShade(Direction.EAST, true);
-            Vector3f normal = bakedQuad.getDirection().step();
+            normal.set(bakedQuad.getDirection().step());
             normal.mul(pose.normal());
             normal.normalize();  
             float nx2 = normal.x() * normal.x();
