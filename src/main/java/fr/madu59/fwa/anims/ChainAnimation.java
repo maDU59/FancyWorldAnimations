@@ -9,6 +9,7 @@ import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -24,7 +25,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -46,6 +46,7 @@ public class ChainAnimation extends Animation{
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
+    private int chainCount = 0;
     private BlockState state;
     private List<BlockModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
@@ -61,22 +62,50 @@ public class ChainAnimation extends Animation{
         return Double.MAX_VALUE;
     }
 
+    @Override
+    public boolean isEnabled(){
+        return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
+    }
+
     public static boolean hasInfiniteAnimation(){
-        return true;
+        return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
+    }
+
+    @Override
+    public void setLast(boolean isLast){
+        if(this.isLast == null || this.isLast != isLast){
+            super.setLast(isLast);
+            if (isLast) needUpdate();
+        }
+    }
+
+    @Override
+    public AABB getBoundingBox(){
+        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    }
+
+    public void update(){
+        ClientLevel level = Minecraft.getInstance().level;
+        if(isLast == null && !level.getBlockState(position).isAir()){
+            isLast = SwingingBlockHelper.isLast(position);
+            if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
+        }
+        chainCount = SwingingBlockHelper.getChainCount(position);
+        needUpdate = false;
     }
 
     @Override
     public void render(AnimationRenderingContext context) {
-        if (!SwingingBlockHelper.isLast(position)) return;
+        if(isLast == null){
+            update();
+            return;
+        }
+        if (!isLast) return;
+        if (needUpdate) update();
         ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
         float prevFactor = 0.0F;
-        if ((SettingsManager.CHAIN_GROUNDED.getValue() && !level.getBlockState(position.below()).isAir()) || !SettingsManager.CHAIN_STATE.getValue()) {
-            swingScale = 0.0F;
-            prevFactor = 1.0F;
-        }
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
-        int chainCount = SwingingBlockHelper.getChainCount(position);
+        VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
@@ -123,7 +152,6 @@ public class ChainAnimation extends Animation{
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
 
         if(level != null){

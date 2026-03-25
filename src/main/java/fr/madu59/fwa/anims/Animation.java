@@ -5,6 +5,7 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class Animation {
 
@@ -16,6 +17,9 @@ public class Animation {
     protected double toRemoveTick = 0.0;
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
+
+    protected Boolean isLast;
+    protected boolean needUpdate = true;
 
     public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         this.position = position;
@@ -91,8 +95,20 @@ public class Animation {
         return false;
     }
 
+    public void setLast(boolean isLast){
+        this.isLast = isLast;
+    }
+
+    public void needUpdate(){
+        needUpdate = true;
+    }
+
     public double getProgress(double nowTick) {
         return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
+    }
+
+    public AABB getBoundingBox(){
+        return new AABB(position);
     }
 
     public void render(AnimationRenderingContext context) {

@@ -27,11 +27,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
 import net.neoforged.fml.loading.FMLLoader;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class BellAnimation extends Animation{
 
@@ -40,6 +40,10 @@ public class BellAnimation extends Animation{
     private final float hash;
     private BellBlockEntity bellBlockEntity;
     private List<BlockModelPart> parts = new ArrayList<>();
+    private final Direction facing;
+    private final BellAttachType attachment;
+    private final Identifier atlasId = Identifier.tryParse("minecraft:blocks");
+    private final Identifier textureId = Identifier.tryParse("minecraft:entity/bell/bell_body");
     
     public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -54,6 +58,9 @@ public class BellAnimation extends Animation{
         else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
             FancyWorldAnimationsClient.removeAnimationAt(position);
         }
+
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        attachment = defaultState.getValue(BlockStateProperties.BELL_ATTACHMENT);
     }
 
     @Override
@@ -143,9 +150,7 @@ public class BellAnimation extends Animation{
             return;
         }
         PoseStack poseStack = context.getPoseStack();
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(Identifier.tryParse("minecraft:blocks")).getSprite(Identifier.tryParse("minecraft:entity/bell/bell_body"));
-        Direction facing = defaultState.getValue(BellBlock.FACING);
-        BellAttachType attachment = defaultState.getValue(BellBlock.ATTACHMENT);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(textureId);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
@@ -166,7 +171,7 @@ public class BellAnimation extends Animation{
         context.getSubmitNodeCollector().submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), light, OverlayTexture.NO_OVERLAY, sprite);
 
         if(shouldUseFallbackRender()){
-            VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+            VertexConsumer buffer = RenderHelper.getBuffer();
             RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }

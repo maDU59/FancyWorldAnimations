@@ -16,13 +16,12 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ComposterAnimation extends Animation{
 
@@ -64,7 +63,7 @@ public class ComposterAnimation extends Animation{
     }
 
     private double getHeight(BlockState state){
-        return Math.min((state.getValue(ComposterBlock.LEVEL) * 2.0 + 1.0) / 16.0, 15.0/16.0);
+        return Math.min((state.getValue(BlockStateProperties.LEVEL_COMPOSTER) * 2.0 + 1.0) / 16.0, 15.0/16.0);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class ComposterAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+        VertexConsumer buffer = RenderHelper.getBuffer();
         
         for(BlockModelPart part: parts){
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
