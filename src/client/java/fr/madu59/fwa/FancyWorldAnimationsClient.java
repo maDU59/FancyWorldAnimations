@@ -123,12 +123,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
 
-		double startTick = (double)level.getGameTime();
+		double startTick = getPartialTick();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = (double)level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = getPartialTick() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
 				animations.removeAt(blockPos);
 			}
 		}
@@ -140,7 +140,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	public static double getPartialTick() {
-		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+		return System.nanoTime() / 50_000_000.0;
 	}
 
 	public static void render(AnimationRenderingContext context)
