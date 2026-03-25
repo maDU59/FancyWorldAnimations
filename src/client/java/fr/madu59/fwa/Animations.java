@@ -38,17 +38,19 @@ public class Animations{
         Iterator<Animation> it = this.animations.values().iterator();
         while (it.hasNext()) {
             Animation animation = it.next();
-            if (animation.isForRemoval()){
-                if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-                    it.remove();
+            BlockPos pos = animation.getPos();
+            if(!level.isLoaded(pos)){
+                if (animation.isForRemoval()){
+                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+                        it.remove();
+                    }
+                }
+                else if (animation.isFinished(nowTick)) {
+                    animation.markForRemoval();
+                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
                 }
             }
-            else if (animation.isFinished(nowTick)) {
-                animation.markForRemoval();
-                BlockPos pos = animation.getPos();
-                ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
-            }
-            if(!level.isLoaded(animation.getPos())){
+            else{
                 it.remove();
             }
         }
@@ -59,7 +61,7 @@ public class Animations{
     }
 
     public Animation getAt(BlockPos blockPos) {
-        return this.animations.getOrDefault(blockPos, null);
+        return this.animations.get(blockPos);
     }
 
     public void add(BlockPos pos, Animation anim) {
