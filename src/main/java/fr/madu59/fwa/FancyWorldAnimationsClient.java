@@ -75,7 +75,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 @EventBusSubscriber(modid = FancyWorldAnimations.MOD_ID, value = Dist.CLIENT)
 public class FancyWorldAnimationsClient{
 
-	private static final Animations animations = new Animations();
+	public static final Animations animations = new Animations();
 	private static final boolean IRIS_LOADED = FMLLoader.getLoadingModList().getModFileById("iris") != null;
 
 	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
