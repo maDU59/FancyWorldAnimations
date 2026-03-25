@@ -49,6 +49,7 @@ public class LanternAnimation extends Animation{
     private final BlockStateModel model;
     private PoseStack stack = new PoseStack();
     private int chainCount;
+    private List<BlockStateModelPart> chainParts = new ArrayList<>();
     
     public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
@@ -122,7 +123,7 @@ public class LanternAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             BlockState chainState = level.getBlockState(mutable);
-            List<BlockModelPart> chainParts = new ArrayList<>();
+            chainParts.clear();
             BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             chainModel =Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);

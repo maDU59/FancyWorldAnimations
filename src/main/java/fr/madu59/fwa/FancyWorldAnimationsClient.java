@@ -165,7 +165,7 @@ public class FancyWorldAnimationsClient{
 		}
 		if(animations.isEmpty()) return;
 
-		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
+		RenderHelper.prepareFrame(context);
 
 		for (Animation animation : animations.animations.values()) {
 			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
@@ -209,7 +209,7 @@ public class FancyWorldAnimationsClient{
 	private static boolean isOpen(BlockState state)
 	{
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof DoorBlock || "dramaticdoors".equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof TrapDoorBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof FenceGateBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof LeverBlock) return state.getValue(BlockStateProperties.POWERED);
@@ -307,8 +307,8 @@ public class FancyWorldAnimationsClient{
 
 	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
 	{
-		if (animations.containsAt(pos)) {
-			Animation animation = animations.getAt(pos);
+		Animation animation = animations.getAt(pos);
+		if (animation != null) {
 			return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 		}
 		else{
@@ -318,8 +318,8 @@ public class FancyWorldAnimationsClient{
 
 	public static boolean shouldCancelBlockRendering(BlockPos pos)
 	{
-		if (animations.containsAt(pos)) {
-			Animation animation = animations.getAt(pos);
+		Animation animation = animations.getAt(pos);
+		if (animation != null) {
 			if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
 			return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
 		}
@@ -340,8 +340,10 @@ public class FancyWorldAnimationsClient{
 		if(SettingsManager.CHAIN_STATE.getValue()){
 			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(animations.animations.getOrDefault(abovePos, null))){
-					animations.animations.get(abovePos).markForRemoval();
+				while(true) {
+					Animation anim = animations.animations.get(abovePos);
+					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
+					anim.markForRemoval();
 					abovePos = abovePos.above();
 				}
 			}
@@ -354,22 +356,24 @@ public class FancyWorldAnimationsClient{
 				}
 			}
 		}
+		BlockPos abovePos = blockPos.above();
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
-			BlockPos abovePos = blockPos.above();
-			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
-				animations.animations.get(abovePos).setLast(false);
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
+				Animation anim = animations.animations.get(abovePos);
+				if (anim != null) anim.setLast(false);
 			}
 		}
 		else{
-			BlockPos abovePos = blockPos.above();
-			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
-				animations.animations.get(abovePos).setLast(true);
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
+				Animation anim = animations.animations.get(abovePos);
+				if (anim != null) anim.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
-			if (animations.animations.containsKey(lastPos)) animations.animations.get(lastPos).needUpdate();
+			Animation anim = animations.animations.get(lastPos);
+			if (anim != null) anim.needUpdate();
 		}
 	}
 
