@@ -1,5 +1,6 @@
 package fr.madu59.fwa.config;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 
 public class Option<T> {
@@ -8,13 +9,15 @@ public class Option<T> {
     private String description;
     private T value;
     private T defaultValue;
+    private boolean reload;
 
-    public Option(String id, String name, String description, T value, T defaultValue) {
+    public Option(String id, String name, String description, T value, T defaultValue, boolean reload) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.value = value;
         this.defaultValue = defaultValue;
+        this.reload = reload;
         SettingsManager.ALL_OPTIONS.add(this);
     }
 
@@ -43,6 +46,7 @@ public class Option<T> {
     }
 
     public void setToNextValue() {
+        if(reload) Minecraft.getInstance().levelRenderer.allChanged();
         this.value = cycle(this.value);
     }
 

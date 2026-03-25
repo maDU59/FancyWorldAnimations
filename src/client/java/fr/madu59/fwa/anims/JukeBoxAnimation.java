@@ -8,6 +8,7 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -26,10 +27,37 @@ public class JukeBoxAnimation extends Animation{
 
     BlockState newState;
     private final Minecraft client = Minecraft.getInstance();
+    private final ItemStack discItemStack;
+    private final BakedModel model;
+    private final ItemRenderer  itemRenderer;
     
     public JukeBoxAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState) {
         super(position, defaultState, startTick, oldIsOpen, newIsOpen);
         this.newState = newState;
+
+        ClientLevel level = Minecraft.getInstance().level;
+        ItemStack itemStack = new ItemStack(Items.MUSIC_DISC_13);
+        if(level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
+            itemStack = jukeboxBlockEntity.getTheItem();
+        }
+        if (itemStack.isEmpty()) {
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            if (server != null) {
+                ServerLevel serverLevel = server.getLevel(level.dimension());
+        
+                if (serverLevel != null) {
+                    if (serverLevel.getChunkAt(position).getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity) {
+                        itemStack = jukeboxBlockEntity.getTheItem();
+                    }
+                }
+            }
+        }
+        if (itemStack.isEmpty()) {
+            itemStack = new ItemStack(Items.MUSIC_DISC_13);
+        }
+        discItemStack = itemStack;
+        itemRenderer = Minecraft.getInstance().getItemRenderer();
+        model = itemRenderer.getModel(discItemStack, level, null, position.hashCode());
     }
 
     @Override
@@ -73,28 +101,6 @@ public class JukeBoxAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
 
         float scale = 0.67f;
-
-        ItemRenderer itemRenderer = client.getItemRenderer();
-        ItemStack discItemStack = new ItemStack(Items.MUSIC_DISC_13);
-        if(client.level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
-            discItemStack = jukeboxBlockEntity.getTheItem();
-        }
-        if (discItemStack.isEmpty()) {
-            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-            if (server != null) {
-                ServerLevel serverLevel = server.getLevel(client.level.dimension());
-        
-                if (serverLevel != null) {
-                    if (serverLevel.getChunkAt(position).getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity) {
-                        discItemStack = jukeboxBlockEntity.getTheItem();
-                    }
-                }
-            }
-        }
-        if (discItemStack.isEmpty()) {
-            discItemStack = new ItemStack(Items.MUSIC_DISC_13);
-        }
-        BakedModel model = itemRenderer.getModel(discItemStack, client.level, null, position.hashCode());
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
 

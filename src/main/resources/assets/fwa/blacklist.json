@@ -12,6 +12,25 @@
         "tfmg:heavy_plated_door",
         "tfmg:steel_door",
         "dawnoftimebuilder:spruce_paper_door", 
-        "dawnoftimebuilder:paper_door"
+        "dawnoftimebuilder:paper_door",
+        "northstar:titanium_space_door",
+        "northstar:iron_space_door",
+        "createframed:black_stained_framed_glass_door",
+        "createframed:blue_stained_framed_glass_door",
+        "createframed:cyan_stained_framed_glass_door",
+        "createframed:white_stained_framed_glass_door",
+        "createframed:brown_stained_framed_glass_door",
+        "createframed:gray_stained_framed_glass_door",
+        "createframed:green_stained_framed_glass_door",
+        "createframed:light_blue_stained_framed_glass_door",
+        "createframed:light_gray_stained_framed_glass_door",
+        "createframed:lime_stained_framed_glass_door",
+        "createframed:magenta_stained_framed_glass_door",
+        "createframed:orange_stained_framed_glass_door",
+        "createframed:pink_stained_framed_glass_door",
+        "createframed:purple_stained_framed_glass_door",
+        "createframed:red_stained_framed_glass_door",
+        "createframed:yellow_stained_framed_glass_door",
+        "createframed:tinted_framed_glass_door"
     ]
 }
