@@ -16,19 +16,18 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndLightGetter;
+import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 
 public class VaultAnimation extends Animation{
 
-    BlockState newState;
     private final ItemStackRenderState keyState = new ItemStackRenderState();
     private final Direction facing;
     
-    public VaultAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.newState = newState;
+    public VaultAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -62,6 +61,11 @@ public class VaultAnimation extends Animation{
     @Override
     public AABB getBoundingBox(){
         return new AABB(position.getCenter().add(-1.5, -1.5, -1.5), position.getCenter().add(1.5, 1.5, 1.5));
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.VAULT_STATE, VaultState.UNLOCKING);
     }
 
     private float getDistance(double nowTick) {

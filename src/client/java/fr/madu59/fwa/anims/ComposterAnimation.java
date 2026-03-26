@@ -25,17 +25,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ComposterAnimation extends Animation{
 
-    private final BlockState oldState;
-    private final BlockState newState;
     private final BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
 
     
-    public ComposterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-
-        newState = newBlockState;
-        oldState = oldBlockState;
+    public ComposterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);

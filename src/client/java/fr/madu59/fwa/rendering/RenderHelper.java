@@ -17,7 +17,6 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.CardinalLighting;
-import net.minecraft.world.phys.Vec3;
 
 public class RenderHelper {
 

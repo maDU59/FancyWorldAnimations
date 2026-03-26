@@ -29,8 +29,8 @@ public class ButtonAnimation extends Animation{
     private List<BlockStateModelPart> parts = new ArrayList<>();
     private final BlockStateModel model;
     
-    public ButtonAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public ButtonAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
@@ -50,6 +50,11 @@ public class ButtonAnimation extends Animation{
     @Override
     public boolean isEnabled(){
         return SettingsManager.BUTTON_STATE.getValue();
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.POWERED, false);
     }
 
     @Override
