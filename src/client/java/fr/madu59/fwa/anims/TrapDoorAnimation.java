@@ -35,17 +35,18 @@ public class TrapDoorAnimation extends Animation{
     private final Half half;
     private final float dY;
     
-    public TrapDoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public TrapDoorAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
+        BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         half = defaultState.getValue(BlockStateProperties.HALF);
         hingeSide = facing.getOpposite();
 
-        VoxelShape collShape = defaultState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
-        AABB boundingBox = collShape.isEmpty() ? defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
+        VoxelShape collShape = closedState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
+        AABB boundingBox = collShape.isEmpty() ? closedState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
 
         float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
         float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
@@ -90,7 +91,9 @@ public class TrapDoorAnimation extends Animation{
     private double getAngle(double nowTick, Direction hingeSide) {
         double angle1 = getStartAngle(this.oldIsOpen, hingeSide);
         double angle2 = getStartAngle(this.newIsOpen, hingeSide);
-        return angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), getCurve());
+        double progress = Curves.ease(getProgress(nowTick), getCurve());
+        if (newIsOpen) progress = -1+progress;
+        return angle1 + (angle2 - angle1) * progress;
     }
 
     @Override
@@ -117,6 +120,11 @@ public class TrapDoorAnimation extends Animation{
             float rotY = dY * cos;
             shiftX = -rotX;
             shiftY = dY - rotY;
+        }
+
+        if(newIsOpen){
+            shiftX = -shiftX;
+            shiftZ = -shiftZ;
         }
 
         poseStack.translate(shiftX, shiftY, shiftZ);
