@@ -47,14 +47,12 @@ public class ChainAnimation extends Animation{
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
     private int chainCount = 0;
-    private BlockState state;
     private List<BlockModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
     private PoseStack stack = new PoseStack();
     
-    public ChainAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        state = newState;
+    public ChainAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
     }
 
     @Override
@@ -131,7 +129,7 @@ public class ChainAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
-            parts = new ArrayList<>();
+            parts.clear();
             BlockState chainState = level.getBlockState(mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
@@ -189,17 +187,17 @@ public class ChainAnimation extends Animation{
             stack.last().pose().set(matrixEntry.pose());
             stack.last().normal().set(matrixEntry.normal());
             if (!parts.isEmpty()) {
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, parts, state, position, stack, new SheetedDecalTextureGenerator(vertexConsumer, stack.last(), 1.0F), true, OverlayTexture.NO_OVERLAY);
+                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, parts, newState, position, stack, new SheetedDecalTextureGenerator(vertexConsumer, stack.last(), 1.0F), true, OverlayTexture.NO_OVERLAY);
             }
         });
     }
 
     public void addBreakingBlockEffect(ClientLevel clientLevel, Direction direction) {
-        if (state.shouldSpawnTerrainParticles()) {
+        if (newState.shouldSpawnTerrainParticles()) {
             int i = position.getX();
             int j = position.getY();
             int k = position.getZ();
-            AABB aABB = state.getShape(clientLevel, position).bounds();
+            AABB aABB = newState.getShape(clientLevel, position).bounds();
             double d = (double)i + clientLevel.getRandom().nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
             double e = (double)j + clientLevel.getRandom().nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
             double g = (double)k + clientLevel.getRandom().nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
@@ -227,7 +225,7 @@ public class ChainAnimation extends Animation{
                 d = (double)i + aABB.maxX + (double)0.1F;
             }
 
-            Minecraft.getInstance().particleEngine.add((new TerrainParticle(clientLevel, d, e, g, (double)0.0F, (double)0.0F, (double)0.0F, state, position)).setPower(0.2F).scale(0.6F));
+            Minecraft.getInstance().particleEngine.add((new TerrainParticle(clientLevel, d, e, g, (double)0.0F, (double)0.0F, (double)0.0F, newState, position)).setPower(0.2F).scale(0.6F));
         }
     }
 }
