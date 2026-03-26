@@ -135,7 +135,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
-		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
+		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		if (animation.isEnabled()) animations.add(blockPos, animation);
 	}
 
@@ -152,6 +152,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(dimension != null && dimension != level.dimension()){
 			animations.animations.clear();
+			dimension = level.dimension();
 			return;
 		}
 		if(animations.isEmpty()) return;
@@ -216,49 +217,29 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		return false;
 	}
 
-	private static BlockState getDefaultState(BlockState state, Type type)
-	{
-		return switch (type)
-		{
-			case DOOR -> state.setValue(BlockStateProperties.OPEN, false);
-			case TRAPDOOR -> state.setValue(BlockStateProperties.OPEN, false);
-			case FENCE_GATE -> state.setValue(BlockStateProperties.OPEN, false);
-			case LEVER -> state.setValue(BlockStateProperties.POWERED, false);
-			case LECTERN -> state.setValue(BlockStateProperties.HAS_BOOK, false);
-			case BUTTON -> state.setValue(BlockStateProperties.POWERED, false);
-			case JUKEBOX -> state.setValue(BlockStateProperties.HAS_RECORD, false);
-			case END_PORTAL_FRAME -> state.setValue(BlockStateProperties.EYE, false);
-			case REPEATER -> state.setValue(BlockStateProperties.DELAY, 1);
-			case CAMPFIRE -> state.setValue(BlockStateProperties.LIT, false);
-			case TRIPWIRE_HOOK -> state.setValue(BlockStateProperties.ATTACHED, false);
-			case VAULT -> state.setValue(BlockStateProperties.VAULT_STATE, VaultState.UNLOCKING);
-			default -> state;
-		};
-	}
-
-	private static Animation createAnimation(BlockPos pos, Type type, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)
+	private static Animation createAnimation(BlockPos pos, Type type, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)
 	{
 		switch (type)
 		{
-			case DOOR: return new DoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case TRAPDOOR: return new TrapDoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case FENCE_GATE: return new FenceGateAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case LEVER: return new LeverAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case CHISELED_BOOKSHELF: return new ChiseledBookShelfAnimation(pos, newState, startTick, oldIsOpen, newIsOpen, oldState);
-			case LECTERN: return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case BUTTON: return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case JUKEBOX: return new JukeBoxAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState);
-			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case REPEATER: return new RepeaterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case BELL: return new BellAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
-			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case VAULT: return new VaultAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case LANTERN: return new LanternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case CHAIN: return new ChainAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case DOOR: return new DoorAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case TRAPDOOR: return new TrapDoorAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case FENCE_GATE: return new FenceGateAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LEVER: return new LeverAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case CHISELED_BOOKSHELF: return new ChiseledBookShelfAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LECTERN: return new LecternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case BUTTON: return new ButtonAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case JUKEBOX: return new JukeBoxAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case REPEATER: return new RepeaterAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case BELL: return new BellAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case CAMPFIRE: return new CampfireAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case COMPOSTER: return new ComposterAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case VAULT: return new VaultAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LANTERN: return new LanternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case CHAIN: return new ChainAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			default: return new Animation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		}
 	}
 
