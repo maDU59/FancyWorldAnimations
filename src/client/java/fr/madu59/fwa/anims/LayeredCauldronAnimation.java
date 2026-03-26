@@ -28,28 +28,28 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LayeredCauldronAnimation extends Animation{
 
-    private final BlockState oldState;
-    private final BlockState newState;
+    private final BlockState oldBlockState;
+    private final BlockState newBlockState;
     private final boolean isInverted;
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
     
-    public LayeredCauldronAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public LayeredCauldronAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
-        if (newBlockState.getBlock() instanceof CauldronBlock){
-            newState = oldBlockState;
-            oldState = newBlockState;
+        if (newState.getBlock() instanceof CauldronBlock){
+            newBlockState = oldState;
+            oldBlockState = newState;
             isInverted = true;
         }
         else{
-            newState = newBlockState;
-            oldState = oldBlockState;
+            newBlockState = newState;
+            oldBlockState = oldState;
             isInverted = false;
         }
 
-        RandomSource random = RandomSource.create(newState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(newState);
+        RandomSource random = RandomSource.create(newBlockState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(newBlockState);
         model.collectParts(random, parts);
     }
 
@@ -94,7 +94,7 @@ public class LayeredCauldronAnimation extends Animation{
             renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
         }
 
-        float dy = getPosition(context.getNowTick(), getHeight(newState), getHeight(oldState));
+        float dy = getPosition(context.getNowTick(), getHeight(newBlockState), getHeight(oldBlockState));
         poseStack.translate(0,dy,0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
@@ -111,7 +111,7 @@ public class LayeredCauldronAnimation extends Animation{
                 float r = 1.0f, g = 1.0f, b = 1.0f;
 
                 if (quad.isTinted()) {
-                    int color = Minecraft.getInstance().getBlockColors().getColor(newState, Minecraft.getInstance().level, position, quad.tintIndex());
+                    int color = Minecraft.getInstance().getBlockColors().getColor(newBlockState, Minecraft.getInstance().level, position, quad.tintIndex());
                     r = (float) (color >> 16 & 255) / 255.0F;
                     g = (float) (color >> 8 & 255) / 255.0F;
                     b = (float) (color & 255) / 255.0F;

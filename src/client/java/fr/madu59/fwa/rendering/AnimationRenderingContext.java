@@ -61,6 +61,10 @@ public class AnimationRenderingContext {
         return cameraPos;
     }
 
+    public Camera getCamera() {
+        return camera;
+    }
+
     public boolean isShadow(){
         return isShadow;
     }
