@@ -38,8 +38,8 @@ public class BellAnimation extends Animation{
     private final ResourceLocation atlasId = ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png");
     private final ResourceLocation textureId = ResourceLocation.tryParse("minecraft:entity/bell/bell_body");
     
-    public BellAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public BellAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();

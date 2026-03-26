@@ -25,8 +25,8 @@ public class ButtonAnimation extends Animation{
     private final BakedModel model;
     private final RandomSource random;
     
-    public ButtonAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public ButtonAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
@@ -45,6 +45,11 @@ public class ButtonAnimation extends Animation{
     @Override
     public boolean isEnabled(){
         return SettingsManager.BUTTON_STATE.getValue();
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.POWERED, false);
     }
 
     @Override
