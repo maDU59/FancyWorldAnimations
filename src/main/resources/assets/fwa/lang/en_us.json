@@ -28,6 +28,7 @@
     "fwa.config.option.infinite.name":"Idle animation",
     "fwa.config.option.chain_grounded.name":"Don't animate chains lines linked to the ground",
     "fwa.config.option.split.name":"Model splitting method",
+    "fwa.config.option.texture_change_time.name":"Texture change time",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",
@@ -39,6 +40,8 @@
     "fwa.config.value.fast":"Fast",
     "fwa.config.value.model":"Model",
     "fwa.config.value.texture":"Texture",
+    "fwa.config.value.start":"Start",
+    "fwa.config.value.end":"End",
 
     "fwa.config.done":"Done"
 }
