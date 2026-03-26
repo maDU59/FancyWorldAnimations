@@ -23,23 +23,20 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class JukeBoxAnimation extends Animation{
 
-    BlockState newState;
     private final ItemStackRenderState discState = new ItemStackRenderState();
-    private final Minecraft client = Minecraft.getInstance();
     private final ItemStack discItemStack;
     
-    public JukeBoxAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.newState = newState;
+    public JukeBoxAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         ItemStack itemStack = new ItemStack(Items.MUSIC_DISC_13);
-        if(client.level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
+        if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
             itemStack = jukeboxBlockEntity.getTheItem();
         }
         if (itemStack.isEmpty()) {
             IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
             if (server != null) {
-                ServerLevel serverLevel = server.getLevel(client.level.dimension());
+                ServerLevel serverLevel = server.getLevel(Minecraft.getInstance().level.dimension());
         
                 if (serverLevel != null) {
                     if (serverLevel.getChunkAt(position).getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity) {
@@ -96,7 +93,7 @@ public class JukeBoxAnimation extends Animation{
 
         float scale = 0.67f;
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position.above());
+        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.above());
 
         float dy = getDeltaY(context.getNowTick());
         dy = newIsOpen? 1f - dy : dy;
@@ -105,7 +102,7 @@ public class JukeBoxAnimation extends Animation{
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 
-        client.getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, false, client.level, null, position.hashCode());
+        Minecraft.getInstance().getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, false, Minecraft.getInstance().level, null, position.hashCode());
 
         discState.render(poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
     }

@@ -38,15 +38,13 @@ public class LanternAnimation extends Animation{
     private int crumbleStage = -1;
     private long lastCrumbleParticleTime = 0L;
     private int lastTick = 0;
-    private BlockState state;
     private final RandomSource random;
     private final BakedModel model;
     private PoseStack stack = new PoseStack();
     private int chainCount;
     
-    public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        state = newState;
+    public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         chainCount = SwingingBlockHelper.getChainCount(position);
@@ -186,11 +184,11 @@ public class LanternAnimation extends Animation{
     // }
 
     public void addBreakingBlockEffect(ClientLevel clientLevel, Direction direction) {
-        if (state.shouldSpawnTerrainParticles()) {
+        if (newState.shouldSpawnTerrainParticles()) {
             int i = position.getX();
             int j = position.getY();
             int k = position.getZ();
-            AABB aABB = state.getShape(clientLevel, position).bounds();
+            AABB aABB = newState.getShape(clientLevel, position).bounds();
             double d = (double)i + clientLevel.getRandom().nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
             double e = (double)j + clientLevel.getRandom().nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
             double g = (double)k + clientLevel.getRandom().nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
@@ -218,7 +216,7 @@ public class LanternAnimation extends Animation{
                 d = (double)i + aABB.maxX + (double)0.1F;
             }
 
-            Minecraft.getInstance().particleEngine.add((new TerrainParticle(clientLevel, d, e, g, (double)0.0F, (double)0.0F, (double)0.0F, state, position)).setPower(0.2F).scale(0.6F));
+            Minecraft.getInstance().particleEngine.add((new TerrainParticle(clientLevel, d, e, g, (double)0.0F, (double)0.0F, (double)0.0F, newState, position)).setPower(0.2F).scale(0.6F));
         }
    }
 }
