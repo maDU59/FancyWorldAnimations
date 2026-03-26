@@ -28,8 +28,8 @@ public class LecternAnimation extends Animation{
     private final float hash;
     private final ResourceLocation textureId = ResourceLocation.tryParse("minecraft:textures/entity/enchanting_table_book.png");
 
-    public LecternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public LecternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
         this.hash = position.hashCode();
     }
@@ -58,6 +58,11 @@ public class LecternAnimation extends Animation{
     @Override
     public boolean hideOriginalBlock() {
         return false;
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.HAS_BOOK, false);
     }
 
     public static boolean hasInfiniteAnimation(){

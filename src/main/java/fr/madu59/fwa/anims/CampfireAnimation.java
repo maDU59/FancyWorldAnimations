@@ -19,19 +19,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class CampfireAnimation extends Animation{
 
-    private final BlockState oldState;
-    private final BlockState newState;
     private final BlockState state;
     private final BakedModel model;
     private final RandomSource random;
     
-    public CampfireAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState, BlockState newBlockState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        newState = newBlockState;
-        oldState = oldBlockState;
+    public CampfireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         if (oldIsOpen) state = oldState;
         else state = newState;
@@ -58,6 +55,11 @@ public class CampfireAnimation extends Animation{
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getCurve() {
         return (T) Curves.Door.DEFAULT;
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.LIT, false);
     }
 
     @Override

@@ -14,6 +14,8 @@ public class Animation {
     protected final boolean oldIsOpen;
     protected final boolean newIsOpen;
     protected final BlockState defaultState;
+    protected final BlockState oldState;
+    protected final BlockState newState;
     protected double toRemoveTick = 0.0;
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
@@ -21,12 +23,14 @@ public class Animation {
     protected Boolean isLast;
     protected boolean needUpdate = true;
 
-    public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
+    public Animation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         this.position = position;
-        this.defaultState = defaultState;
+        this.defaultState = getDefaultState(newState);
         this.startTick = startTick;
         this.oldIsOpen = oldIsOpen;
         this.newIsOpen = newIsOpen;
+        this.oldState = oldState;
+        this.newState = newState;
     }
 
     public boolean isUnique() {
@@ -113,6 +117,10 @@ public class Animation {
 
     public AABB getBoundingBox(){
         return new AABB(position);
+    }
+
+    public BlockState getDefaultState(BlockState state){
+        return state;
     }
 
     public void render(AnimationRenderingContext context) {

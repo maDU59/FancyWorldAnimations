@@ -25,14 +25,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class JukeBoxAnimation extends Animation{
 
-    BlockState newState;
     private final ItemStack discItemStack;
     private final BakedModel model;
     private final ItemRenderer  itemRenderer;
     
-    public JukeBoxAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.newState = newState;
+    public JukeBoxAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         ClientLevel level = Minecraft.getInstance().level;
         ItemStack itemStack = new ItemStack(Items.MUSIC_DISC_13);

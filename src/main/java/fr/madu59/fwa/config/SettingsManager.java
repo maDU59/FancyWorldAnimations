@@ -8,7 +8,7 @@ import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraftforge.fml.loading.FMLPaths;
-import fr.madu59.fwa.utils.ModelSplitHelper.SPLIT_METHOD;
+import fr.madu59.fwa.utils.ModelSplitHelper.splitMethod;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -122,11 +122,11 @@ public class SettingsManager {
         1.0
     );
 
-    public static Option<SPLIT_METHOD> LEVER_SPLIT = loadOptionWithDefaults(
+    public static Option<splitMethod> LEVER_SPLIT = loadOptionWithDefaults(
         "lever_split",
         "fwa.config.option.split.name",
         "fwa.config.option.split.description",
-        SPLIT_METHOD.MODEL
+        splitMethod.MODEL
     ); 
 
     public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(

@@ -25,16 +25,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RepeaterAnimation extends Animation{
 
-    private final BlockState oldState;
-    private final BlockState newState;
     private final RandomSource random;
     private final BakedModel model;
     
-    public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public RepeaterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
-        newState = newBlockState;
-        oldState = oldBlockState;
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
@@ -53,6 +49,11 @@ public class RepeaterAnimation extends Animation{
     @Override
     public boolean isEnabled(){
         return SettingsManager.REPEATER_STATE.getValue();
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.DELAY, 1);
     }
 
     private float getPosition(double nowTick, int newPos, int oldPos){

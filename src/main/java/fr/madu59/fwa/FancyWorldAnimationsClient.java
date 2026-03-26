@@ -133,24 +133,24 @@ public class FancyWorldAnimationsClient{
 		boolean oldIsOpen = isOpen(oldState);
 		boolean newIsOpen = isOpen(newState);
 
-		double startTick = (double)level.getGameTime();
+		double startTick = getPartialTick();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = (double)level.getGameTime() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = getPartialTick() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
 				animations.removeAt(blockPos);
 			}
 		}
 
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
-		Animation animation = createAnimation(blockPos, type, getDefaultState(newState, type), startTick, oldIsOpen, newIsOpen, oldState, newState);
+		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		if (animation.isEnabled()) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
-		return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0.0f), 1.0f);
+		return System.nanoTime() / 50_000_000.0;
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -162,7 +162,7 @@ public class FancyWorldAnimationsClient{
 		}
 		if(animations.isEmpty()) return;
 
-		RenderHelper.prepareFrame(context.getBufferSource(), context.isShadow());
+		RenderHelper.prepareFrame(context);
 
 		for (Animation animation : animations.animations.values()) {
 			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
@@ -208,7 +208,7 @@ public class FancyWorldAnimationsClient{
 	private static boolean isOpen(BlockState state)
 	{
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof DoorBlock || "dramaticdoors".equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof TrapDoorBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof FenceGateBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof LeverBlock) return state.getValue(BlockStateProperties.POWERED);
@@ -222,47 +222,28 @@ public class FancyWorldAnimationsClient{
 		return false;
 	}
 
-	private static BlockState getDefaultState(BlockState state, Type type)
-	{
-		return switch (type)
-		{
-			case DOOR -> state.setValue(BlockStateProperties.OPEN, false);
-			case TRAPDOOR -> state.setValue(BlockStateProperties.OPEN, false);
-			case FENCE_GATE -> state.setValue(BlockStateProperties.OPEN, false);
-			case LEVER -> state.setValue(BlockStateProperties.POWERED, false);
-			case LECTERN -> state.setValue(BlockStateProperties.HAS_BOOK, false);
-			case BUTTON -> state.setValue(BlockStateProperties.POWERED, false);
-			case JUKEBOX -> state.setValue(BlockStateProperties.HAS_RECORD, false);
-			case END_PORTAL_FRAME -> state.setValue(BlockStateProperties.EYE, false);
-			case REPEATER -> state.setValue(BlockStateProperties.DELAY, 1);
-			case CAMPFIRE -> state.setValue(BlockStateProperties.LIT, false);
-			case TRIPWIRE_HOOK -> state.setValue(BlockStateProperties.ATTACHED, false);
-			default -> state;
-		};
-	}
-
-	private static Animation createAnimation(BlockPos pos, Type type, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)
+	private static Animation createAnimation(BlockPos pos, Type type, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)
 	{
 		switch (type)
 		{
-			case DOOR: return new DoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case TRAPDOOR: return new TrapDoorAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case FENCE_GATE: return new FenceGateAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case LEVER: return new LeverAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case CHISELED_BOOKSHELF: return new ChiseledBookShelfAnimation(pos, newState, startTick, oldIsOpen, newIsOpen, oldState);
-			case LECTERN: return new LecternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case BUTTON: return new ButtonAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case JUKEBOX: return new JukeBoxAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState);
-			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case REPEATER: return new RepeaterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case BELL: return new BellAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case CAMPFIRE: return new CampfireAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, oldState, newState);
-			case COMPOSTER: return new ComposterAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
-			case LANTERN: return new LanternAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			case CHAIN: return new ChainAnimation(pos, defaultState, startTick, oldIsOpen, newIsOpen, newState, oldState);
-			default: return new Animation(pos, defaultState, startTick, oldIsOpen, newIsOpen);
+			case DOOR: return new DoorAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case TRAPDOOR: return new TrapDoorAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case FENCE_GATE: return new FenceGateAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LEVER: return new LeverAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case CHISELED_BOOKSHELF: return new ChiseledBookShelfAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LECTERN: return new LecternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case BUTTON: return new ButtonAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case JUKEBOX: return new JukeBoxAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case END_PORTAL_FRAME: return new EndPortalFrameAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case REPEATER: return new RepeaterAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LAYERED_CAULDRON: return new LayeredCauldronAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case BELL: return new BellAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case CAMPFIRE: return new CampfireAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case COMPOSTER: return new ComposterAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case TRIPWIRE_HOOK: return new TripWireHookAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case LANTERN: return new LanternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case CHAIN: return new ChainAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			default: return new Animation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		}
 	}
 
@@ -302,8 +283,8 @@ public class FancyWorldAnimationsClient{
 
 	public static boolean shouldCancelBlockEntityRendering(BlockPos pos)
 	{
-		if (animations.containsAt(pos)) {
-			Animation animation = animations.getAt(pos);
+		Animation animation = animations.getAt(pos);
+		if (animation != null) {
 			return animation.hideOriginalBlockEntity() && !animation.isForRemoval() && SettingsManager.MOD_TOGGLE.getValue();
 		}
 		else{
@@ -313,8 +294,8 @@ public class FancyWorldAnimationsClient{
 
 	public static boolean shouldCancelBlockRendering(BlockPos pos)
 	{
-		if (animations.containsAt(pos)) {
-			Animation animation = animations.getAt(pos);
+		Animation animation = animations.getAt(pos);
+		if (animation != null) {
 			if(animation.isForRemoval()) animation.approveRemoval(getPartialTick());
 			return animation.hideOriginalBlock()  && !animation.isForRemoval()  && SettingsManager.MOD_TOGGLE.getValue();
 		}
@@ -335,8 +316,10 @@ public class FancyWorldAnimationsClient{
 		if(SettingsManager.CHAIN_STATE.getValue()){
 			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(animations.animations.getOrDefault(abovePos, null))){
-					animations.animations.get(abovePos).markForRemoval();
+				while(true) {
+					Animation anim = animations.animations.get(abovePos);
+					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
+					anim.markForRemoval();
 					abovePos = abovePos.above();
 				}
 			}
@@ -349,22 +332,24 @@ public class FancyWorldAnimationsClient{
 				}
 			}
 		}
+		BlockPos abovePos = blockPos.above();
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
-			BlockPos abovePos = blockPos.above();
-			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
-				animations.animations.get(abovePos).setLast(false);
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
+				Animation anim = animations.animations.get(abovePos);
+				if (anim != null) anim.setLast(false);
 			}
 		}
 		else{
-			BlockPos abovePos = blockPos.above();
-			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && animations.animations.containsKey(abovePos)){
-				animations.animations.get(abovePos).setLast(true);
+			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
+				Animation anim = animations.animations.get(abovePos);
+				if (anim != null) anim.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
-			if (animations.animations.containsKey(lastPos)) animations.animations.get(lastPos).needUpdate();
+			Animation anim = animations.animations.get(lastPos);
+			if (anim != null) anim.needUpdate();
 		}
 	}
 
