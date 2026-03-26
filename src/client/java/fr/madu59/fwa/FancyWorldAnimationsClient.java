@@ -147,6 +147,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(dimension != null && dimension != level.dimension()){
 			animations.animations.clear();
+			dimension = level.dimension();
 			return;
 		}
 		if(animations.isEmpty()) return;
