@@ -5,10 +5,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@Pseudo
 @Mixin(targets = {"net/caffeinemc/mods/sodium/client/world/LevelSlice", "net/caffeinemc/mods/sodium/client/world/WorldSlice", "me/jellysquid/mods/sodium/client/world/WorldSlice", "me/jellysquid/mods/sodium/client/world/LevelSlice"}, remap = false)
 public abstract class LevelSliceMixin {
 
