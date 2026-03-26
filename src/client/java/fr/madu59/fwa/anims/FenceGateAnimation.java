@@ -35,8 +35,8 @@ public class FenceGateAnimation extends Animation{
     private final Direction facing;
 
 
-    public FenceGateAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public FenceGateAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
@@ -74,7 +74,9 @@ public class FenceGateAnimation extends Animation{
     private double getAngle(double nowTick, Direction facing) {
         double angle1 = getStartAngle(this.oldIsOpen);
         double angle2 = getStartAngle(this.newIsOpen);
-        double finalAngle = angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), getCurve());
+        double progress = Curves.ease(getProgress(nowTick), getCurve());
+        if (newIsOpen) progress = -1+progress;
+        double finalAngle = angle1 + (angle2 - angle1) * progress;
         if(facing == Direction.NORTH || facing == Direction.WEST){
             finalAngle = -finalAngle;
         }
@@ -136,17 +138,21 @@ public class FenceGateAnimation extends Animation{
             Vector3fc pos3 = Backport.getPos(quad, 2);
             Vector3fc pos4 = Backport.getPos(quad, 3);
 
-            float min, max;
+            float min, max, min2, max2;
             if(facing.getAxis() == Axis.X){
                 min = Math.min(pos1.z(), Math.min(pos2.z(), Math.min(pos3.z(), pos4.z())));
                 max = Math.max(pos1.z(), Math.max(pos2.z(), Math.max(pos3.z(), pos4.z())));
+                min2 = Math.min(pos1.x(), Math.min(pos2.x(), Math.min(pos3.x(), pos4.x())));
+                max2 = Math.max(pos1.x(), Math.max(pos2.x(), Math.max(pos3.x(), pos4.x())));
             }
             else{
                 min = Math.min(pos1.x(), Math.min(pos2.x(), Math.min(pos3.x(), pos4.x())));
                 max = Math.max(pos1.x(), Math.max(pos2.x(), Math.max(pos3.x(), pos4.x())));
+                min2 = Math.min(pos1.z(), Math.min(pos2.z(), Math.min(pos3.z(), pos4.z())));
+                max2 = Math.max(pos1.z(), Math.max(pos2.z(), Math.max(pos3.z(), pos4.z())));
             }
 
-            if (ModelSplitHelper.gte(min, 0.125f) && ModelSplitHelper.lte(max, 0.875f) && !(ModelSplitHelper.is(max,min) && (ModelSplitHelper.lte(max,0.125f) || ModelSplitHelper.gte(max, 0.875f)))) {
+            if ((ModelSplitHelper.gte(max2, 0.5625f) || ModelSplitHelper.lte(min2, 0.4375f))  || (ModelSplitHelper.gte(min, 0.125f) && ModelSplitHelper.lte(max, 0.875f) && !(ModelSplitHelper.is(max,min) && (ModelSplitHelper.lte(max,0.125f) || ModelSplitHelper.gte(max, 0.875f))))) {
                 if(ModelSplitHelper.is(min,0.5f) && ModelSplitHelper.is(max,0.5f)){
                     right.add(quad);
                     left.add(quad);
