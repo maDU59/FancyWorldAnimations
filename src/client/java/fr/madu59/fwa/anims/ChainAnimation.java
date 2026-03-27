@@ -165,7 +165,6 @@ public class ChainAnimation extends Animation{
     }
 
     public int getCrumblingStage(double nowTick){
-        if(lastTick - Mth.floor(nowTick) >= 0.5) return crumbleStage;
         lastTick = Mth.floor(nowTick);
         Long2ObjectMap<SortedSet<BlockDestructionProgress>> progressMap = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).fwa$getDestructionProgress();
         SortedSet<BlockDestructionProgress> sortedSet = progressMap.get(position.asLong());
