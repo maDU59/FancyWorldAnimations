@@ -2,7 +2,6 @@ package fr.madu59.fwa.anims;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -10,24 +9,19 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
-import fr.madu59.fwa.mixin.client.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndLightGetter;
@@ -38,11 +32,7 @@ public class ChainAnimation extends Animation{
 
     private float tiltX = 0f;
     private float tiltZ = 0f;
-    private float yaw = 0f;
     private float spin = 0f;
-    private int crumbleStage = -1;
-    private long lastCrumbleParticleTime = 0L;
-    private int lastTick = 0;
     private int chainCount = 0;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
@@ -103,7 +93,6 @@ public class ChainAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
-        float yaw = this.yaw * Math.max(0.55F, swingScale);
         float tiltX = this.tiltX * swingScale;
         float tiltZ = this.tiltZ * swingScale;
         float spin = this.spin * Math.max(0.55F, swingScale);
@@ -118,7 +107,6 @@ public class ChainAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F && swingScale != 0.0F) {
-                poseStack.mulPose(Axis.YP.rotationDegrees(yaw * deltaFactor));
                 poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
                 poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
                 poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
@@ -135,48 +123,16 @@ public class ChainAnimation extends Animation{
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);
         }
-        //this.renderCrumblingOverlay(context.getSubmitNodeCollector(), poseStack);
         poseStack.popPose();
     }
 
     public void extractRenderState(AnimationRenderingContext context) {
-        ClientLevel level = Minecraft.getInstance().level;
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)context.getNowTick()) * 0.1f + posOffset;
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
-
-        if(level != null){
-            int lastCrumbleStage = this.crumbleStage;
-            int crumbleStage = getCrumblingStage(context.getNowTick());
-            int maxCrumbleStage = ModelBakery.DESTROY_STAGE_COUNT;
-            if (crumbleStage >= 0){
-                crumbleStage = Mth.clamp(crumbleStage, 0, maxCrumbleStage - 1);
-                long time = level.getGameTime();
-                if (crumbleStage != lastCrumbleStage || time - this.lastCrumbleParticleTime >= 10L) {
-                    addBreakingBlockEffect(level, Direction.getRandom(level.getRandom()));
-                    this.lastCrumbleParticleTime = time;
-                }
-            }
-            this.crumbleStage = crumbleStage;
-        }
-    }
-
-    public int getCrumblingStage(double nowTick){
-        lastTick = Mth.floor(nowTick);
-        Long2ObjectMap<SortedSet<BlockDestructionProgress>> progressMap = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).fwa$getDestructionProgress();
-        SortedSet<BlockDestructionProgress> sortedSet = progressMap.get(position.asLong());
-        if (sortedSet != null && !sortedSet.isEmpty()) {
-            return sortedSet.last().getProgress();
-        }
-        return -1;
-    }
-
-    public void renderCrumblingOverlay(SubmitNodeCollector submitNodeCollector, PoseStack poseStack){
-        if(this.crumbleStage < 0) return;
-        submitNodeCollector.submitBreakingBlockModel(poseStack, model, defaultState.getSeed(position), crumbleStage);
     }
 
     public void addBreakingBlockEffect(ClientLevel clientLevel, Direction direction) {
