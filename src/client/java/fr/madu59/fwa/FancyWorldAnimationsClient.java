@@ -240,7 +240,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static Type typeOf(BlockState state){
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock || BuiltInRegistries.BLOCK.getKey(block).getNamespace() == "dramaticdoors") return Type.DOOR;
+		if(block instanceof DoorBlock || "dramaticdoors".equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
 		if(block instanceof LeverBlock) return Type.LEVER;
