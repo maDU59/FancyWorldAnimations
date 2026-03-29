@@ -14,6 +14,7 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -112,7 +113,7 @@ public class LayeredCauldronAnimation extends Animation{
                 float r = 1.0f, g = 1.0f, b = 1.0f;
 
                 if (quad.materialInfo().isTinted()) {
-                    var tintSources = Minecraft.getInstance().getBlockColors().getTintSources(newBlockState);
+                    List<BlockTintSource> tintSources = Minecraft.getInstance().getBlockColors().getTintSources(newBlockState);
                     int index = quad.materialInfo().tintIndex();
                     if (index >= 0 && index < tintSources.size()) {
                         int color = tintSources.get(index).colorInWorld(newBlockState, Minecraft.getInstance().level, position);
