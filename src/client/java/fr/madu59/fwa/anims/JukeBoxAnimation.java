@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
@@ -13,7 +14,6 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -21,7 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class JukeBoxAnimation extends Animation{
 
@@ -71,10 +70,7 @@ public class JukeBoxAnimation extends Animation{
 
     @Override
     public boolean isEnabled(BlockState state){
-        VoxelShape shape = state.getShape(Minecraft.getInstance().level, position);
-
-        if (shape.max(Direction.Axis.Y) < 16.0) return false;
-        return SettingsManager.JUKEBOX_STATE.getValue();
+        return SettingsManager.JUKEBOX_STATE.getValue() && !ModCompat.isAmendmentsLoaded();
     }
 
     public static boolean hasInfiniteAnimation(){

@@ -33,11 +33,12 @@ public class VaultAnimation extends Animation{
     public VaultAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-        ItemStack itemStack = new ItemStack(Items.TRIAL_KEY);
+        ItemStack defaultKeyStack = new ItemStack(Items.TRIAL_KEY);
+        ItemStack itemStack = defaultKeyStack;
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof VaultBlockEntity vaultBlockEntity){
             itemStack = vaultBlockEntity.getConfig().keyItem();
         }
-        if (itemStack.isEmpty()) {
+        if (ItemStack.isSameItem(itemStack, defaultKeyStack) || itemStack.isEmpty()) {
             IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
             if (server != null) {
                 ServerLevel serverLevel = server.getLevel(Minecraft.getInstance().level.dimension());
@@ -49,8 +50,8 @@ public class VaultAnimation extends Animation{
                 }
             }
         }
-        if (itemStack.isEmpty()) {
-            itemStack = new ItemStack(Items.TRIAL_KEY);
+        if (ItemStack.isSameItem(itemStack, defaultKeyStack) || itemStack.isEmpty()) {
+            itemStack = defaultState.getValue(BlockStateProperties.OMINOUS)? new ItemStack(Items.OMINOUS_TRIAL_KEY) : new ItemStack(Items.TRIAL_KEY);
         }
 
         keyItemStack = itemStack;
@@ -112,8 +113,6 @@ public class VaultAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
 
         float scale = 1;
-
-        if(defaultState.getValue(BlockStateProperties.OMINOUS)) keyItemStack = new ItemStack(Items.OMINOUS_TRIAL_KEY);
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position.above());
 
