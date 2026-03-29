@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
@@ -51,7 +52,10 @@ public class VaultAnimation extends Animation{
             }
         }
         if (ItemStack.isSameItem(itemStack, defaultKeyStack) || itemStack.isEmpty()) {
-            itemStack = defaultState.getValue(BlockStateProperties.OMINOUS)? new ItemStack(Items.OMINOUS_TRIAL_KEY) : new ItemStack(Items.TRIAL_KEY);
+            itemStack = ModCompat.getVaultKeyItem(newState.getBlock());
+            if (ItemStack.isSameItem(itemStack, defaultKeyStack) || itemStack.isEmpty()) {
+                itemStack = defaultState.getValue(BlockStateProperties.OMINOUS)? new ItemStack(Items.OMINOUS_TRIAL_KEY) : new ItemStack(Items.TRIAL_KEY);
+            }
         }
 
         keyItemStack = itemStack;
