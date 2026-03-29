@@ -17,7 +17,7 @@ public class ModCompat {
 
     private final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
     private final static boolean IS_AMENDMENTS_LOADED = FabricLoader.getInstance().isModLoaded("amendments");
-    private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris");
+    private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
 
     private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
 
