@@ -21,6 +21,7 @@ import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.compat.Blacklist;
 import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
@@ -197,7 +198,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	private static boolean isOpen(BlockState state)
 	{
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock || "dramaticdoors".equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return state.getValue(BlockStateProperties.OPEN);
+		if(block instanceof DoorBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof TrapDoorBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof FenceGateBlock) return state.getValue(BlockStateProperties.OPEN);
 		if(block instanceof LeverBlock) return state.getValue(BlockStateProperties.POWERED);
@@ -209,7 +210,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
 		if(block instanceof TripWireHookBlock) return state.getValue(BlockStateProperties.ATTACHED);
 		if(block instanceof VaultBlock) return state.getValue(BlockStateProperties.VAULT_STATE) == VaultState.UNLOCKING;
-		return false;
+		return ModCompat.isOpen(state, block);
 	}
 
 	private static Animation createAnimation(BlockPos pos, Type type, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)
@@ -240,7 +241,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static Type typeOf(BlockState state){
 		Block block = state.getBlock();
-		if(block instanceof DoorBlock || "dramaticdoors".equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return Type.DOOR;
+		if(block instanceof DoorBlock) return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
 		if(block instanceof LeverBlock) return Type.LEVER;
@@ -258,7 +259,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof VaultBlock) return Type.VAULT;
 		if(block instanceof LanternBlock) return Type.LANTERN;
 		if(block instanceof ChainBlock) return Type.CHAIN;
-		return Type.USELESS;
+		return ModCompat.typeOf(block);
 	}
 
 	private static Type typeOf(BlockState oldState, BlockState newState)
