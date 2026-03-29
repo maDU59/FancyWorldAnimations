@@ -112,10 +112,14 @@ public class LayeredCauldronAnimation extends Animation{
                 float r = 1.0f, g = 1.0f, b = 1.0f;
 
                 if (quad.materialInfo().isTinted()) {
-                    int color = Minecraft.getInstance().getBlockColors().getTintSources(newBlockState).get(quad.materialInfo().tintIndex()).colorInWorld(newBlockState, Minecraft.getInstance().level, position);
-                    r = (float) (color >> 16 & 255) / 255.0F;
-                    g = (float) (color >> 8 & 255) / 255.0F;
-                    b = (float) (color & 255) / 255.0F;
+                    var tintSources = Minecraft.getInstance().getBlockColors().getTintSources(newBlockState);
+                    int index = quad.materialInfo().tintIndex();
+                    if (index >= 0 && index < tintSources.size()) {
+                        int color = tintSources.get(index).colorInWorld(newBlockState, Minecraft.getInstance().level, position);
+                        r = (float) (color >> 16 & 255) / 255.0F;
+                        g = (float) (color >> 8 & 255) / 255.0F;
+                        b = (float) (color & 255) / 255.0F;
+                    }
                 }
 
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, r, g, b, light);
