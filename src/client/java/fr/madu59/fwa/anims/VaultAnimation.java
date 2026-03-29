@@ -10,12 +10,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndLightGetter;
+import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -25,10 +28,32 @@ public class VaultAnimation extends Animation{
 
     private final ItemStackRenderState keyState = new ItemStackRenderState();
     private final Direction facing;
+    private final ItemStack keyItemStack;
     
     public VaultAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        ItemStack itemStack = new ItemStack(Items.TRIAL_KEY);
+        if(Minecraft.getInstance().level.getBlockEntity(position) instanceof VaultBlockEntity vaultBlockEntity){
+            itemStack = vaultBlockEntity.getConfig().keyItem();
+        }
+        if (itemStack.isEmpty()) {
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            if (server != null) {
+                ServerLevel serverLevel = server.getLevel(Minecraft.getInstance().level.dimension());
+        
+                if (serverLevel != null) {
+                    if (serverLevel.getChunkAt(position).getBlockEntity(position) instanceof VaultBlockEntity vaultBlockEntity) {
+                        itemStack = vaultBlockEntity.getConfig().keyItem();
+                    }
+                }
+            }
+        }
+        if (itemStack.isEmpty()) {
+            itemStack = new ItemStack(Items.TRIAL_KEY);
+        }
+
+        keyItemStack = itemStack;
     }
 
     @Override
@@ -88,8 +113,6 @@ public class VaultAnimation extends Animation{
 
         float scale = 1;
 
-        //VaultBlockEntity vaultBlockEntity = (VaultBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
-        ItemStack keyItemStack = new ItemStack(Items.TRIAL_KEY);
         if(defaultState.getValue(BlockStateProperties.OMINOUS)) keyItemStack = new ItemStack(Items.OMINOUS_TRIAL_KEY);
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position.above());
