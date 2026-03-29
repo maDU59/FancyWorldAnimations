@@ -49,7 +49,7 @@ public class VaultAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.VAULT_STATE.getValue();
     }
 

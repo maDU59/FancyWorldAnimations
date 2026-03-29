@@ -63,7 +63,7 @@ public class Animation {
         return true;
     }
 
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return true;
     }
 

@@ -62,7 +62,7 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.CAULDRON_STATE.getValue();
     }
 

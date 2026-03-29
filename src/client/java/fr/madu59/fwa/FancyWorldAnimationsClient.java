@@ -134,7 +134,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
-		if (animation.isEnabled()) animations.add(blockPos, animation);
+		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
