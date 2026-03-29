@@ -55,7 +55,7 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.LANTERN_STATE.getValue();
     }
 

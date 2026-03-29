@@ -49,7 +49,7 @@ public class ComposterAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.COMPOSTER_STATE.getValue();
     }
 

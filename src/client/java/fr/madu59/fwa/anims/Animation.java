@@ -59,7 +59,7 @@ public class Animation {
         return (T) Curves.Classic.LINEAR;
     }
 
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return true;
     }
 

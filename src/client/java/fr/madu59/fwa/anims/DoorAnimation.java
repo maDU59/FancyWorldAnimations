@@ -100,7 +100,7 @@ public class DoorAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.DOOR_STATE.getValue();
     }
 
