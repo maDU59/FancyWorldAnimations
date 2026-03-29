@@ -6,6 +6,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -65,8 +66,8 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
-        return SettingsManager.CAULDRON_STATE.getValue();
+    public boolean isEnabled(BlockState state){
+        return SettingsManager.CAULDRON_STATE.getValue() && !ModCompat.isAmendmentsLoaded();
     }
 
     private float getPosition(double nowTick, double newPos, double oldPos){

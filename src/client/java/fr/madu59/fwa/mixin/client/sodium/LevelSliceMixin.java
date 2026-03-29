@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = {"net/caffeinemc/mods/sodium/client/world/LevelSlice", "net/caffeinemc/mods/sodium/client/world/WorldSlice"}, remap = false)
+@Mixin(targets = {"net/caffeinemc/mods/sodium/client/world/LevelSlice", "net/caffeinemc/mods/sodium/client/world/WorldSlice", "me/jellysquid/mods/sodium/client/world/WorldSlice", "me/jellysquid/mods/sodium/client/world/LevelSlice"}, remap = false)
 public abstract class LevelSliceMixin {
 
     @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
