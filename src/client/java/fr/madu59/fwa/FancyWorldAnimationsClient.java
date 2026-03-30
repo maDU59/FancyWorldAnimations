@@ -69,7 +69,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
-	private static final boolean IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris");
 	private static ResourceKey<Level> dimension;
 
 	@Override
@@ -160,7 +159,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		for (Animation animation : animations.animations.values()) {
 			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
 				renderAnimation(animation, context);
-				if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && IRIS_LOADED){
+				if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && ModCompat.isIrisLoaded()){
 					source.endBatch();
 				}
 			}
