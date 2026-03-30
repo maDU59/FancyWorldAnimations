@@ -182,7 +182,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(type == Type.LANTERN) return SwingingBlockHelper.isHangingLantern(newState);
 		if(type == Type.CHAIN) {
-			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos));
+			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos))));
 		}
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		return oldIsOpen != newIsOpen;
@@ -321,6 +321,25 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 				}
 			}
 			if(newState.isAir() || (SwingingBlockHelper.isSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
+				BlockPos abovePos = blockPos.above();
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+					BlockState aboveState = level.getBlockState(abovePos);
+					onBlockUpdate(abovePos, aboveState, aboveState, false);
+					abovePos = abovePos.above();
+				}
+			}
+		}
+		if(!SettingsManager.CHAIN_STATE.getValue()){
+			if(!SwingingBlockHelper.isHangingLantern(newState) && !SwingingBlockHelper.isHangingLantern(level.getBlockState(SwingingBlockHelper.getLast(blockPos)))){
+				BlockPos abovePos = blockPos.above();
+				while(true) {
+					Animation anim = animations.animations.get(abovePos);
+					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
+					anim.markForRemoval();
+					abovePos = abovePos.above();
+				}
+			}
+			if(SwingingBlockHelper.isActiveHangingLantern(newState)){
 				BlockPos abovePos = blockPos.above();
 				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
