@@ -17,14 +17,12 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -134,42 +132,5 @@ public class ChainAnimation extends Animation{
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
-    }
-
-    public void addBreakingBlockEffect(ClientLevel clientLevel, Direction direction) {
-        if (newState.shouldSpawnTerrainParticles()) {
-            int i = position.getX();
-            int j = position.getY();
-            int k = position.getZ();
-            AABB aABB = newState.getShape(clientLevel, position).bounds();
-            double d = (double)i + clientLevel.getRandom().nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
-            double e = (double)j + clientLevel.getRandom().nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
-            double g = (double)k + clientLevel.getRandom().nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
-            if (direction == Direction.DOWN) {
-                e = (double)j + aABB.minY - (double)0.1F;
-            }
-
-            if (direction == Direction.UP) {
-                e = (double)j + aABB.maxY + (double)0.1F;
-            }
-
-            if (direction == Direction.NORTH) {
-                g = (double)k + aABB.minZ - (double)0.1F;
-            }
-
-            if (direction == Direction.SOUTH) {
-                g = (double)k + aABB.maxZ + (double)0.1F;
-            }
-
-            if (direction == Direction.WEST) {
-                d = (double)i + aABB.minX - (double)0.1F;
-            }
-
-            if (direction == Direction.EAST) {
-                d = (double)i + aABB.maxX + (double)0.1F;
-            }
-
-            Minecraft.getInstance().particleEngine.add((new TerrainParticle(clientLevel, d, e, g, (double)0.0F, (double)0.0F, (double)0.0F, newState, position)).setPower(0.2F).scale(0.6F));
-        }
     }
 }
