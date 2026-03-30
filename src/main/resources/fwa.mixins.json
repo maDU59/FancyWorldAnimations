@@ -13,7 +13,6 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderChunkRegionMixin",
-		"LevelRendererAccessor",
 		"sodium.LevelSliceMixin",
 		"iris.ShadowRendererMixin"
 	],
