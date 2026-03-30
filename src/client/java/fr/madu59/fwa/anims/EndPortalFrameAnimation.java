@@ -51,7 +51,7 @@ public class EndPortalFrameAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState states){
         return SettingsManager.END_PORTAL_FRAME_STATE.getValue();
     }
 
