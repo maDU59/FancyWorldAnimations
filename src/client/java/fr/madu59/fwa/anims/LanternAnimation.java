@@ -104,7 +104,7 @@ public class LanternAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
-            int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, mutable);
+            int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
             chainParts.clear();
             BlockStateModel chainModel;
@@ -125,7 +125,7 @@ public class LanternAnimation extends Animation{
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
-        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, position);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
         poseStack.popPose();

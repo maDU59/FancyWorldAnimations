@@ -111,7 +111,7 @@ public class ChainAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             parts.clear();
-            int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, mutable);
+            int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
