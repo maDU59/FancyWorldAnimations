@@ -79,7 +79,7 @@ public class TrapDoorAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.TRAPDOOR_STATE.getValue();
     }
 

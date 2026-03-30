@@ -47,7 +47,7 @@ public class RepeaterAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.REPEATER_STATE.getValue();
     }
 
