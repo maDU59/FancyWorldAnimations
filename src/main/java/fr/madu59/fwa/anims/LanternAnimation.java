@@ -86,7 +86,6 @@ public class LanternAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         float swingScale = 0.7f;
         float tiltX = this.tiltX * swingScale;
         float tiltZ = this.tiltZ * swingScale;
@@ -109,6 +108,7 @@ public class LanternAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
+            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
             chainParts.clear();
             BlockStateModel chainModel;
@@ -129,6 +129,7 @@ public class LanternAnimation extends Animation{
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
+        int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, position);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
         poseStack.popPose();
