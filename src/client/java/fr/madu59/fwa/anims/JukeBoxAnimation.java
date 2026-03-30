@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
@@ -68,8 +69,8 @@ public class JukeBoxAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
-        return SettingsManager.JUKEBOX_STATE.getValue();
+    public boolean isEnabled(BlockState state){
+        return SettingsManager.JUKEBOX_STATE.getValue() && !ModCompat.isAmendmentsLoaded();
     }
 
     public static boolean hasInfiniteAnimation(){

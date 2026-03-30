@@ -54,7 +54,7 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.CHISELED_BOOKSHELF_STATE.getValue();
     }
 

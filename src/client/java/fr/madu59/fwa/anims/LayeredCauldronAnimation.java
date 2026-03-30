@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -62,8 +63,8 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
-        return SettingsManager.CAULDRON_STATE.getValue();
+    public boolean isEnabled(BlockState state){
+        return SettingsManager.CAULDRON_STATE.getValue() && !ModCompat.isAmendmentsLoaded();
     }
 
     private float getPosition(double nowTick, double newPos, double oldPos){
@@ -108,9 +109,11 @@ public class LayeredCauldronAnimation extends Animation{
 
                 if (quad.isTinted()) {
                     int color = Minecraft.getInstance().getBlockColors().getColor(newBlockState, Minecraft.getInstance().level, position, quad.getTintIndex());
-                    r = (float) (color >> 16 & 255) / 255.0F;
-                    g = (float) (color >> 8 & 255) / 255.0F;
-                    b = (float) (color & 255) / 255.0F;
+                    if(color != -1){
+                        r = (float) (color >> 16 & 255) / 255.0F;
+                        g = (float) (color >> 8 & 255) / 255.0F;
+                        b = (float) (color & 255) / 255.0F;
+                    }
                 }
 
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, r, g, b, light);
