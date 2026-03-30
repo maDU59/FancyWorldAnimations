@@ -67,7 +67,7 @@ public class BellAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.BELL_STATE.getValue();
     }
 

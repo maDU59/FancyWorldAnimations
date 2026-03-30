@@ -26,8 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RepeaterAnimation extends Animation{
-
-    private final RandomSource random = RandomSource.create(42);
+    
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
     
@@ -35,6 +34,7 @@ public class RepeaterAnimation extends Animation{
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model.collectParts(random, parts);
     }
 
@@ -50,7 +50,7 @@ public class RepeaterAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.REPEATER_STATE.getValue();
     }
 
