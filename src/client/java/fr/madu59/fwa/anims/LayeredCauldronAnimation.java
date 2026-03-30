@@ -117,9 +117,11 @@ public class LayeredCauldronAnimation extends Animation{
                     int index = quad.materialInfo().tintIndex();
                     if (index >= 0 && index < tintSources.size()) {
                         int color = tintSources.get(index).colorInWorld(newBlockState, Minecraft.getInstance().level, position);
-                        r = (float) (color >> 16 & 255) / 255.0F;
-                        g = (float) (color >> 8 & 255) / 255.0F;
-                        b = (float) (color & 255) / 255.0F;
+                        if (color != -1){
+                            r = (float) (color >> 16 & 255) / 255.0F;
+                            g = (float) (color >> 8 & 255) / 255.0F;
+                            b = (float) (color & 255) / 255.0F;
+                        }
                     }
                 }
 
