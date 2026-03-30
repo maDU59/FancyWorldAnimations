@@ -59,10 +59,6 @@ public class Animation {
         return (T) Curves.Classic.LINEAR;
     }
 
-    public boolean renderShadow(){
-        return true;
-    }
-
     public boolean isEnabled(BlockState state){
         return true;
     }
@@ -112,7 +108,9 @@ public class Animation {
     }
 
     public double getProgress(double nowTick) {
-        return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
+        double duration = getAnimDuration();
+        if (duration <= 0) return 1.0;
+        return Math.clamp((nowTick - this.startTick) / duration, 0.0, 1.0);
     }
 
     public AABB getBoundingBox(){
