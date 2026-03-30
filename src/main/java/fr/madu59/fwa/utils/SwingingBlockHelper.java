@@ -10,6 +10,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,7 +58,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isLast(BlockPos blockPos){
-        Animation anim = FancyWorldAnimationsClient.animations.animations.getOrDefault(blockPos.below(), null);
+        Animation anim = FancyWorldAnimationsClient.animations.animations.get(blockPos.below());
         return !isSwingingBlock(Minecraft.getInstance().level.getBlockState(blockPos.below())) && !(anim instanceof LanternAnimation || anim instanceof ChainAnimation);
     }
 
@@ -67,5 +68,27 @@ public class SwingingBlockHelper {
             pos.move(0,-1,0);
         }
         return pos.move(0,1,0);
+    }
+
+    public static BlockState getLastAnimation(BlockPos blockPos){
+        MutableBlockPos pos = blockPos.mutable();
+        Animation anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+        if(anim == null) {
+            pos.move(0,-1,0);
+            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            if(anim == null) {
+                return Blocks.AIR.defaultBlockState();
+            }
+        }
+        while (anim != null){
+            pos.move(0,-1,0);
+            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            if (anim != null && isHangingLantern(anim.getDefaultState())) break;
+        }
+        if(anim == null) {
+            pos.move(0,1,0);
+            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+        }
+        return anim.getDefaultState();
     }
 }
