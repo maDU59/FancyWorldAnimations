@@ -2,7 +2,7 @@
 	"required": true,
 	"package": "fr.madu59.fwa.mixin.client",
 	"plugin": "fr.madu59.fwa.compat.ModCompatPlugin",
-	"compatibilityLevel": "JAVA_21",
+	"compatibilityLevel": "JAVA_17",
 	"client": [
 		"ClientLevelMixin",
 		"BlockEntityRenderDispatcherMixin",
