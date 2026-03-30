@@ -83,7 +83,6 @@ public class ChainAnimation extends Animation{
         VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         float tiltX = this.tiltX * swingScale;
         float tiltZ = this.tiltZ * swingScale;
         float spin = this.spin * Math.max(0.55F, swingScale);
@@ -104,6 +103,7 @@ public class ChainAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
+            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             RenderHelper.renderModel(buffer, poseStack.last(), Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState), 1.0f, 1.0f, 1.0f, 1.0f, light, random, chainState);

@@ -117,8 +117,12 @@ public class Animation {
         return new AABB(position);
     }
 
-    public BlockState getDefaultState(BlockState state){
+    protected BlockState getDefaultState(BlockState state){
         return state;
+    }
+
+    public BlockState getDefaultState(){
+        return defaultState;
     }
 
     public void render(AnimationRenderingContext context) {
