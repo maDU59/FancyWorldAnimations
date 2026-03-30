@@ -34,12 +34,8 @@ public class LanternAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
-    private int crumbleStage = -1;
-    private long lastCrumbleParticleTime = 0L;
-    private int lastTick = 0;
     private List<BlockModelPart> parts = new ArrayList<>();
     private final BlockStateModel model;
-    private PoseStack stack = new PoseStack();
     private int chainCount;
     private List<BlockModelPart> chainParts = new ArrayList<>();
     
