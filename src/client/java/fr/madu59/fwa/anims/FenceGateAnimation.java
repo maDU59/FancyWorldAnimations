@@ -62,7 +62,7 @@ public class FenceGateAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.FENCEGATE_STATE.getValue();
     }
 

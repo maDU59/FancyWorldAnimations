@@ -59,11 +59,7 @@ public class Animation {
         return (T) Curves.Classic.LINEAR;
     }
 
-    public boolean renderShadow(){
-        return true;
-    }
-
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return true;
     }
 
@@ -112,6 +108,8 @@ public class Animation {
     }
 
     public double getProgress(double nowTick) {
+        double duration = getAnimDuration();
+        if (duration <= 0) return 1.0;
         return Math.min(Math.max((nowTick - this.startTick) / getAnimDuration(), 0.0), 1.0);
     }
 
