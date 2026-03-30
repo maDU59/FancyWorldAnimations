@@ -33,12 +33,8 @@ public class LanternAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
-    private int crumbleStage = -1;
-    private long lastCrumbleParticleTime = 0L;
-    private int lastTick = 0;
     private List<BlockModelPart> parts = new ArrayList<>();
     private final BlockStateModel model;
-    private PoseStack stack = new PoseStack();
     private int chainCount;
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
@@ -141,31 +137,5 @@ public class LanternAnimation extends Animation{
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
-
-        if(level != null){
-            int lastCrumbleStage = this.crumbleStage;
-            int crumbleStage = getCrumblingStage(context.getNowTick());
-            int maxCrumbleStage = ModelBakery.DESTROY_STAGE_COUNT;
-            if (crumbleStage >= 0){
-                crumbleStage = Mth.clamp(crumbleStage, 0, maxCrumbleStage - 1);
-                long time = level.getGameTime();
-                if (crumbleStage != lastCrumbleStage || time - this.lastCrumbleParticleTime >= 10L) {
-                    addBreakingBlockEffect(level, Direction.getRandom(level.getRandom()));
-                    this.lastCrumbleParticleTime = time;
-                }
-            }
-            this.crumbleStage = crumbleStage;
-        }
-    }
-
-    public int getCrumblingStage(double nowTick){
-        if(lastTick - Mth.floor(nowTick) >= 0.5) return crumbleStage;
-        lastTick = Mth.floor(nowTick);
-        Long2ObjectMap<SortedSet<BlockDestructionProgress>> progressMap = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).fwa$getDestructionProgress();
-        SortedSet<BlockDestructionProgress> sortedSet = progressMap.get(position.asLong());
-        if (sortedSet != null && !sortedSet.isEmpty()) {
-            return sortedSet.last().getProgress();
-        }
-        return -1;
     }
 }

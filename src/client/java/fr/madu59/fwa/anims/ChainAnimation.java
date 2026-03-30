@@ -36,7 +36,6 @@ public class ChainAnimation extends Animation{
     private float spin = 0f;
     private int chainCount = 0;
     private BlockStateModel model;
-    private PoseStack stack = new PoseStack();
     
     public ChainAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
