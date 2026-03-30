@@ -51,7 +51,7 @@ public class LecternAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.LECTERN_STATE.getValue();
     }
 

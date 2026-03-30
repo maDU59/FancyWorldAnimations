@@ -1,5 +1,6 @@
 {
     "mods":[
+        "endrem"
     ],
     "blocks":[
         "create:train_door",

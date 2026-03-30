@@ -45,7 +45,7 @@ public class CampfireAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.CAMPFIRE_STATE.getValue();
     }
 
