@@ -35,6 +35,7 @@ public class LanternAnimation extends Animation{
     private final BlockStateModel model;
     private int chainCount;
     private List<BlockStateModelPart> chainParts = new ArrayList<>();
+    private final Quaternionf combined = new Quaternionf();
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -101,7 +102,7 @@ public class LanternAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F) {
-                Quaternionf combined = new Quaternionf()
+                combined.identity()
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
                     .rotateY(spin * deltaFactor);
@@ -123,11 +124,11 @@ public class LanternAnimation extends Animation{
         }
         float deltaFactor = 1f - prevFactor;
         if (deltaFactor != 0.0F) {
-            Quaternionf combined = new Quaternionf()
-                .rotateZ(tiltZ * deltaFactor)
-                .rotateX(tiltX * deltaFactor)
-                .rotateY(spin * deltaFactor);
-            poseStack.mulPose(combined);
+            combined.identity()
+                    .rotateZ(tiltZ * deltaFactor)
+                    .rotateX(tiltX * deltaFactor)
+                    .rotateY(spin * deltaFactor);
+                poseStack.mulPose(combined);
         }
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);

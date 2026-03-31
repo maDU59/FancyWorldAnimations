@@ -35,6 +35,7 @@ public class ChainAnimation extends Animation{
     private int chainCount = 0;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
+    private final Quaternionf combined = new Quaternionf();
     
     public ChainAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -106,7 +107,7 @@ public class ChainAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F && swingScale != 0.0F) {
-                Quaternionf combined = new Quaternionf()
+                combined.identity()
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
                     .rotateY(spin * deltaFactor);
