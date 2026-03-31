@@ -3,10 +3,11 @@ package fr.madu59.fwa.anims;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Quaternionf;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -38,6 +39,7 @@ public class LanternAnimation extends Animation{
     private final BlockStateModel model;
     private int chainCount;
     private List<BlockModelPart> chainParts = new ArrayList<>();
+    private final Quaternionf combined = new Quaternionf();
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -48,8 +50,8 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public double getLifeSpan(){
-        return SettingsManager.LANTERN_STATE.getValue()? Double.MAX_VALUE : 0;
+    public boolean isFinished(double nowTick) {
+        return false;
     }
 
     public static boolean hasInfiniteAnimation(){
@@ -88,9 +90,10 @@ public class LanternAnimation extends Animation{
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
         float swingScale = 0.7f;
-        float tiltX = this.tiltX * swingScale;
-        float tiltZ = this.tiltZ * swingScale;
-        float spin = this.spin * Math.max(0.55F, swingScale);
+        float degToRad = (float) Math.PI / 180.0f;
+        float tiltX = this.tiltX * swingScale * degToRad;
+        float tiltZ = this.tiltZ * swingScale * degToRad;
+        float spin = this.spin * Math.max(0.55F, swingScale) * degToRad;
         poseStack.pushPose();
         poseStack.translate(0.5F, chainCount, 0.5F);
         float prevFactor = 0.0F;
@@ -103,9 +106,11 @@ public class LanternAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F) {
-                poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
-                poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
-                poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
+                combined.identity()
+                    .rotateZ(tiltZ * deltaFactor)
+                    .rotateX(tiltX * deltaFactor)
+                    .rotateY(spin * deltaFactor);
+                poseStack.mulPose(combined);
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
@@ -123,9 +128,11 @@ public class LanternAnimation extends Animation{
         }
         float deltaFactor = 1f - prevFactor;
         if (deltaFactor != 0.0F) {
-            poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
-            poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
-            poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
+            combined.identity()
+                    .rotateZ(tiltZ * deltaFactor)
+                    .rotateX(tiltX * deltaFactor)
+                    .rotateY(spin * deltaFactor);
+                poseStack.mulPose(combined);
         }
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);
