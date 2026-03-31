@@ -75,7 +75,8 @@ public class LanternAnimation extends Animation{
     }
 
     public void update(){
-        chainCount = SwingingBlockHelper.getChainCount(position);
+        if(!SettingsManager.CHAIN_STATE.getValue() && !SettingsManager.LANTERN_OVERRIDE.getValue()) chainCount = 1;
+        else chainCount = SwingingBlockHelper.getChainCount(position);
         needUpdate = false;
     }
 
