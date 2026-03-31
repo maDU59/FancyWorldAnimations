@@ -40,7 +40,7 @@ public class RenderHelper {
             ZShade = level.getShade(Direction.NORTH, true);
             XShade = level.getShade(Direction.EAST, true);
         }
-        shouldShade = context.isShadow();
+        shouldShade = !context.isShadow();
         bufferSource = context.getBufferSource();
     }
 
