@@ -41,7 +41,7 @@ public class RenderHelper {
             ZShade = cardinalLighting.byFace(Direction.NORTH);
             XShade = cardinalLighting.byFace(Direction.EAST);
         }
-        shouldShade = context.isShadow();
+        shouldShade = !context.isShadow();
         bufferSource = context.getBufferSource();
     }
 
