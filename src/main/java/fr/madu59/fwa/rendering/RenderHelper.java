@@ -26,6 +26,11 @@ public class RenderHelper {
     private static float ZShade = 0;
     private static float XShade = 0;
     private static Vector3f normal = new Vector3f();
+    private static boolean shouldShade = true;
+    private static final Direction[] DIRECTIONS_WITH_NULL = {
+        null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
+    };
+    private static final Direction[] DIRECTIONS = Direction.values();
 
     public static void prepareFrame(AnimationRenderingContext context){
         if(!context.isShadow()){
@@ -35,6 +40,7 @@ public class RenderHelper {
             ZShade = level.getShade(Direction.NORTH, true);
             XShade = level.getShade(Direction.EAST, true);
         }
+        shouldShade = context.isShadow();
         bufferSource = context.getBufferSource();
     }
 
@@ -47,9 +53,8 @@ public class RenderHelper {
     }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, BakedModel model, float a, float r, float g, float b, int light, RandomSource random, BlockState blockState){
-        renderQuads(buffer, pose, model.getQuads(blockState, null, random), a, r, g, b, light);
-        for(Direction dir : Direction.values()){
-            renderQuads(buffer, pose, model.getQuads(blockState, dir, random), a, r, g, b, light);
+        for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
+            renderQuads(buffer, pose, model.getQuads(blockState, DIRECTIONS_WITH_NULL[j], random), a, r, g, b, light);
         }
     }
 
@@ -58,20 +63,20 @@ public class RenderHelper {
     //     Vec3 dirV = camPos.subtract(pos.getCenter());
     //     for (BlockStateModelPart part : parts){
     //         renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
-    //         for(Direction dir : Direction.values()){
+    //         for(Direction dir : DIRECTIONS){
     //             if(dirV.dot(dir.getUnitVec3()) >= 0) renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
     //         }
     //     }
     // }
 
     public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
-        for (BakedQuad bakedQuad : bakedQuads){
-            renderQuad(buffer, pose, bakedQuad, a, r, g, b, light);
+        for (int i = 0; i < bakedQuads.size(); i++){
+            renderQuad(buffer, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade);
         }
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
-        renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, true);
+        renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, shouldShade);
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
