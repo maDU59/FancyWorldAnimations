@@ -28,6 +28,7 @@
     "fwa.config.option.chain_grounded.name":"Don't animate chains lines linked to the ground",
     "fwa.config.option.split.name":"Model splitting method",
     "fwa.config.option.texture_change_time.name":"Texture change time",
+    "fwa.config.option.override.name":"Override chains' state if there's a lantern at the end",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",

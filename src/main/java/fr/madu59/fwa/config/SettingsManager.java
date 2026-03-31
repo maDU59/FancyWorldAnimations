@@ -378,6 +378,14 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> LANTERN_OVERRIDE = loadOptionWithDefaults(
+        "lantern_override",
+        "fwa.config.option.override.name",
+        "fwa.config.option.override.description",
+        true,
+        true
+    );
+
     public static Option<Boolean> CHAIN_STATE = loadOptionWithDefaults(
         "chain_state",
         "fwa.config.option.state.name",
