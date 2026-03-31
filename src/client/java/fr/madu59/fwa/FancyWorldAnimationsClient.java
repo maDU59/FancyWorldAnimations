@@ -160,7 +160,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			}
 		}
 		dimension = level.dimension();
-		animations.clean(context.getNowTick());
+		if(!context.isShadow()) animations.clean(context.getNowTick());
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
