@@ -177,7 +177,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(type == Type.LANTERN) return SwingingBlockHelper.isHangingLantern(newState);
 		if(type == Type.CHAIN) {
-			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos))));
+			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || ((SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos)))) && SettingsManager.LANTERN_OVERRIDE.getValue()));
 		}
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		return oldIsOpen != newIsOpen;
@@ -334,7 +334,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 					abovePos = abovePos.above();
 				}
 			}
-			if(SwingingBlockHelper.isActiveHangingLantern(newState)){
+			if(SwingingBlockHelper.isActiveHangingLantern(newState) && SettingsManager.LANTERN_OVERRIDE.getValue()){
 				BlockPos abovePos = blockPos.above();
 				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
