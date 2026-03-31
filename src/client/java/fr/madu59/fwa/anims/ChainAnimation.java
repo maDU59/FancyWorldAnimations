@@ -3,9 +3,10 @@ package fr.madu59.fwa.anims;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Quaternionf;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
@@ -40,8 +41,8 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
-    public double getLifeSpan(){
-        return Double.MAX_VALUE;
+    public boolean isFinished(double nowTick) {
+        return false;
     }
 
     @Override
@@ -90,9 +91,10 @@ public class ChainAnimation extends Animation{
         VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
-        float tiltX = this.tiltX * swingScale;
-        float tiltZ = this.tiltZ * swingScale;
-        float spin = this.spin * Math.max(0.55F, swingScale);
+        float degToRad = (float) Math.PI / 180.0f;
+        float tiltX = this.tiltX * swingScale * degToRad;
+        float tiltZ = this.tiltZ * swingScale * degToRad;
+        float spin = this.spin * Math.max(0.55F, swingScale) * degToRad;
         poseStack.pushPose();
         poseStack.translate(0.5F, chainCount, 0.5F);
         MutableBlockPos mutable = position.mutable().move(0,chainCount-1,0);
@@ -104,9 +106,11 @@ public class ChainAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F && swingScale != 0.0F) {
-                poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
-                poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
-                poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
+                Quaternionf combined = new Quaternionf()
+                    .rotateZ(tiltZ * deltaFactor)
+                    .rotateX(tiltX * deltaFactor)
+                    .rotateY(spin * deltaFactor);
+                poseStack.mulPose(combined);
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
