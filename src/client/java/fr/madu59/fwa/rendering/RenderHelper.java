@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.QuadInstance;
 
 import net.minecraft.client.Minecraft;
@@ -87,7 +88,7 @@ public class RenderHelper {
         if(isShaded){
             normal.set(bakedQuad.direction().getUnitVec3f());
             normal.mul(pose.normal());
-            normal.normalize();  
+            normal.normalize(); // Might not be needed
             float nx2 = normal.x() * normal.x();
             float ny2 = normal.y() * normal.y();
             float nz2 = normal.z() * normal.z();
