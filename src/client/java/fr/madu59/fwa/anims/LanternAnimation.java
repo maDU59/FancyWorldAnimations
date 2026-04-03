@@ -111,8 +111,8 @@ public class LanternAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
-            int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
+            int light = LevelRenderer.getLightCoords(LevelRenderer.BrightnessGetter.DEFAULT ,(BlockAndLightGetter) level, chainState, mutable);
             chainParts.clear();
             BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));

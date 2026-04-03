@@ -107,7 +107,7 @@ public class ChainAnimation extends Animation{
             float deltaFactor = targetFactor - prevFactor;
             prevFactor = targetFactor;
             
-            if (deltaFactor != 0.0F && swingScale != 0.0F) {
+            if (deltaFactor != 0.0F) {
                 combined.identity()
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
@@ -117,8 +117,8 @@ public class ChainAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             parts.clear();
-            int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
+            int light = LevelRenderer.getLightCoords(LevelRenderer.BrightnessGetter.DEFAULT ,(BlockAndLightGetter) level, chainState, mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             model.collectParts(random, parts);
