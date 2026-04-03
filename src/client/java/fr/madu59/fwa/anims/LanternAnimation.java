@@ -86,6 +86,7 @@ public class LanternAnimation extends Animation{
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
         float swingScale = 0.7f;
+        if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float degToRad = (float) Math.PI / 180.0f;
         float tiltX = this.tiltX * swingScale * degToRad;
         float tiltZ = this.tiltZ * swingScale * degToRad;

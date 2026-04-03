@@ -88,6 +88,7 @@ public class ChainAnimation extends Animation{
         if (needUpdate) update();
         ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
+        if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float prevFactor = 0.0F;
         VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();

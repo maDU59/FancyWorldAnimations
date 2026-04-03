@@ -6,7 +6,6 @@ import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.QuadInstance;
 
 import net.minecraft.client.Minecraft;
