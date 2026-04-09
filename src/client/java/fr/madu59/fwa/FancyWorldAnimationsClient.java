@@ -238,7 +238,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 	}
 
-	private static Type typeOf(BlockState state){
+	public static Type typeOf(BlockState state){
 		Block block = state.getBlock();
 		if(block instanceof DoorBlock) return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
