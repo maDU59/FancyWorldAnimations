@@ -125,6 +125,10 @@ public class Animation {
         return defaultState;
     }
 
+    public boolean isRendering(){
+        return true;
+    }
+
     public void render(AnimationRenderingContext context) {
     }
 }

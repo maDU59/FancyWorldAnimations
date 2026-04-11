@@ -56,6 +56,11 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
+    public boolean isRendering(){
+        return isLast;
+    }
+
+    @Override
     public void setLast(boolean isLast){
         if(this.isLast == null || this.isLast != isLast){
             super.setLast(isLast);
