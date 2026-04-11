@@ -68,7 +68,7 @@ public class LanternAnimation extends Animation{
 
     @Override
     public boolean isRendering(){
-        return isLast;
+        return Boolean.TRUE.equals(isLast);
     }
 
     @Override
