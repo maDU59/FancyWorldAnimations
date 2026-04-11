@@ -155,7 +155,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		RenderHelper.prepareFrame(context);
 
 		for (Animation animation : animations.animations.values()) {
-			if((context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())) && animation.isRendering()){
+			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
 		}
