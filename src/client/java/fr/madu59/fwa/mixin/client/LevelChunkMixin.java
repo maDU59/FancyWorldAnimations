@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
+import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -40,7 +41,8 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     state.is(Blocks.JUKEBOX) || 
     state.is(Blocks.BELL) ||
     state.getBlock() instanceof LanternBlock ||
-    state.getBlock() instanceof ChainBlock;
+    state.getBlock() instanceof ChainBlock ||
+    ModCompat.isAnimatedModdedBlock(state);
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory palettedContainerFactory, long l, LevelChunkSection @Nullable [] levelChunkSections, @Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, palettedContainerFactory, l, levelChunkSections, blendingData);

@@ -6,7 +6,6 @@ import java.util.List;
 import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
@@ -18,11 +17,8 @@ import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.Mth;
@@ -60,6 +56,11 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
+    public boolean isRendering(){
+        return isLast;
+    }
+
+    @Override
     public void setLast(boolean isLast){
         if(this.isLast == null || this.isLast != isLast){
             super.setLast(isLast);
@@ -92,6 +93,7 @@ public class ChainAnimation extends Animation{
         if (needUpdate) update();
         ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
+        if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float prevFactor = 0.0F;
         VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
@@ -110,7 +112,7 @@ public class ChainAnimation extends Animation{
             float deltaFactor = targetFactor - prevFactor;
             prevFactor = targetFactor;
             
-            if (deltaFactor != 0.0F && swingScale != 0.0F) {
+            if (deltaFactor != 0.0F) {
                 combined.identity()
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
@@ -120,8 +122,8 @@ public class ChainAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             parts.clear();
-            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
+            int light = LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndTintGetter) level, chainState, mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
             model.collectParts(random, parts);

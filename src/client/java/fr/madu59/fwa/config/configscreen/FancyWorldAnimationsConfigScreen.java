@@ -106,10 +106,11 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.CHEST_EASING);
         list.addCategory("fwa.config.category.lantern");
         list.addButton(SettingsManager.LANTERN_STATE);
-        list.addButton(SettingsManager.LANTERN_OVERRIDE);
         list.addCategory("fwa.config.category.chain");
         list.addButton(SettingsManager.CHAIN_STATE);
         list.addButton(SettingsManager.CHAIN_GROUNDED);
+        list.addButton(SettingsManager.LANTERN_OVERRIDE);
+        list.addButton(SettingsManager.CHAIN_SWING_LIMIT);
         
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {
