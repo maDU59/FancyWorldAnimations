@@ -52,7 +52,7 @@ public class ChainAnimation extends Animation{
 
     @Override
     public boolean isRendering(){
-        return isLast;
+        return Boolean.TRUE.equals(isLast);
     }
 
     @Override
