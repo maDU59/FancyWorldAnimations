@@ -6,9 +6,9 @@ import java.util.List;
 import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
@@ -19,10 +19,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -57,8 +56,18 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
+    public boolean hideOriginalBlockEntity() {
+        return !ModCompat.WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()));
+    }
+
+    @Override
     public boolean isEnabled(BlockState state){
         return SettingsManager.LANTERN_STATE.getValue();
+    }
+
+    @Override
+    public boolean isRendering(){
+        return isLast;
     }
 
     @Override
@@ -88,6 +97,7 @@ public class LanternAnimation extends Animation{
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
         float swingScale = 0.7f;
+        if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float degToRad = (float) Math.PI / 180.0f;
         float tiltX = this.tiltX * swingScale * degToRad;
         float tiltZ = this.tiltZ * swingScale * degToRad;
@@ -112,8 +122,8 @@ public class LanternAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
-            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
+            int light = LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndTintGetter) level, chainState, mutable);
             BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             chainModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
