@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class ModCompat {
 
     private final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
+    public final static Identifier WW_DISPLAY_LANTERNS = Identifier.tryParse("wilderwild:display_lantern");
     private final static boolean IS_AMENDMENTS_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("amendments") != null;
     private final static boolean IS_IRIS_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("iris") != null || FMLLoader.getCurrent().getLoadingModList().getModFileById("oculus") != null;
 
@@ -27,6 +28,7 @@ public class ModCompat {
     
     public static Type typeOf(Block block){
         if(DRAMATIC_DOORS_NAMESPACE.equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return Type.DOOR;
+        if(WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(block))) return Type.LANTERN;
         return Type.USELESS;
     }
 
@@ -59,6 +61,11 @@ public class ModCompat {
 
     public static void registerVaultKey(Identifier vaultId, Identifier itemId){
         VAULT_KEYS.put(vaultId, BuiltInRegistries.ITEM.get(itemId).map(ItemStack::new).orElse(ItemStack.EMPTY));
+    }
+
+    public static boolean isAnimatedModdedBlock(BlockState state){
+        if(WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()))) return true;
+        return false;
     }
 
 }

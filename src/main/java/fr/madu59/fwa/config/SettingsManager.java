@@ -402,6 +402,14 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> CHAIN_SWING_LIMIT = loadOptionWithDefaults(
+        "chain_swing_limit",
+        "fwa.config.option.swing_limit.name",
+        "fwa.config.option.swing_limit.description",
+        true,
+        true
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {
