@@ -66,11 +66,6 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public boolean isRendering(){
-        return Boolean.TRUE.equals(isLast);
-    }
-
-    @Override
     public AABB getBoundingBox(){
         return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
     }
