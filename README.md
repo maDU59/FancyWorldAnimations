@@ -18,10 +18,10 @@ It's the mod you never knew you needed until now, once you try it it's hard to g
   <table>
 <tr>
 <td width="50%">
-<img src="https://cdn.modrinth.com/data/IAzUFvS6/images/bc41e76047e79be41fe6b2290dab29df58a9e380.gif">
+<img src="https://cdn.modrinth.com/data/IAzUFvS6/images/7d844e9aa0b4df04d8e84014751a2525b017ee4d.gif">
 </td>
 <td width="50%">
-<img src="https://cdn.modrinth.com/data/IAzUFvS6/images/e219109d4371a777697672db06267573db49f0f7.gif">
+<img src="https://cdn.modrinth.com/data/IAzUFvS6/images/e87dff10addb69c8d1710cf3886aaf6c07d7e59e.gif">
 </td>
 </tr>
 </table>

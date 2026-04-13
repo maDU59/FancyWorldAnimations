@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -150,6 +151,11 @@ public class BellAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
+        if(shouldUseFallbackRender()){
+            VertexConsumer buffer = RenderHelper.getBuffer();
+            RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
+        }
+
         setupAnim(bellBlockEntity, Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f));
 
         if (bellBlockEntity.ticks == 0) {
@@ -162,9 +168,8 @@ public class BellAnimation extends Animation{
 
         bellBody.render(poseStack, sprite.wrap(RenderHelper.getBuffer()), light, OverlayTexture.NO_OVERLAY, -1);
 
-        if(shouldUseFallbackRender()){
-            VertexConsumer buffer = RenderHelper.getBuffer();
-            RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
+        if(context.getBufferSource() instanceof BufferSource bufferSource){
+            bufferSource.endBatch();
         }
     }
 
