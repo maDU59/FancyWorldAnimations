@@ -31,13 +31,6 @@ public class SettingsManager {
         true
     );
 
-    public static Option<Boolean> MAX_SHADER_COMPAT = loadOptionWithDefaults(
-        "max_shader_compat",
-        "fwa.config.option.max_shader_compat.name",
-        "fwa.config.option.max_shader_compat.description",
-        false
-    );
-
     public static Option<Boolean> DOOR_STATE = loadOptionWithDefaults(
         "door_state",
         "fwa.config.option.state.name",
@@ -405,6 +398,14 @@ public class SettingsManager {
         "chain_chain_grounded",
         "fwa.config.option.chain_grounded.name",
         "fwa.config.option.chain_grounded.description",
+        true,
+        true
+    );
+
+    public static Option<Boolean> CHAIN_SWING_LIMIT = loadOptionWithDefaults(
+        "chain_swing_limit",
+        "fwa.config.option.swing_limit.name",
+        "fwa.config.option.swing_limit.description",
         true,
         true
     );

@@ -30,6 +30,7 @@
     "fwa.config.option.split.name":"Model splitting method",
     "fwa.config.option.texture_change_time.name":"Texture change time",
     "fwa.config.option.override.name":"Override chains' state if there's a lantern at the end",
+    "fwa.config.option.swing_limit.name":"Limit the swing of the chains to a certain angle",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",
