@@ -49,6 +49,11 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
+    public boolean isRendering(){
+        return Boolean.TRUE.equals(isLast);
+    }
+
+    @Override
     public void setLast(boolean isLast){
         if(this.isLast == null || this.isLast != isLast){
             super.setLast(isLast);
@@ -72,15 +77,21 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
-    public void render(AnimationRenderingContext context) {
+    public void tick(double nowTick) {
         if(isLast == null){
             update();
             return;
         }
         if (!isLast) return;
         if (needUpdate) update();
+    }
+
+    @Override
+    public void render(AnimationRenderingContext context) {
+        if (!isLast) return;
         ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
+        if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float prevFactor = 0.0F;
         VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
@@ -99,7 +110,7 @@ public class ChainAnimation extends Animation{
             float deltaFactor = targetFactor - prevFactor;
             prevFactor = targetFactor;
             
-            if (deltaFactor != 0.0F && swingScale != 0.0F) {
+            if (deltaFactor != 0.0F) {
                 combined.identity()
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
@@ -108,8 +119,8 @@ public class ChainAnimation extends Animation{
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
-            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, mutable);
             BlockState chainState = level.getBlockState(mutable);
+            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, chainState, mutable);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             RenderHelper.renderModel(buffer, poseStack.last(), Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState), 1.0f, 1.0f, 1.0f, 1.0f, light, random, chainState);
             poseStack.popPose();

@@ -168,11 +168,9 @@ public class FancyWorldAnimationsClient{
 		RenderHelper.prepareFrame(context);
 
 		for (Animation animation : animations.animations.values()) {
-			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
+			animation.tick(context.getNowTick());
+			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
-				if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && ModCompat.isIrisLoaded()){
-					source.endBatch();
-				}
 			}
 		}
 		if(!context.isShadow()) animations.clean(context.getNowTick());
@@ -252,7 +250,7 @@ public class FancyWorldAnimationsClient{
 		}
 	}
 
-	private static Type typeOf(BlockState state){
+	public static Type typeOf(BlockState state){
 		Block block = state.getBlock();
 		if(block instanceof DoorBlock) return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
