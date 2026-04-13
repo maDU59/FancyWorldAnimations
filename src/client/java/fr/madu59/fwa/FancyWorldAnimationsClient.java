@@ -31,7 +31,6 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -157,9 +156,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		RenderHelper.prepareFrame(context);
 
 		for (Animation animation : animations.animations.values()) {
-			if(context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox())){
+			animation.tick(context.getNowTick());
+			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
-				if (context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue() && ModCompat.isIrisLoaded()){
+				if (ModCompat.isIrisLoaded() && SettingsManager.MAX_SHADER_COMPAT.getValue() && context.getBufferSource() instanceof MultiBufferSource.BufferSource source){
 					source.endBatch();
 				}
 			}
@@ -243,7 +243,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 	}
 
-	private static Type typeOf(BlockState state){
+	public static Type typeOf(BlockState state){
 		Block block = state.getBlock();
 		if(block instanceof DoorBlock) return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
