@@ -84,13 +84,18 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
-    public void render(AnimationRenderingContext context) {
+    public void tick(double nowTick) {
         if(isLast == null){
             update();
             return;
         }
         if (!isLast) return;
         if (needUpdate) update();
+    }
+
+    @Override
+    public void render(AnimationRenderingContext context) {
+        if (!isLast) return;
         ClientLevel level = Minecraft.getInstance().level;
         float swingScale = 0.7F;
         if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);

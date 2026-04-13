@@ -129,6 +129,9 @@ public class Animation {
         return true;
     }
 
+    public void tick(double nowTick) {
+    }
+
     public void render(AnimationRenderingContext context) {
     }
 }
