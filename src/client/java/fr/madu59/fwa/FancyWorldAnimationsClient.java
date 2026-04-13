@@ -159,7 +159,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			animation.tick(context.getNowTick());
 			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
-				if (animation.isRendering() && ModCompat.isIrisLoaded() && context.getBufferSource() instanceof MultiBufferSource.BufferSource source && SettingsManager.MAX_SHADER_COMPAT.getValue()){
+				if (ModCompat.isIrisLoaded() && SettingsManager.MAX_SHADER_COMPAT.getValue() && context.getBufferSource() instanceof MultiBufferSource.BufferSource source){
 					source.endBatch();
 				}
 			}
