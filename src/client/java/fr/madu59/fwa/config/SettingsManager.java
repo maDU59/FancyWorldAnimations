@@ -31,13 +31,6 @@ public class SettingsManager {
         true
     );
 
-    public static Option<Boolean> MAX_SHADER_COMPAT = loadOptionWithDefaults(
-        "max_shader_compat",
-        "fwa.config.option.max_shader_compat.name",
-        "fwa.config.option.max_shader_compat.description",
-        true
-    );
-
     public static Option<Boolean> DOOR_STATE = loadOptionWithDefaults(
         "door_state",
         "fwa.config.option.state.name",
