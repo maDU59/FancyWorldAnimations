@@ -12,8 +12,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
-import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class SwingingBlockHelper {
     public static boolean isActiveSwingingBlock(BlockState blockState){
@@ -33,7 +33,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isHangingLantern(BlockState blockState){
-        return blockState.getBlock() instanceof LanternBlock && blockState.getValue(LanternBlock.HANGING);
+        return FancyWorldAnimationsClient.typeOf(blockState) == FancyWorldAnimationsClient.Type.LANTERN && blockState.getValue(BlockStateProperties.HANGING);
     }
 
     public static boolean isActiveHangingLantern(BlockState blockState){
