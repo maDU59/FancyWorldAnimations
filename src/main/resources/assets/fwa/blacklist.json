@@ -3,7 +3,8 @@
         "endrem",
         "framedblocks",
         "copycats",
-        "create_connected"
+        "create_connected",
+        "potioncauldron"
     ],
     "blocks":[
         "create:train_door",
