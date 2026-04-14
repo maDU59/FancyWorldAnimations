@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -122,24 +123,23 @@ public class ModCompat {
                 BlockEntity be = level.getBlockEntity(pos);
                 if (be == null) return DEFAULT_BOOK_TEXTURE;
 
-                // pepjebs.mapatlases.utils.AtlasLectern is injected onto
-                // LecternBlockEntity by Map Atlases at runtime via mixin.
-                // We load the interface reflectively so this class compiles and
-                // runs fine even when Map Atlases is absent.
-                Class<?> atlasLecternClass =
-                        Class.forName("pepjebs.mapatlases.utils.AtlasLectern");
+                boolean hasAtlas = false;
 
-                // hasAtlas() — defined in the AtlasLectern interface
-                boolean hasAtlas = (boolean)
-                        atlasLecternClass.getMethod("mapatlases$hasAtlas").invoke(be);
+                CompoundTag nbt = be.getUpdateTag(level.registryAccess());
+
+                if (nbt.contains("Book")) {
+                    CompoundTag bookTag = nbt.getCompound("Book").orElseThrow();
+                    String bookId = bookTag.getString("id").orElseThrow();
+
+                    if ("map_atlases:atlas".equals(bookId)) {
+                        hasAtlas = true;
+                    }
+                }
 
                 if (!hasAtlas) return DEFAULT_BOOK_TEXTURE;
 
                 return getDimensionAtlasTexture(level);
 
-            } catch (ClassNotFoundException ignored) {
-                // Map Atlases is not installed — perfectly normal
-                return DEFAULT_BOOK_TEXTURE;
             } catch (Exception e) {
                 // Something changed in Map Atlases' API; degrade gracefully
                 return DEFAULT_BOOK_TEXTURE;
