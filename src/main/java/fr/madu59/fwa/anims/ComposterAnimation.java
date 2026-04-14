@@ -13,9 +13,8 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -26,7 +25,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class ComposterAnimation extends Animation{
 
     private final BlockStateModel model;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
 
     
     public ComposterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
