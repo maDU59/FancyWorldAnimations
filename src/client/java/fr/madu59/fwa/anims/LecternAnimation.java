@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
@@ -22,16 +23,18 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-public class LecternAnimation extends Animation{
-    
+public class LecternAnimation extends Animation {
+
+
     private final BookModel bookModel;
     private final float hash;
-    private final Identifier textureId = Identifier.tryParse("minecraft:textures/entity/enchanting_table_book.png");
+    private final Identifier textureId;
 
     public LecternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
         this.hash = position.hashCode();
+        this.textureId = ModCompat.MapAtlasesCompat.resolveTexture(position);
     }
 
     @Override
