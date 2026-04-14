@@ -31,7 +31,7 @@ import net.minecraft.world.phys.AABB;
 public class DoorAnimation extends Animation{
 
     private final BlockStateModel model;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private final RenderType renderType;
     private final float dX;
     private final float dZ;

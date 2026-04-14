@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class CampfireAnimation extends Animation{
 
     private final BlockStateModel model;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public CampfireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);

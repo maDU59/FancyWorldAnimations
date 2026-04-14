@@ -4,21 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.fml.loading.FMLLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.fml.loading.FMLLoader;
 
 public class ModCompat {
 
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
     public final static Identifier WW_DISPLAY_LANTERNS = Identifier.tryParse("wilderwild:display_lantern");
-    private final static boolean IS_AMENDMENTS_LOADED = FabricLoader.getInstance().isModLoaded("amendments");
-    private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
+    private final static boolean IS_AMENDMENTS_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("amendments") != null;
+    private final static boolean IS_IRIS_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("iris") != null || FMLLoader.getCurrent().getLoadingModList().getModFileById("oculus") != null;
 
     private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
 

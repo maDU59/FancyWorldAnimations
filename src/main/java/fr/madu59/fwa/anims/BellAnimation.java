@@ -41,7 +41,7 @@ public class BellAnimation extends Animation{
     private final BlockStateModel model;
     private final float hash;
     private BellBlockEntity bellBlockEntity;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private final Direction facing;
     private final BellAttachType attachment;
     private final Identifier atlasId = Identifier.tryParse("minecraft:blocks");
