@@ -27,13 +27,15 @@ public class ModCompat {
     }
     
     public static Type typeOf(Block block){
-        if(DRAMATIC_DOORS_NAMESPACE.equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return Type.DOOR;
-        if(WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(block))) return Type.LANTERN;
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
+        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return Type.DOOR;
+        if(WW_DISPLAY_LANTERNS.equals(blockId)) return Type.LANTERN;
         return Type.USELESS;
     }
 
     public static boolean isOpen(BlockState state, Block block){
-        if (DRAMATIC_DOORS_NAMESPACE.equals(BuiltInRegistries.BLOCK.getKey(block).getNamespace())) return state.getValue(BlockStateProperties.OPEN);
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
+        if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace())) return state.getValue(BlockStateProperties.OPEN);
         return false;
     }
 
