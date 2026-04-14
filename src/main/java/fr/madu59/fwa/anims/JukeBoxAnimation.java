@@ -3,6 +3,7 @@ package fr.madu59.fwa.anims;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
@@ -23,13 +24,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class JukeBoxAnimation extends Animation{
 
-    BlockState newState;
     private final ItemStackRenderState discState = new ItemStackRenderState();
     private final ItemStack discItemStack;
     
-    public JukeBoxAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        this.newState = newState;
+    public JukeBoxAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         ItemStack itemStack = new ItemStack(Items.MUSIC_DISC_13);
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
@@ -70,8 +69,8 @@ public class JukeBoxAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
-        return SettingsManager.JUKEBOX_STATE.getValue();
+    public boolean isEnabled(BlockState state){
+        return SettingsManager.JUKEBOX_STATE.getValue() && !ModCompat.isAmendmentsLoaded();
     }
 
     public static boolean hasInfiniteAnimation(){
@@ -95,7 +94,7 @@ public class JukeBoxAnimation extends Animation{
 
         float scale = 0.67f;
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position.above());
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position.above());
 
         float dy = getDeltaY(context.getNowTick());
         dy = newIsOpen? 1f - dy : dy;

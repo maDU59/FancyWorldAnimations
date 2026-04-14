@@ -25,19 +25,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RepeaterAnimation extends Animation{
-
-    private final BlockState oldState;
-    private final BlockState newState;
-    private final RandomSource random = RandomSource.create(42);
+    
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
     
-    public RepeaterAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newBlockState, BlockState oldBlockState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public RepeaterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
-        newState = newBlockState;
-        oldState = oldBlockState;
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
     }
 
@@ -53,8 +49,13 @@ public class RepeaterAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.REPEATER_STATE.getValue();
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.DELAY, 1);
     }
 
     private float getPosition(double nowTick, int newPos, int oldPos){
@@ -90,8 +91,8 @@ public class RepeaterAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantTorch, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
-            if ((path.contains("redstone_torch") && quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f && quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f && quad.position0().z() > 5f/16f && quad.position0().z()  < 11f/16f && quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f) == wantTorch) {
+            String path = quad.materialInfo().sprite().contents().name().getPath();
+            if ((path.contains("redstone_torch") && (quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f || quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f) && (quad.position0().z() > 5f/16f && quad.position0().z() < 11f/16f || quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f)) == wantTorch) {
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }

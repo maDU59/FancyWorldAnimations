@@ -29,13 +29,13 @@ public class ChiseledBookShelfAnimation extends Animation{
     private final Identifier atlasId = Identifier.tryParse("minecraft:blocks");
     private final Identifier textureId = Identifier.tryParse("minecraft:block/chiseled_bookshelf_occupied");
     
-    public ChiseledBookShelfAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldBlockState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public ChiseledBookShelfAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         this.pos = 0;
         for(BooleanProperty prop : ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES){
             this.pos += 1;
-            if(defaultState.getValue(prop) != oldBlockState.getValue(prop)){
+            if(defaultState.getValue(prop) != oldState.getValue(prop)){
                 isAdding = defaultState.getValue(prop);
                 break;
             }
@@ -54,7 +54,7 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.CHISELED_BOOKSHELF_STATE.getValue();
     }
 

@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.CardinalLighting;
-import net.minecraft.world.phys.Vec3;
 
 public class RenderHelper {
 
@@ -28,6 +27,12 @@ public class RenderHelper {
     private static float ZShade = 0;
     private static float XShade = 0;
     private static Vector3f normal = new Vector3f();
+    private static boolean shouldShade = true;
+    private static final Direction[] DIRECTIONS_WITH_NULL = {
+        null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
+    };
+    private static final Direction[] DIRECTIONS = Direction.values();
+    private static final QuadInstance quadInstance = new QuadInstance();
 
     public static void prepareFrame(AnimationRenderingContext context){
         if(!context.isShadow()){
@@ -37,6 +42,7 @@ public class RenderHelper {
             ZShade = cardinalLighting.byFace(Direction.NORTH);
             XShade = cardinalLighting.byFace(Direction.EAST);
         }
+        shouldShade = !context.isShadow();
         bufferSource = context.getBufferSource();
     }
 
@@ -48,11 +54,10 @@ public class RenderHelper {
         return bufferSource.getBuffer(renderType);
     }
 
-    public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light){
-        for (BlockModelPart part : parts){
-            renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
-            for(Direction dir : Direction.values()){
-                renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
+    public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
+        for (int i = 0; i < parts.size(); i++){
+            for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
+                renderQuads(buffer, pose, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light);
             }
         }
     }
@@ -62,20 +67,20 @@ public class RenderHelper {
     //     Vec3 dirV = camPos.subtract(pos.getCenter());
     //     for (BlockStateModelPart part : parts){
     //         renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
-    //         for(Direction dir : Direction.values()){
+    //         for(Direction dir : DIRECTIONS){
     //             if(dirV.dot(dir.getUnitVec3()) >= 0) renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
     //         }
     //     }
     // }
 
     public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
-        for (BakedQuad bakedQuad : bakedQuads){
-            renderQuad(buffer, pose, bakedQuad, a, r, g, b, light);
+        for (int i = 0; i < bakedQuads.size(); i++){
+            renderQuad(buffer, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade);
         }
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
-        renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, true);
+        renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, shouldShade);
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
@@ -83,7 +88,7 @@ public class RenderHelper {
         if(isShaded){
             normal.set(bakedQuad.direction().getUnitVec3f());
             normal.mul(pose.normal());
-            normal.normalize();  
+            normal.normalize(); // Might not be needed
             float nx2 = normal.x() * normal.x();
             float ny2 = normal.y() * normal.y();
             float nz2 = normal.z() * normal.z();
@@ -92,6 +97,8 @@ public class RenderHelper {
             shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
         }
 
-        buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
+        quadInstance.setLightCoords(light);
+        quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
+        buffer.putBakedQuad(pose, bakedQuad, quadInstance);
     }
 }

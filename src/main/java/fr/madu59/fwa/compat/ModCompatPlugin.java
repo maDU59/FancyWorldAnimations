@@ -12,10 +12,10 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".sodium.")) {
-            return FMLLoader.getCurrent().getLoadingModList().getModFileById("sodium") != null;
+            return FMLLoader.getCurrent().getLoadingModList().getModFileById("sodium") != null || FMLLoader.getCurrent().getLoadingModList().getModFileById("embeddium") != null;
         }
         if (mixinClassName.contains(".iris.")) {
-            return FMLLoader.getCurrent().getLoadingModList().getModFileById("iris") != null;
+            return FMLLoader.getCurrent().getLoadingModList().getModFileById("iris") != null || FMLLoader.getCurrent().getLoadingModList().getModFileById("oculus") != null;
         }
         return true;
     }

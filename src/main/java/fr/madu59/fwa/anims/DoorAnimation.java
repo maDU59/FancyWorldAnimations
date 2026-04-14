@@ -39,15 +39,16 @@ public class DoorAnimation extends Animation{
     private final float pivotZ;
     private final DoorHingeSide hinge;
 
-    public DoorAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public DoorAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
         String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
-        if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderTypes.translucentMovingBlock();
+        if(path.contains("stained") || path.contains("tinted")) renderType = RenderTypes.translucentMovingBlock();
         else renderType = RenderTypes.cutoutMovingBlock();
 
+        BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         hinge = defaultState.getValue(BlockStateProperties.DOOR_HINGE);
 
@@ -55,7 +56,7 @@ public class DoorAnimation extends Animation{
                 ? facing.getClockWise(Direction.Axis.Y)
                 : facing.getCounterClockWise(Direction.Axis.Y);
 
-        AABB boundingBox = defaultState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds();
+        AABB boundingBox = closedState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds();
 
         float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);
         float pivotZ = (float) ((boundingBox.minZ + boundingBox.maxZ) * 0.5);
@@ -99,7 +100,7 @@ public class DoorAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return SettingsManager.DOOR_STATE.getValue();
     }
 
@@ -111,7 +112,9 @@ public class DoorAnimation extends Animation{
     private double getAngle(double nowTick, DoorHingeSide hinge) {
         double angle1 = getStartAngle(this.oldIsOpen, hinge);
         double angle2 = getStartAngle(this.newIsOpen, hinge);
-        return angle1 + (angle2 - angle1) * Curves.ease(getProgress(nowTick), getCurve());
+        double progress = Curves.ease(getProgress(nowTick), getCurve());
+        if (newIsOpen) progress = -1+progress;
+        return angle1 + (angle2 - angle1) * progress;
     }
 
     @Override
@@ -126,6 +129,11 @@ public class DoorAnimation extends Animation{
         float rotDZ = dX * sin + dZ * cos;
         float shiftX = dX - rotDX;
         float shiftZ = dZ - rotDZ;
+
+        if(newIsOpen){
+            shiftX = -shiftX;
+            shiftZ = -shiftZ;
+        }
 
         poseStack.translate(shiftX, 0.0f, shiftZ);
         poseStack.translate(pivotX, 0.0f, pivotZ);

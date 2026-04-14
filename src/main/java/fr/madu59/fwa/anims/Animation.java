@@ -15,18 +15,22 @@ public class Animation {
     protected final boolean newIsOpen;
     protected final BlockState defaultState;
     protected double toRemoveTick = 0.0;
+    protected final BlockState oldState;
+    protected final BlockState newState;
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
 
     protected Boolean isLast;
     protected boolean needUpdate = true;
 
-    public Animation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
+    public Animation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         this.position = position;
-        this.defaultState = defaultState;
+        this.defaultState = getDefaultState(newState);
         this.startTick = startTick;
         this.oldIsOpen = oldIsOpen;
         this.newIsOpen = newIsOpen;
+        this.oldState = oldState;
+        this.newState = newState;
     }
 
     public boolean isUnique() {
@@ -55,7 +59,7 @@ public class Animation {
         return (T) Curves.Classic.LINEAR;
     }
 
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState state){
         return true;
     }
 
@@ -104,11 +108,28 @@ public class Animation {
     }
 
     public double getProgress(double nowTick) {
-        return Math.clamp((nowTick - this.startTick) / getAnimDuration(), 0.0, 1.0);
+        double duration = getAnimDuration();
+        if (duration <= 0) return 1.0;
+        return Math.clamp((nowTick - this.startTick) / duration, 0.0, 1.0);
     }
 
     public AABB getBoundingBox(){
         return new AABB(position);
+    }
+
+    protected BlockState getDefaultState(BlockState state){
+        return state;
+    }
+
+    public BlockState getDefaultState(){
+        return defaultState;
+    }
+
+    public boolean isRendering(){
+        return true;
+    }
+
+    public void tick(double nowTick) {
     }
 
     public void render(AnimationRenderingContext context) {

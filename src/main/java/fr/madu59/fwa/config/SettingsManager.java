@@ -7,8 +7,8 @@ import com.google.gson.reflect.TypeToken;
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Curves;
-import fr.madu59.fwa.utils.ModelSplitHelper.SPLIT_METHOD;
 import net.neoforged.fml.loading.FMLPaths;
+import fr.madu59.fwa.utils.ModelSplitHelper.splitMethod;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -115,11 +115,11 @@ public class SettingsManager {
         1.0
     );
 
-    public static Option<SPLIT_METHOD> LEVER_SPLIT = loadOptionWithDefaults(
+    public static Option<splitMethod> LEVER_SPLIT = loadOptionWithDefaults(
         "lever_split",
         "fwa.config.option.split.name",
         "fwa.config.option.split.description",
-        SPLIT_METHOD.MODEL
+        splitMethod.MODEL
     ); 
 
     public static Option<Boolean> LECTERN_STATE = loadOptionWithDefaults(
@@ -378,6 +378,14 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> LANTERN_OVERRIDE = loadOptionWithDefaults(
+        "lantern_override",
+        "fwa.config.option.override.name",
+        "fwa.config.option.override.description",
+        true,
+        true
+    );
+
     public static Option<Boolean> CHAIN_STATE = loadOptionWithDefaults(
         "chain_state",
         "fwa.config.option.state.name",
@@ -390,6 +398,14 @@ public class SettingsManager {
         "chain_chain_grounded",
         "fwa.config.option.chain_grounded.name",
         "fwa.config.option.chain_grounded.description",
+        true,
+        true
+    );
+
+    public static Option<Boolean> CHAIN_SWING_LIMIT = loadOptionWithDefaults(
+        "chain_swing_limit",
+        "fwa.config.option.swing_limit.name",
+        "fwa.config.option.swing_limit.description",
         true,
         true
     );

@@ -31,8 +31,8 @@ public class EndPortalFrameAnimation extends Animation{
     private List<BlockModelPart> eyeParts = new ArrayList<>();
     private final BlockStateModel eyeModel;
     
-    public EndPortalFrameAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
+    public EndPortalFrameAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
@@ -54,13 +54,18 @@ public class EndPortalFrameAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled(BlockState states){
         return SettingsManager.END_PORTAL_FRAME_STATE.getValue();
     }
 
     @Override
     public boolean hideOriginalBlock(){
         return newIsOpen;
+    }
+
+    @Override
+    public BlockState getDefaultState(BlockState state){
+        return state.setValue(BlockStateProperties.EYE, false);
     }
 
     public static boolean hasInfiniteAnimation(){

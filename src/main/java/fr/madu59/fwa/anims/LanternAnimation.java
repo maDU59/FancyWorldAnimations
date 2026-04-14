@@ -2,34 +2,27 @@ package fr.madu59.fwa.anims;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
+
+import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
-import fr.madu59.fwa.mixin.LevelRendererAccessor;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.BlockDestructionProgress;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -41,19 +34,15 @@ public class LanternAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
-    private int crumbleStage = -1;
-    private long lastCrumbleParticleTime = 0L;
-    private int lastTick = 0;
-    private BlockState state;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private final BlockStateModel model;
     private PoseStack stack = new PoseStack();
     private int chainCount;
     private List<BlockStateModelPart> chainParts = new ArrayList<>();
+    private final Quaternionf combined = new Quaternionf();
     
-    public LanternAnimation(BlockPos position, BlockState defaultState, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState newState, BlockState oldState) {
-        super(position, defaultState, startTick, oldIsOpen, newIsOpen);
-        state = newState;
+    public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
+        super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
@@ -61,8 +50,8 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public double getLifeSpan(){
-        return SettingsManager.LANTERN_STATE.getValue()? Double.MAX_VALUE : 0;
+    public boolean isFinished(double nowTick) {
+        return false;
     }
 
     public static boolean hasInfiniteAnimation(){
@@ -70,7 +59,12 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public boolean isEnabled(){
+    public boolean hideOriginalBlockEntity() {
+        return !ModCompat.WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()));
+    }
+
+    @Override
+    public boolean isEnabled(BlockState state){
         return SettingsManager.LANTERN_STATE.getValue();
     }
 
@@ -88,7 +82,8 @@ public class LanternAnimation extends Animation{
     }
 
     public void update(){
-        chainCount = SwingingBlockHelper.getChainCount(position);
+        if(!SettingsManager.CHAIN_STATE.getValue() && !SettingsManager.LANTERN_OVERRIDE.getValue()) chainCount = 1;
+        else chainCount = SwingingBlockHelper.getChainCount(position);
         needUpdate = false;
     }
 
@@ -99,11 +94,12 @@ public class LanternAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         float swingScale = 0.7f;
-        float tiltX = this.tiltX * swingScale;
-        float tiltZ = this.tiltZ * swingScale;
-        float spin = this.spin * Math.max(0.55F, swingScale);
+        if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
+        float degToRad = (float) Math.PI / 180.0f;
+        float tiltX = this.tiltX * swingScale * degToRad;
+        float tiltZ = this.tiltZ * swingScale * degToRad;
+        float spin = this.spin * Math.max(0.55F, swingScale) * degToRad;
         poseStack.pushPose();
         poseStack.translate(0.5F, chainCount, 0.5F);
         float prevFactor = 0.0F;
@@ -116,13 +112,16 @@ public class LanternAnimation extends Animation{
             prevFactor = targetFactor;
             
             if (deltaFactor != 0.0F) {
-                poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
-                poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
-                poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
+                combined.identity()
+                    .rotateZ(tiltZ * deltaFactor)
+                    .rotateX(tiltX * deltaFactor)
+                    .rotateY(spin * deltaFactor);
+                poseStack.mulPose(combined);
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             BlockState chainState = level.getBlockState(mutable);
+            int light = LevelRenderer.getLightCoords(LevelRenderer.BrightnessGetter.DEFAULT ,(BlockAndLightGetter) level, chainState, mutable);
             chainParts.clear();
             BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
@@ -135,102 +134,27 @@ public class LanternAnimation extends Animation{
         }
         float deltaFactor = 1f - prevFactor;
         if (deltaFactor != 0.0F) {
-            poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ * deltaFactor));
-            poseStack.mulPose(Axis.XP.rotationDegrees(tiltX * deltaFactor));
-            poseStack.mulPose(Axis.YP.rotationDegrees(spin * deltaFactor));
+            combined.identity()
+                    .rotateZ(tiltZ * deltaFactor)
+                    .rotateX(tiltX * deltaFactor)
+                    .rotateY(spin * deltaFactor);
+                poseStack.mulPose(combined);
         }
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, position);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
-        //this.renderCrumblingOverlay(context.getSubmitNodeCollector(), poseStack);
         poseStack.popPose();
         poseStack.popPose();
     }
 
     public void extractRenderState(AnimationRenderingContext context) {
-        ClientLevel level = Minecraft.getInstance().level;
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)context.getNowTick()) * 0.1f + posOffset;
 
         this.tiltX = (float) Math.sin(uniqueTime) * 8f;
         this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
         this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
-
-        if(level != null){
-            int lastCrumbleStage = this.crumbleStage;
-            int crumbleStage = getCrumblingStage(context.getNowTick());
-            int maxCrumbleStage = ModelBakery.DESTROY_STAGE_COUNT;
-            if (crumbleStage >= 0){
-                crumbleStage = Mth.clamp(crumbleStage, 0, maxCrumbleStage - 1);
-                long time = level.getGameTime();
-                if (crumbleStage != lastCrumbleStage || time - this.lastCrumbleParticleTime >= 10L) {
-                    addBreakingBlockEffect(level, Direction.getRandom(level.getRandom()));
-                    this.lastCrumbleParticleTime = time;
-                }
-            }
-            this.crumbleStage = crumbleStage;
-        }
     }
-
-    public int getCrumblingStage(double nowTick){
-        if(lastTick - Mth.floor(nowTick) >= 0.5) return crumbleStage;
-        lastTick = Mth.floor(nowTick);
-        Long2ObjectMap<SortedSet<BlockDestructionProgress>> progressMap = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).fwa$getDestructionProgress();
-        SortedSet<BlockDestructionProgress> sortedSet = progressMap.get(position.asLong());
-        if (sortedSet != null && !sortedSet.isEmpty()) {
-            return sortedSet.last().getProgress();
-        }
-        return -1;
-    }
-
-    public void renderCrumblingOverlay(SubmitNodeCollector submitNodeCollector, PoseStack poseStack){
-        if(this.crumbleStage < 0) return;
-        ClientLevel level = Minecraft.getInstance().level;
-        RenderType renderType = (RenderType) ModelBakery.DESTROY_TYPES.get(this.crumbleStage);
-        submitNodeCollector.submitCustomGeometry(poseStack, renderType, (matrixEntry, vertexConsumer) -> {
-            stack.last().pose().set(matrixEntry.pose());
-            stack.last().normal().set(matrixEntry.normal());
-            if (!parts.isEmpty()) {
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, parts, state, position, stack, new SheetedDecalTextureGenerator(vertexConsumer, stack.last(), 1.0F), true, OverlayTexture.NO_OVERLAY);
-            }
-        });
-    }
-
-    public void addBreakingBlockEffect(ClientLevel clientLevel, Direction direction) {
-        if (state.shouldSpawnTerrainParticles()) {
-            int i = position.getX();
-            int j = position.getY();
-            int k = position.getZ();
-            AABB aABB = state.getShape(clientLevel, position).bounds();
-            double d = (double)i + clientLevel.getRandom().nextDouble() * (aABB.maxX - aABB.minX - (double)0.2F) + (double)0.1F + aABB.minX;
-            double e = (double)j + clientLevel.getRandom().nextDouble() * (aABB.maxY - aABB.minY - (double)0.2F) + (double)0.1F + aABB.minY;
-            double g = (double)k + clientLevel.getRandom().nextDouble() * (aABB.maxZ - aABB.minZ - (double)0.2F) + (double)0.1F + aABB.minZ;
-            if (direction == Direction.DOWN) {
-                e = (double)j + aABB.minY - (double)0.1F;
-            }
-
-            if (direction == Direction.UP) {
-                e = (double)j + aABB.maxY + (double)0.1F;
-            }
-
-            if (direction == Direction.NORTH) {
-                g = (double)k + aABB.minZ - (double)0.1F;
-            }
-
-            if (direction == Direction.SOUTH) {
-                g = (double)k + aABB.maxZ + (double)0.1F;
-            }
-
-            if (direction == Direction.WEST) {
-                d = (double)i + aABB.minX - (double)0.1F;
-            }
-
-            if (direction == Direction.EAST) {
-                d = (double)i + aABB.maxX + (double)0.1F;
-            }
-
-            Minecraft.getInstance().particleEngine.add((new TerrainParticle(clientLevel, d, e, g, (double)0.0F, (double)0.0F, (double)0.0F, state, position)).setPower(0.2F).scale(0.6F));
-        }
-   }
 }
