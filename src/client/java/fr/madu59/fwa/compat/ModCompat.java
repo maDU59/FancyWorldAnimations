@@ -35,7 +35,7 @@ public class ModCompat {
 
     public static boolean isOpen(BlockState state, Block block){
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace())) return state.getValue(BlockStateProperties.OPEN);
+        if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return state.getValue(BlockStateProperties.OPEN);
         return false;
     }
 
