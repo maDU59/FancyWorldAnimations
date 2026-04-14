@@ -28,13 +28,12 @@ public class LecternAnimation extends Animation {
 
     private final BookModel bookModel;
     private final float hash;
-    private final Identifier textureId;
+    private Identifier textureId;
 
     public LecternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
         this.hash = position.hashCode();
-        this.textureId = ModCompat.MapAtlasesCompat.resolveTexture(position);
     }
 
     @Override
@@ -94,6 +93,7 @@ public class LecternAnimation extends Animation {
 
     @Override
     public void render(AnimationRenderingContext context) {
+        if (textureId == null) textureId = ModCompat.MapAtlasesCompat.resolveTexture(position);
         PoseStack poseStack = context.getPoseStack();
         Double nowTick = context.getNowTick();
 
