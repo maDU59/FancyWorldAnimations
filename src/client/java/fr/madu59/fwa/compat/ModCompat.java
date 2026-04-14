@@ -23,6 +23,7 @@ public class ModCompat {
     public final static ResourceLocation WW_DISPLAY_LANTERNS = ResourceLocation.tryParse("wilderwild:display_lantern");
     private final static boolean IS_AMENDMENTS_LOADED = FabricLoader.getInstance().isModLoaded("amendments");
     private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
+    private final static boolean IS_MAP_ATLASES_LOADED = FabricLoader.getInstance().isModLoaded("map_atlases");
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -111,6 +112,9 @@ public class ModCompat {
          * default texture.
          */
         public static ResourceLocation resolveTexture(BlockPos pos) {
+
+            if (!IS_MAP_ATLASES_LOADED) return DEFAULT_BOOK_TEXTURE;
+
             try {
                 Level level = Minecraft.getInstance().level;
                 if (level == null) return DEFAULT_BOOK_TEXTURE;
@@ -124,8 +128,6 @@ public class ModCompat {
                 // runs fine even when Map Atlases is absent.
                 Class<?> atlasLecternClass =
                         Class.forName("pepjebs.mapatlases.utils.AtlasLectern");
-
-                if (!atlasLecternClass.isInstance(be)) return DEFAULT_BOOK_TEXTURE;
 
                 // hasAtlas() — defined in the AtlasLectern interface
                 boolean hasAtlas = (boolean)
