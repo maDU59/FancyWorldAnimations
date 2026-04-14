@@ -92,7 +92,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	public static void onBlockUpdate(BlockPos blockPos, BlockState oldState, BlockState newState, boolean propagateChain)
 	{
 		ClientLevel level = Minecraft.getInstance().level;
-		if(level == null) return;
+		if(level == null || newState == null) return;
 
 		if(SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue()){
 			if(propagateChain){
