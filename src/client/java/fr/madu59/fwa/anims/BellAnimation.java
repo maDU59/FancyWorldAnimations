@@ -18,7 +18,6 @@ import net.minecraft.client.model.BellModel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -171,7 +170,7 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        bellBody.render(poseStack, sprite.wrap(context.getBufferSource().getBuffer(RenderType.cutoutMipped())), light, OverlayTexture.NO_OVERLAY, -1);
+        bellBody.render(poseStack, sprite.wrap(RenderHelper.getBuffer()), light, OverlayTexture.NO_OVERLAY, -1);
 
         if(context.getBufferSource() instanceof BufferSource bufferSource){
             bufferSource.endBatch();
