@@ -125,7 +125,7 @@ public class ModCompat {
 
                 boolean hasAtlas = false;
 
-                CompoundTag nbt = be.getUpdateTag(level.registryAccess());
+                CompoundTag nbt = be.getUpdateTag();
 
                 if (nbt.contains("Book")) {
                     CompoundTag bookTag = nbt.getCompound("Book");
