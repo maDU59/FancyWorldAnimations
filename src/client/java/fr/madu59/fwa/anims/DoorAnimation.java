@@ -45,7 +45,7 @@ public class DoorAnimation extends Animation{
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
         String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
-        if(path.contains("stained") || path.contains("tinted") || path.contains("_glass")) renderType = RenderTypes.translucentMovingBlock();
+        if(path.contains("stained") || path.contains("tinted")) renderType = RenderTypes.translucentMovingBlock();
         else renderType = RenderTypes.cutoutMovingBlock();
 
         BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
