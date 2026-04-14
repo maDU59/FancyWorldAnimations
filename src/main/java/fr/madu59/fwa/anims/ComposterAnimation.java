@@ -15,10 +15,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -32,7 +33,7 @@ public class ComposterAnimation extends Animation{
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         RandomSource random = RandomSource.create(newState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(newState);
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
         model.collectParts(random, parts);
     }
 
@@ -64,11 +65,11 @@ public class ComposterAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = RenderHelper.getBuffer();
         
-        for(BlockModelPart part: parts){
+        for(BlockStateModelPart part: parts){
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
             for(Direction dir : Direction.values()){
                 renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
@@ -86,7 +87,7 @@ public class ComposterAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantCompost, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.materialInfo().sprite().contents().name().getPath();
             if ((path.endsWith("_compost") || path.contains("_ready")) == wantCompost) {
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }

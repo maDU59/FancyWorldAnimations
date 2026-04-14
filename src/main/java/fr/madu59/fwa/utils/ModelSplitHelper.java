@@ -5,7 +5,7 @@ import java.util.List;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 
 public class ModelSplitHelper {
     public static final float EPSILON = 0.0001f;

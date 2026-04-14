@@ -15,10 +15,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -34,7 +35,7 @@ public class CampfireAnimation extends Animation{
         if (oldIsOpen) state = oldState;
         else state = newState;
         RandomSource random = RandomSource.create(state.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
         model.collectParts(random, parts);
     }
 
@@ -68,9 +69,9 @@ public class CampfireAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        BlockModelPart part = parts.get(0);
+        BlockStateModelPart part = parts.get(0);
         
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = RenderHelper.getBuffer();
 
@@ -100,7 +101,7 @@ public class CampfireAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantFire, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.sprite().contents().name().getPath();
+            String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }

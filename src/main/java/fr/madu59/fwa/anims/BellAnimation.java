@@ -50,7 +50,7 @@ public class BellAnimation extends Animation{
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         this.bellModel = new BellModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL));
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
         this.hash = position.hashCode();
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
@@ -153,7 +153,7 @@ public class BellAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(textureId);
 
-        int light = LevelRenderer.getLightColor((BlockAndLightGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
         if(shouldUseFallbackRender()){
             VertexConsumer buffer = RenderHelper.getBuffer();
