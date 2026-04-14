@@ -1,6 +1,9 @@
 {
     "mods":[
-        "endrem"
+        "endrem",
+        "framedblocks",
+        "copycats",
+        "create_connected"
     ],
     "blocks":[
         "create:train_door",
