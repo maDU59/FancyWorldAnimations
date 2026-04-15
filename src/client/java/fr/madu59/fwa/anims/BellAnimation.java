@@ -175,8 +175,6 @@ public class BellAnimation extends Animation{
 
         context.getSubmitNodeCollector().submitModelPart(bellBody, poseStack, RenderType.cutoutMipped(), light, OverlayTexture.NO_OVERLAY, sprite);
 
-        if(context.getBufferSource() instanceof BufferSource bufferSource){
-            bufferSource.endBatch();
-        }
+        RenderHelper.endBatch(context.getBufferSource());
     }
 }
