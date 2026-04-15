@@ -71,6 +71,7 @@ To edit the settings of the mod:
 <li>Map Atlases</li>
 <li>More Composter Variants</li>
 <li>Every Compat (Wood Good)</li>
+<li>End Remastered</li>
 </ul>
 
 </details>
