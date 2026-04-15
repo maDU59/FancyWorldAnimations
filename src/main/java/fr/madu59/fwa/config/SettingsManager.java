@@ -265,6 +265,27 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> DRIPLEAF_STATE = loadOptionWithDefaults(
+        "dripleaf_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> DRIPLEAF_EASING = loadOptionWithDefaults(
+        "dripleaf_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.SPRINGY
+    );
+
+    public static Option<Double> DRIPLEAF_SPEED = loadOptionWithDefaults(
+        "dripleaf_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
     public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
         "button_state",
         "fwa.config.option.state.name",
@@ -332,7 +353,7 @@ public class SettingsManager {
         "end_portal_frame_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
-        true
+        false
     );
 
     public static Option<Boolean> CAMPFIRE_STATE = loadOptionWithDefaults(

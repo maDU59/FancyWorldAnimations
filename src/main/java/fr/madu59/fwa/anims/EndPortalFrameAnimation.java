@@ -5,6 +5,8 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.compat.ModCompat;
+import fr.madu59.fwa.compat.ModCompat.EndRemasteredCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
@@ -19,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -34,7 +37,13 @@ public class EndPortalFrameAnimation extends Animation{
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        eyeState = defaultState.setValue(BlockStateProperties.EYE, true);
+        if(EndRemasteredCompat.isEndRemasteredPortal(newState)){
+            if(!EndRemasteredCompat.isEmpty(newState)) eyeState = newState;
+            else eyeState = Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(BlockStateProperties.EYE, true);
+        }
+        else{
+            eyeState = defaultState.setValue(BlockStateProperties.EYE, true);
+        }
         eyeRandom = RandomSource.create(eyeState.getSeed(position));
         eyeModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
     }
@@ -62,7 +71,12 @@ public class EndPortalFrameAnimation extends Animation{
 
     @Override
     public BlockState getDefaultState(BlockState state){
-        return state.setValue(BlockStateProperties.EYE, false);
+        if(EndRemasteredCompat.isEndRemasteredPortal(state)){
+            return Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(BlockStateProperties.EYE, false);
+        }
+        else{
+            return state.setValue(BlockStateProperties.EYE, false);
+        }
     }
 
     public static boolean hasInfiniteAnimation(){

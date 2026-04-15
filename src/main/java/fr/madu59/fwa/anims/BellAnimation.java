@@ -168,9 +168,7 @@ public class BellAnimation extends Animation{
 
         bellBody.render(poseStack, sprite.wrap(RenderHelper.getBuffer()), light, OverlayTexture.NO_OVERLAY);
 
-        if(context.getBufferSource() instanceof BufferSource bufferSource){
-            bufferSource.endBatch();
-        }
+        RenderHelper.endBatch(context.getBufferSource());
     }
 
     public void setupAnim(BellBlockEntity bellBlockEntity, float f) {
