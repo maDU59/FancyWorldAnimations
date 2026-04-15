@@ -8,7 +8,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.End;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -179,15 +178,20 @@ public class ModCompat {
     // END REMASTERED COMPATIBILITY
 
     public class EndRemasteredCompat{
-        public static final Method renderMethod;
+        private static Method renderMethod;
 
-        public EndRemasteredCompat() throws ClassNotFoundException {
-            try{
-                Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
-                Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
-                renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
-            }catch(Exception e){
-                return;
+        static {
+            if (isEndRemasteredLoaded()) {
+                try{
+                    Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
+                    Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
+                    renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
+                }catch(Exception e){
+                    renderMethod = null;
+                }
+            }
+            else{
+                renderMethod = null;
             }
         }
 
@@ -199,7 +203,7 @@ public class ModCompat {
         public static void renderEndPortalFrameAnimation(AnimationRenderingContext context, PoseStack poseStack, BlockPos position, int light){
 
             Level level = Minecraft.getInstance().level;
-            if (level == null) return;
+            if (level == null || renderMethod == null) return;
 
             BlockEntity be = level.getBlockEntity(position);
             if (be == null) return;
