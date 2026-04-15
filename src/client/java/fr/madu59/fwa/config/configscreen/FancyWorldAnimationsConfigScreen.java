@@ -111,7 +111,10 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.CHAIN_GROUNDED);
         list.addButton(SettingsManager.LANTERN_OVERRIDE);
         list.addButton(SettingsManager.CHAIN_SWING_LIMIT);
-        
+        list.addCategory("fwa.config.category.dripleaf");
+        list.addButton(SettingsManager.DRIPLEAF_STATE);
+        list.addButton(SettingsManager.DRIPLEAF_EASING);
+        list.addSlider(SettingsManager.DRIPLEAF_SPEED, 0.5, 2.0, 0.1);
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {
             this.minecraft.setScreen(this.parent);

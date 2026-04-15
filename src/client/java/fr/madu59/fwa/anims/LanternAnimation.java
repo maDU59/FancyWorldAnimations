@@ -139,6 +139,7 @@ public class LanternAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, position);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        parts.clear();
         model.collectParts(random, parts);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
