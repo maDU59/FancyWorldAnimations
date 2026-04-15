@@ -10,6 +10,7 @@ import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.ComposterAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
+import fr.madu59.fwa.anims.DripleafAnimation;
 import fr.madu59.fwa.anims.EndPortalFrameAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.JukeBoxAnimation;
@@ -41,6 +42,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BellBlock;
+import net.minecraft.world.level.block.BigDripleafBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CampfireBlock;
@@ -186,6 +188,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || ((SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos)))) && SettingsManager.LANTERN_OVERRIDE.getValue()));
 		}
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
+		if(type == Type.DRIPLEAF) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof BigDripleafBlock && newState.getValue(BlockStateProperties.TILT) != oldState.getValue(BlockStateProperties.TILT);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -240,6 +243,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case VAULT: return new VaultAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case LANTERN: return new LanternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case CHAIN: return new ChainAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case DRIPLEAF: return new DripleafAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			default: return new Animation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		}
 	}
@@ -264,6 +268,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof VaultBlock) return Type.VAULT;
 		if(block instanceof LanternBlock) return Type.LANTERN;
 		if(block instanceof ChainBlock) return Type.CHAIN;
+		if(block instanceof BigDripleafBlock) return Type.DRIPLEAF;
 		return ModCompat.typeOf(block);
 	}
 
@@ -390,6 +395,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		VAULT,
 		LANTERN,
 		CHAIN,
+		DRIPLEAF,
 		USELESS
 	}
 }
