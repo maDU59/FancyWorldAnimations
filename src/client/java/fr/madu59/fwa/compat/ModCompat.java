@@ -48,12 +48,14 @@ public class ModCompat {
         Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
         if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return Type.DOOR;
         if(WW_DISPLAY_LANTERNS.equals(blockId)) return Type.LANTERN;
+        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return Type.END_PORTAL_FRAME;
         return Type.USELESS;
     }
 
     public static boolean isOpen(BlockState state, Block block){
         Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
         if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return state.getValue(BlockStateProperties.OPEN);
+        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return state.getValue(BlockStateProperties.EYE);
         return false;
     }
 
@@ -196,8 +198,7 @@ public class ModCompat {
         }
 
         public static boolean isEndRemasteredPortal(BlockState state){
-            Identifier blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-            return ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId);
+            return ENDREM_ANCIENT_PORTAL_FRAME.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
         }
 
         public static void renderEndPortalFrameAnimation(AnimationRenderingContext context, PoseStack poseStack, BlockPos position, int light){
