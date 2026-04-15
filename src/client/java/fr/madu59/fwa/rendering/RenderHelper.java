@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
@@ -94,5 +95,11 @@ public class RenderHelper {
         }
 
         buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, light, OverlayTexture.NO_OVERLAY);
+    }
+
+    public static void endBatch(MultiBufferSource bufferSource){
+        if(bufferSource instanceof BufferSource bs){
+            bs.endBatch();
+        }
     }
 }

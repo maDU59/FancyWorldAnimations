@@ -29,15 +29,11 @@ public class LanternAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
-    private final RandomSource random;
-    private final BakedModel model;
     private int chainCount;
     private final Quaternionf combined = new Quaternionf();
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         chainCount = SwingingBlockHelper.getChainCount(position);
     }
 
@@ -132,6 +128,8 @@ public class LanternAnimation extends Animation{
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, position);
+        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
         RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
         poseStack.popPose();
         poseStack.popPose();

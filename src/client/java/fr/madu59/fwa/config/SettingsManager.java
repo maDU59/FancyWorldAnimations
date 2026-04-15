@@ -332,7 +332,7 @@ public class SettingsManager {
         "end_portal_frame_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
-        true
+        false
     );
 
     public static Option<Boolean> CAMPFIRE_STATE = loadOptionWithDefaults(

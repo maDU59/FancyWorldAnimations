@@ -1,11 +1,19 @@
 package fr.madu59.fwa.compat;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -17,14 +25,20 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.Vec3;
 
 public class ModCompat {
 
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
+
     public final static ResourceLocation WW_DISPLAY_LANTERNS = ResourceLocation.tryParse("wilderwild:display_lantern");
+    public final static ResourceLocation ENDREM_ANCIENT_PORTAL_FRAME = ResourceLocation.tryParse("endrem:ancient_portal_frame");
+
     private final static boolean IS_AMENDMENTS_LOADED = FabricLoader.getInstance().isModLoaded("amendments");
     private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
     private final static boolean IS_MAP_ATLASES_LOADED = FabricLoader.getInstance().isModLoaded("map_atlases");
+    private final static boolean IS_END_REMASTERED_LOADED = FabricLoader.getInstance().isModLoaded("endrem");
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -36,12 +50,14 @@ public class ModCompat {
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
         if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return Type.DOOR;
         if(WW_DISPLAY_LANTERNS.equals(blockId)) return Type.LANTERN;
+        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return Type.END_PORTAL_FRAME;
         return Type.USELESS;
     }
 
     public static boolean isOpen(BlockState state, Block block){
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
         if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return state.getValue(BlockStateProperties.OPEN);
+        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return !EndRemasteredCompat.isEmpty(state);
         return false;
     }
 
@@ -53,6 +69,10 @@ public class ModCompat {
 
     public static boolean isIrisLoaded(){
         return IS_IRIS_LOADED;
+    }
+
+    public static boolean isEndRemasteredLoaded(){
+        return IS_END_REMASTERED_LOADED;
     }
 
     // VAULT COMPATIBILITY
@@ -159,4 +179,41 @@ public class ModCompat {
 
     }
 
+    // END REMASTERED COMPATIBILITY
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public class EndRemasteredCompat{
+        private static Class<?> enumClass;
+        private static Class<?> ancientPortalFrameClass;
+        private static Object emptyEnum;
+        private static Object eyeProperty;
+
+        static {
+            if (isEndRemasteredLoaded()) {
+                try{
+                    enumClass = Class.forName("com.teamremastered.endrem.blocks.ERFrameProperties");
+                    ancientPortalFrameClass = Class.forName("com.teamremastered.endrem.blocks.AncientPortalFrame");
+                    emptyEnum = Enum.valueOf((Class<Enum>)enumClass, "EMPTY");
+                    eyeProperty = ancientPortalFrameClass.getField("EYE").get(null);
+                }catch(Exception e){
+
+                }
+            }
+        }
+
+        public static boolean isEndRemasteredPortal(BlockState state){
+            if(state == null) return false;
+            return ENDREM_ANCIENT_PORTAL_FRAME.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
+        }
+
+        public static boolean isEmpty(BlockState state){
+            if(eyeProperty == null || emptyEnum == null) return false;
+            return state.getValue((Property) eyeProperty) == emptyEnum;
+        }
+
+        public static BlockState setEmpty(BlockState state){
+            if(eyeProperty == null || emptyEnum == null) return state;
+            return state.setValue((Property) eyeProperty, (Comparable) emptyEnum);
+        }
+    }
 }
