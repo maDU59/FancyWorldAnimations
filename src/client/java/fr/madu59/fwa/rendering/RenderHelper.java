@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.QuadInstance;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -99,5 +100,11 @@ public class RenderHelper {
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
         buffer.putBakedQuad(pose, bakedQuad, quadInstance);
+    }
+
+    public static void endBatch(MultiBufferSource bufferSource){
+        if(bufferSource instanceof BufferSource bs){
+            bs.endBatch();
+        }
     }
 }

@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import fr.madu59.fwa.rendering.RenderHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -214,6 +215,7 @@ public class ModCompat {
                 Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
 
                 renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, new Vec3(0, 0, 0));
+                RenderHelper.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
             }
