@@ -34,16 +34,12 @@ public class LanternAnimation extends Animation{
     private float tiltZ = 0f;
     private float spin = 0f;
     private List<BlockModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
     private int chainCount;
     private List<BlockModelPart> chainParts = new ArrayList<>();
     private final Quaternionf combined = new Quaternionf();
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        model.collectParts(random, parts);
         chainCount = SwingingBlockHelper.getChainCount(position);
     }
 
@@ -121,9 +117,8 @@ public class LanternAnimation extends Animation{
             BlockState chainState = level.getBlockState(mutable);
             int light = LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndTintGetter) level, chainState, mutable);
             chainParts.clear();
-            BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
-            chainModel =Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
+            BlockStateModel chainModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
             chainModel.collectParts(random, chainParts);
             RenderHelper.renderModel(buffer, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
@@ -142,6 +137,10 @@ public class LanternAnimation extends Animation{
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, position);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        parts.clear();
+        model.collectParts(random, parts);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
         poseStack.popPose();

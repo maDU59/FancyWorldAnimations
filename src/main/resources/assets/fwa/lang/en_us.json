@@ -19,6 +19,7 @@
     "fwa.config.category.vault":"VAULTS",
     "fwa.config.category.lantern":"LANTERNS",
     "fwa.config.category.chain":"CHAINS",
+    "fwa.config.category.dripleaf":"DRIPLEAF",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.state.name":"Animation state",
