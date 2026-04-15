@@ -1,11 +1,19 @@
 package fr.madu59.fwa.compat;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
+import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.End;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -17,14 +25,19 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class ModCompat {
 
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
+
     public final static Identifier WW_DISPLAY_LANTERNS = Identifier.tryParse("wilderwild:display_lantern");
+    public final static Identifier ENDREM_ANCIENT_PORTAL_FRAME = Identifier.tryParse("endrem:ancient_portal_frame");
+
     private final static boolean IS_AMENDMENTS_LOADED = FabricLoader.getInstance().isModLoaded("amendments");
     private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
     private final static boolean IS_MAP_ATLASES_LOADED = FabricLoader.getInstance().isModLoaded("map_atlases");
+    private final static boolean IS_END_REMASTERED_LOADED = FabricLoader.getInstance().isModLoaded("endrem");
 
     private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -53,6 +66,10 @@ public class ModCompat {
 
     public static boolean isIrisLoaded(){
         return IS_IRIS_LOADED;
+    }
+
+    public static boolean isEndRemasteredLoaded(){
+        return IS_END_REMASTERED_LOADED;
     }
 
     // VAULT COMPATIBILITY
@@ -159,4 +176,42 @@ public class ModCompat {
 
     }
 
+    // END REMASTERED COMPATIBILITY
+
+    public class EndRemasteredCompat{
+        public static final Method renderMethod;
+
+        public EndRemasteredCompat() throws ClassNotFoundException {
+            try{
+                Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
+                Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
+                renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
+            }catch(Exception e){
+                return;
+            }
+        }
+
+        public static boolean isEndRemasteredPortal(BlockState state){
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+            return ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId);
+        }
+
+        public static void renderEndPortalFrameAnimation(AnimationRenderingContext context, PoseStack poseStack, BlockPos position, int light){
+
+            Level level = Minecraft.getInstance().level;
+            if (level == null) return;
+
+            BlockEntity be = level.getBlockEntity(position);
+            if (be == null) return;
+
+            try{
+                BlockEntityRenderDispatcher dispatcher = net.minecraft.client.Minecraft.getInstance().getBlockEntityRenderDispatcher();
+                Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
+
+                renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, new Vec3(0, 0, 0));
+            }catch(Exception e){
+                return;
+            }
+        }
+    }
 }
