@@ -14,27 +14,27 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndLightGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class DripleafAnimation extends Animation{
 
     private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockModelPart> parts = new ArrayList<>();
 
     
     public DripleafAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         RandomSource random = RandomSource.create(newState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(newState);
         model.collectParts(random, parts);
     }
 
@@ -71,11 +71,11 @@ public class DripleafAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
+        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         VertexConsumer buffer = RenderHelper.getBuffer();
         
-        for(BlockStateModelPart part: parts){
+        for(BlockModelPart part: parts){
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
             for(Direction dir : Direction.values()){
                 renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
@@ -106,7 +106,7 @@ public class DripleafAnimation extends Animation{
 
     private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantLeaf, int light) {
         for (BakedQuad quad : quads) {
-            String path = quad.materialInfo().sprite().contents().name().getPath();
+            String path = quad.sprite().contents().name().getPath();
             if (!path.contains("_stem") == wantLeaf) {
                 RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
