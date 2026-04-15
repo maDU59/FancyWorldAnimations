@@ -188,7 +188,7 @@ public class ModCompat {
                 try{
                     Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
                     Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
-                    renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
+                    renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class);
                 }catch(Exception e){
                     renderMethod = null;
                 }
@@ -214,7 +214,7 @@ public class ModCompat {
                 BlockEntityRenderDispatcher dispatcher = net.minecraft.client.Minecraft.getInstance().getBlockEntityRenderDispatcher();
                 Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
 
-                renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, new Vec3(0, 0, 0));
+                renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
                 RenderHelper.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
