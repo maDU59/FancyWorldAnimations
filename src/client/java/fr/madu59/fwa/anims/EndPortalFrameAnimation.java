@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
@@ -84,9 +85,14 @@ public class EndPortalFrameAnimation extends Animation{
             VertexConsumer buffer = RenderHelper.getBuffer();
             RenderHelper.renderModel(buffer, poseStack.last(), model, 1f, 1f, 1f, 1f, light, random, defaultState);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
-            renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 1f, 1f, 1f, 1f);
-            for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, dir, eyeRandom), true, light, 1f, 1f, 1f, 1f);
+            if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
+                ModCompat.EndRemasteredCompat.renderEndPortalFrameAnimation(context, poseStack, position, light);
+            }
+            else{
+                renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 1f, 1f, 1f, 1f);
+                for(Direction dir : Direction.values()){
+                    renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, dir, eyeRandom), true, light, 1f, 1f, 1f, 1f);
+                }
             }
 
         }

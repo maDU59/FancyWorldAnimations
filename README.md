@@ -68,8 +68,9 @@ To edit the settings of the mod:
 
 <ul>
 <li>Dramatic Doors</li>
-<li>Create</li>
+<li>Map Atlases</li>
 <li>More Composter Variants</li>
+<li>Every Compat (Wood Good)</li>
 </ul>
 
 </details>
