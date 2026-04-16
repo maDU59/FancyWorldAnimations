@@ -63,7 +63,7 @@ public class Animation {
         return true;
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return false;
     }
 

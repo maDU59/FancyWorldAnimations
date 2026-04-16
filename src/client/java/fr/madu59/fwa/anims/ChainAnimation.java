@@ -51,7 +51,7 @@ public class ChainAnimation extends Animation{
         return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
     }
 

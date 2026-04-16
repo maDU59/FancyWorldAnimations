@@ -40,6 +40,9 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         // Example: Add categories + buttons
         list.addCategory("fwa.config.category.general");
         list.addButton(SettingsManager.MOD_TOGGLE);
+        list.addSlider(SettingsManager.ANIMATION_RENDER_DISTANCE, 32, 1024, 16);
+        list.addSlider(SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE, 32, 1024, 16);
+        list.addSlider(SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE, 0.4f, 1.0f, 0.1f);
         list.addCategory("fwa.config.category.door");
         list.addButton(SettingsManager.DOOR_STATE);
         list.addButton(SettingsManager.DOOR_EASING);

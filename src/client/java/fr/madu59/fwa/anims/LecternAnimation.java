@@ -67,7 +67,7 @@ public class LecternAnimation extends Animation {
         return state.setValue(BlockStateProperties.HAS_BOOK, false);
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.LECTERN_INFINITE.getValue();
     }
 

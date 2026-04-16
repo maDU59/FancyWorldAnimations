@@ -48,7 +48,7 @@ public class LanternAnimation extends Animation{
         return false;
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.LANTERN_STATE.getValue();
     }
 

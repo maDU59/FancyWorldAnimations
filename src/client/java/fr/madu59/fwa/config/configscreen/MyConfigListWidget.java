@@ -75,7 +75,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
                 }
 
                 String format = "%." + decimalPlaces + "f";
-                String formattedValue = String.format(java.util.Locale.ROOT, format, option.getValue());
+                String formattedValue = String.format(java.util.Locale.ROOT, format, option.getValue().floatValue());
 
                 this.setMessage(Component.literal(formattedValue));
             }

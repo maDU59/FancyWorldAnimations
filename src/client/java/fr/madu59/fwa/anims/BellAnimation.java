@@ -82,7 +82,7 @@ public class BellAnimation extends Animation{
         return FabricLoader.getInstance().isModLoaded("betterblockentities");
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.BELL_INFINITE.getValue();
     }
 

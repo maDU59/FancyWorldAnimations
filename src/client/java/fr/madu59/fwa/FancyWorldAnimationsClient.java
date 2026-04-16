@@ -67,6 +67,7 @@ import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
@@ -135,6 +136,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
+		if(!animation.hasInfiniteAnimation() && Minecraft.getInstance().gameRenderer.getMainCamera().position().distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
@@ -158,8 +160,13 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		RenderHelper.prepareFrame(context);
 
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
+		if(context.isShadow()) dist *= SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE.getValue();
+
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
+			if(camPos.distanceToSqr(animation.getPos().getX() + 0.5, animation.getPos().getY() + 0.5, animation.getPos().getZ() + 0.5) > dist * dist) continue;
 			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
