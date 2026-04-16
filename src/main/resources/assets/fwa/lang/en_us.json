@@ -19,7 +19,8 @@
     "fwa.config.category.vault":"VAULTS",
     "fwa.config.category.lantern":"LANTERNS",
     "fwa.config.category.chain":"CHAINS",
-    "fwa.config.category.dripleaf":"DRIPLEAF",
+    "fwa.config.category.dripleaf":"DRIPLEAVES",
+    "fwa.config.category.redstone":"REDSTONE WIRES",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.state.name":"Animation state",

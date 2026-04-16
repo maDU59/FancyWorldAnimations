@@ -307,6 +307,27 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> REDSTONE_STATE = loadOptionWithDefaults(
+        "redstone_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> REDSTONE_EASING = loadOptionWithDefaults(
+        "redstone_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.LINEAR
+    );
+
+    public static Option<Double> REDSTONE_SPEED = loadOptionWithDefaults(
+        "redstone_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
     public static Option<Boolean> REPEATER_STATE = loadOptionWithDefaults(
         "repeater_state",
         "fwa.config.option.state.name",

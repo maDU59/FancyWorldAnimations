@@ -18,6 +18,7 @@ import fr.madu59.fwa.anims.LanternAnimation;
 import fr.madu59.fwa.anims.LayeredCauldronAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
+import fr.madu59.fwa.anims.RedstoneWireAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
@@ -58,6 +59,7 @@ import net.minecraft.world.level.block.LavaCauldronBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
@@ -184,6 +186,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		if(type == Type.DRIPLEAF) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof BigDripleafBlock && newState.getValue(BlockStateProperties.TILT) != oldState.getValue(BlockStateProperties.TILT);
+		if(type == Type.REDSTONE_WIRE) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof RedStoneWireBlock && newState.getValue(BlockStateProperties.POWER) != oldState.getValue(BlockStateProperties.POWER);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -239,6 +242,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			case LANTERN: return new LanternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case CHAIN: return new ChainAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case DRIPLEAF: return new DripleafAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case REDSTONE_WIRE: return new RedstoneWireAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			default: return new Animation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		}
 	}
@@ -264,6 +268,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof LanternBlock) return Type.LANTERN;
 		if(block instanceof ChainBlock) return Type.CHAIN;
 		if(block instanceof BigDripleafBlock) return Type.DRIPLEAF;
+		if(block instanceof RedStoneWireBlock) return Type.REDSTONE_WIRE;
 		return ModCompat.typeOf(block);
 	}
 
@@ -391,6 +396,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LANTERN,
 		CHAIN,
 		DRIPLEAF,
+		REDSTONE_WIRE,
 		USELESS
 	}
 }

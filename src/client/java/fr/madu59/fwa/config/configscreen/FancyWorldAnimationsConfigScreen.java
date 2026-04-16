@@ -83,6 +83,10 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.BUTTON_STATE);
         list.addButton(SettingsManager.BUTTON_EASING);
         list.addSlider(SettingsManager.BUTTON_SPEED, 0.5, 2.0, 0.1);
+        list.addCategory("fwa.config.category.redstone");
+        list.addButton(SettingsManager.REDSTONE_STATE);
+        list.addButton(SettingsManager.REDSTONE_EASING);
+        list.addSlider(SettingsManager.REDSTONE_SPEED, 0.5, 2.0, 0.1);
         list.addCategory("fwa.config.category.repeater");
         list.addButton(SettingsManager.REPEATER_STATE);
         list.addButton(SettingsManager.REPEATER_EASING);
