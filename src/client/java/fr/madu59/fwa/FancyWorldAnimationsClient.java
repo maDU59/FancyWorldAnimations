@@ -137,7 +137,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
-		if(!animation.hasInfiniteAnimation() && Minecraft.getInstance().gameRenderer.getMainCamera().position().distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) return;
+		if(!animation.hasInfiniteAnimation() && Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
@@ -161,7 +161,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		RenderHelper.prepareFrame(context);
 
-		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
 		if(context.isShadow()) dist *= SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE.getValue();
 
