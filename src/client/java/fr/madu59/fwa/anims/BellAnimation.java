@@ -18,7 +18,6 @@ import net.minecraft.client.model.object.bell.BellModel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -83,7 +82,7 @@ public class BellAnimation extends Animation{
         return FabricLoader.getInstance().isModLoaded("betterblockentities");
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.BELL_INFINITE.getValue();
     }
 
