@@ -79,7 +79,7 @@ public class EndPortalFrameAnimation extends Animation{
         }
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.END_PORTAL_FRAME_INFINITE.getValue();
     }
 
