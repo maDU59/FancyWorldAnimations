@@ -1,6 +1,8 @@
 package fr.madu59.fwa.config.configscreen;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
+
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
@@ -42,7 +44,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.MOD_TOGGLE);
         list.addSlider(SettingsManager.ANIMATION_RENDER_DISTANCE, 32, 1024, 16);
         list.addSlider(SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE, 32, 1024, 16);
-        list.addSlider(SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE, 0.4f, 1.0f, 0.1f);
+        if(ModCompat.isIrisLoaded()) list.addSlider(SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE, 0.4f, 1.0f, 0.1f);
         list.addCategory("fwa.config.category.door");
         list.addButton(SettingsManager.DOOR_STATE);
         list.addButton(SettingsManager.DOOR_EASING);
