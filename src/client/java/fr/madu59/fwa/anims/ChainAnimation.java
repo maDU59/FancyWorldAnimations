@@ -44,7 +44,7 @@ public class ChainAnimation extends Animation{
         return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue();
     }
 
@@ -96,7 +96,7 @@ public class ChainAnimation extends Animation{
         VertexConsumer buffer = RenderHelper.getBuffer();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
-        float degToRad = (float) Math.PI / 180.0f;
+        float degToRad = 0.017453292519943295f;
         float tiltX = this.tiltX * swingScale * degToRad;
         float tiltZ = this.tiltZ * swingScale * degToRad;
         float spin = this.spin * Math.max(0.55F, swingScale) * degToRad;
