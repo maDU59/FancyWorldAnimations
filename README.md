@@ -72,6 +72,7 @@ To edit the settings of the mod:
 <li>More Composter Variants</li>
 <li>Every Compat (Wood Good)</li>
 <li>End Remastered</li>
+<li>Enderscape</li>
 </ul>
 
 </details>
