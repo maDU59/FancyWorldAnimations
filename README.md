@@ -41,6 +41,8 @@ It's the mod you never knew you needed until now, once you try it it's hard to g
 <li>Smooth lecterns</li>
 <li>Smooth campfires</li>
 <li>Smooth chiseled bookshelves</li>
+<li>Smooth big dripleaves</li>
+<li>Smooth redstone dusts</li>
 <li>Disc animation on Jukeboxes</li>
 <li>Idling lecterns</li>
 <li>Idling bells</li>
