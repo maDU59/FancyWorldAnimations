@@ -20,6 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,6 +39,7 @@ public class ModCompat {
     private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
     private final static boolean IS_MAP_ATLASES_LOADED = FabricLoader.getInstance().isModLoaded("map_atlases");
     private final static boolean IS_END_REMASTERED_LOADED = FabricLoader.getInstance().isModLoaded("endrem");
+    private final static boolean IS_SCHOLAR_LOADED = FabricLoader.getInstance().isModLoaded("scholar");
 
     private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -70,8 +72,16 @@ public class ModCompat {
         return IS_IRIS_LOADED;
     }
 
+    public static boolean isMapAtlasesLoaded(){
+        return IS_MAP_ATLASES_LOADED;
+    }
+
     public static boolean isEndRemasteredLoaded(){
         return IS_END_REMASTERED_LOADED;
+    }
+
+    public static boolean isScholarLoaded(){
+        return IS_SCHOLAR_LOADED;
     }
 
     // VAULT COMPATIBILITY
@@ -133,7 +143,7 @@ public class ModCompat {
          */
         public static Identifier resolveTexture(BlockPos pos) {
 
-            if (!IS_MAP_ATLASES_LOADED) return DEFAULT_BOOK_TEXTURE;
+            if (!isMapAtlasesLoaded()) return DEFAULT_BOOK_TEXTURE;
 
             try {
                 Level level = Minecraft.getInstance().level;
@@ -220,5 +230,36 @@ public class ModCompat {
                 return;
             }
         }
+    }
+
+    // SCHOLAR COMPATIBILITY
+
+    public class ScholarCompat{
+        public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
+        // public static Method getBookColorMethod;
+
+        // static {
+        //     if (isScholarLoaded()) {
+        //         try{
+        //             Class<?> ChiseledBookshelfColorsClass = Class.forName("io.github.mortuusars.scholar.client.chiseled_bookshelf.ChiseledBookshelfColors");
+        //             getBookColorMethod = ChiseledBookshelfColorsClass.getMethod("getSlotTintColor", BlockState.class, BlockAndTintGetter.class, BlockPos.class, int.class);
+        //         }catch(Exception e){
+        //             System.out.println(e);
+        //             getBookColorMethod = null;
+        //         }
+        //     }
+        //     else{
+        //         getBookColorMethod = null;
+        //     }
+        // }
+
+        // public static int getBookColor(BlockState state, BlockPos blockPos, int slot){
+        //     if(getBookColorMethod == null) return -1;
+        //     try{
+        //         return (int) getBookColorMethod.invoke(null, state, (BlockAndTintGetter) Minecraft.getInstance().level, blockPos, slot);
+        //     }catch(Exception e){
+        //         return -1;
+        //     }
+        // }
     }
 }
