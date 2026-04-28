@@ -15,10 +15,11 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.AtlasManager;
+import net.minecraft.client.resources.model.sprite.AtlasManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -90,7 +91,8 @@ public class ChiseledBookShelfAnimation extends Animation{
         AtlasManager atlasManager = Minecraft.getInstance().getAtlasManager();
         if(ModCompat.isScholarLoaded()){
             sprites = List.of(atlasManager.getAtlasOrThrow(atlasId).getSprite(textureId), atlasManager.getAtlasOrThrow(atlasId).getSprite(ScholarCompat.BOOKS_TEXTURE));
-            colors = List.of(-1, Minecraft.getInstance().getBlockColors().getColor(defaultState, Minecraft.getInstance().level, position, slot));
+            List<BlockTintSource> tintSources = Minecraft.getInstance().getBlockColors().getTintSources(defaultState);
+            colors = List.of(-1, tintSources.get(slot).colorInWorld(defaultState, Minecraft.getInstance().level, position));
             if(!isAdding){
                 FancyWorldAnimationsClient.removeAnimationAt(position);
                 return;
