@@ -8,7 +8,6 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.compat.ModCompat.ScholarCompat;
-import fr.madu59.fwa.compat.scholar.ScholarCompatibleChiseledBookShelfBlockEntity;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
@@ -24,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
+import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -94,9 +94,7 @@ public class ChiseledBookShelfAnimation extends Animation{
                 colors = List.of(-1, Minecraft.getInstance().getBlockColors().getColor(defaultState, Minecraft.getInstance().level, position, slot));
             }
             else{
-                ScholarCompatibleChiseledBookShelfBlockEntity blockEntity = (ScholarCompatibleChiseledBookShelfBlockEntity) Minecraft.getInstance().level.getBlockEntity(position);
-                if(blockEntity == null) return;
-                colors = List.of(-1, ScholarCompat.getColor(blockEntity.fwa$getOldItems().get(slot)));
+                colors = List.of(-1, ScholarCompat.getColor(ScholarCompat.getBookshelfItemStack(position, slot), defaultState, slot));
             }
         }
         else{
