@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
-import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.compat.ModCompat.ScholarCompat;
 import fr.madu59.fwa.compat.scholar.ScholarCompatibleChiseledBookShelfBlockEntity;
@@ -26,7 +25,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
-import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -94,7 +92,6 @@ public class ChiseledBookShelfAnimation extends Animation{
         if(ModCompat.isScholarLoaded()){
             sprites = List.of(atlasManager.getAtlasOrThrow(atlasId).getSprite(textureId), atlasManager.getAtlasOrThrow(atlasId).getSprite(ScholarCompat.BOOKS_TEXTURE));
             List<BlockTintSource> tintSources = Minecraft.getInstance().getBlockColors().getTintSources(defaultState);
-            colors = List.of(-1, tintSources.get(slot).colorInWorld(defaultState, Minecraft.getInstance().level, position));
             if(isAdding){
                 colors = List.of(-1, tintSources.get(slot).colorInWorld(defaultState, Minecraft.getInstance().level, position));
             }
