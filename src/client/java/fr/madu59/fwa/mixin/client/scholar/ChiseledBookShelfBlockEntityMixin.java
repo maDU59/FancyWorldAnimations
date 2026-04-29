@@ -16,8 +16,6 @@ import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
 @Mixin(ChiseledBookShelfBlockEntity.class)
 public abstract class ChiseledBookShelfBlockEntityMixin {
 
-    private final NonNullList<ItemStack> oldItems = NonNullList.withSize(6, ItemStack.EMPTY);
-
     @Shadow 
     public abstract boolean acceptsItemType(ItemStack stack);
 
