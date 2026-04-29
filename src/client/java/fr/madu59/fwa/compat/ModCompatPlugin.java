@@ -17,6 +17,9 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains(".iris.")) {
             return FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
         }
+        if (mixinClassName.contains(".scholar.")) {
+            return FabricLoader.getInstance().isModLoaded("scholar");
+        }
         return true;
     }
 

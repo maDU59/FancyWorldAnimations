@@ -12,7 +12,8 @@
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
 		"sodium.LevelSliceMixin",
-		"iris.ShadowRendererMixin"
+		"iris.ShadowRendererMixin",
+		"scholar.ChiseledBookShelfBlockEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

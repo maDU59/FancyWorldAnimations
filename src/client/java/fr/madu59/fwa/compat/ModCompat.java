@@ -20,7 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -236,30 +236,10 @@ public class ModCompat {
 
     public class ScholarCompat{
         public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
-        // public static Method getBookColorMethod;
 
-        // static {
-        //     if (isScholarLoaded()) {
-        //         try{
-        //             Class<?> ChiseledBookshelfColorsClass = Class.forName("io.github.mortuusars.scholar.client.chiseled_bookshelf.ChiseledBookshelfColors");
-        //             getBookColorMethod = ChiseledBookshelfColorsClass.getMethod("getSlotTintColor", BlockState.class, BlockAndTintGetter.class, BlockPos.class, int.class);
-        //         }catch(Exception e){
-        //             System.out.println(e);
-        //             getBookColorMethod = null;
-        //         }
-        //     }
-        //     else{
-        //         getBookColorMethod = null;
-        //     }
-        // }
-
-        // public static int getBookColor(BlockState state, BlockPos blockPos, int slot){
-        //     if(getBookColorMethod == null) return -1;
-        //     try{
-        //         return (int) getBookColorMethod.invoke(null, state, (BlockAndTintGetter) Minecraft.getInstance().level, blockPos, slot);
-        //     }catch(Exception e){
-        //         return -1;
-        //     }
-        // }
+        public static int getColor(ItemStack stack){
+            if (stack.isEmpty()) return -1;
+            return DyedItemColor.getOrDefault(stack, 0xFF99452E);
+        }
     }
 }

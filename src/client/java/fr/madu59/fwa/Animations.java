@@ -14,10 +14,6 @@ import net.minecraft.core.BlockPos;
 public class Animations{
 
     public final Map<BlockPos, Animation> animations = new ConcurrentHashMap<>();
-
-    public Animations() {
-        super();
-    }
     
     public void removeAt(BlockPos blockPos) {
         this.animations.remove(blockPos);
@@ -28,8 +24,7 @@ public class Animations{
         if(animation == null) return;
         LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
         animation.markForRemoval();
-        BlockPos pos = animation.getPos();
-        ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+        ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(blockPos.getX() >> 4, blockPos.getY() >> 4, blockPos.getZ() >> 4, true);
     }
 
     public void clean(double nowTick) {
