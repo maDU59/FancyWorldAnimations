@@ -1,8 +1,11 @@
 package fr.madu59.fwa.compat;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -15,11 +18,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.WritableBookItem;
+import net.minecraft.world.item.WrittenBookItem;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -236,10 +242,45 @@ public class ModCompat {
 
     public class ScholarCompat{
         public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
+        public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
+        public static Method getDefaultTintColorForSlotMethod;
+        public static Field ITEM_COLORS_FIELD;
 
-        public static int getColor(ItemStack stack){
+        static{
+            if (isScholarLoaded()) {
+                try{
+                    Class<?> chiseledBookshelfColorsClass = Class.forName("io.github.mortuusars.scholar.client.chiseled_bookshelf.ChiseledBookshelfColors");
+                    getDefaultTintColorForSlotMethod = chiseledBookshelfColorsClass.getMethod("getDefaultTintColorForSlot", BlockState.class, int.class);
+                    ITEM_COLORS_FIELD = chiseledBookshelfColorsClass.getDeclaredField("ITEM_COLORS");
+                }catch(Exception e){
+                    getDefaultTintColorForSlotMethod = null;
+                    ITEM_COLORS_FIELD = null;
+                }
+            }
+            else{
+                getDefaultTintColorForSlotMethod = null;
+                ITEM_COLORS_FIELD = null;
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public static int getColor(ItemStack stack, BlockState state, int slot){
             if (stack.isEmpty()) return -1;
-            return DyedItemColor.getOrDefault(stack, 0xFF99452E);
+            else if (stack.getItem() instanceof WritableBookItem || stack.getItem() instanceof WrittenBookItem){
+                return DyedItemColor.getOrDefault(stack, 0xFF99452E);
+            }
+            else{
+                Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                try {
+                    return ((Map<Identifier, Integer>)ITEM_COLORS_FIELD.get(null)).getOrDefault(itemId, (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot));
+                } catch (Exception e) {
+                    return -1;
+                }
+            }
+        }
+
+        public static ItemStack getBookshelfItemStack(BlockPos pos, int slot){
+            return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
         }
     }
 }
