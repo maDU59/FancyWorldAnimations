@@ -240,7 +240,7 @@ public class ModCompat {
     // SCHOLAR COMPATIBILITY
 
     public class ScholarCompat{
-        public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
+        public static final ResourceLocation BOOKS_TEXTURE = ResourceLocation.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
         public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
         public static Method getDefaultTintColorForSlotMethod;
         public static Field ITEM_COLORS_FIELD;
@@ -269,9 +269,9 @@ public class ModCompat {
                 return DyedItemColor.getOrDefault(stack, 0xFF99452E);
             }
             else{
-                Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
                 try {
-                    return ((Map<Identifier, Integer>)ITEM_COLORS_FIELD.get(null)).getOrDefault(itemId, (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot));
+                    return ((Map<ResourceLocation, Integer>)ITEM_COLORS_FIELD.get(null)).getOrDefault(itemId, (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot));
                 } catch (Exception e) {
                     return -1;
                 }
