@@ -242,8 +242,8 @@ public class ModCompat {
     public class ScholarCompat{
         public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
         public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
-        public static Method getDefaultTintColorForSlotMethod;
-        public static Field ITEM_COLORS_FIELD;
+        private static Method getDefaultTintColorForSlotMethod;
+        private static Field ITEM_COLORS_FIELD;
 
         static{
             if (isScholarLoaded()) {
