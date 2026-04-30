@@ -34,7 +34,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -162,9 +161,11 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
 		if(context.isShadow()) dist *= SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE.getValue();
 
+		dist = dist * dist;
+
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(animation.getPos().getX() + 0.5, animation.getPos().getY() + 0.5, animation.getPos().getZ() + 0.5) > dist * dist) continue;
+			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
 			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
