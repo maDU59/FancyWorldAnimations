@@ -165,9 +165,11 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
 		if(context.isShadow()) dist *= SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE.getValue();
 
+		dist = dist * dist;
+
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(animation.getPos().getX() + 0.5, animation.getPos().getY() + 0.5, animation.getPos().getZ() + 0.5) > dist * dist) continue;
+			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
 			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
