@@ -10,21 +10,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fr.madu59.fwa.compat.ModCompat.ScholarCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
 
 @Mixin(ChiseledBookShelfBlockEntity.class)
 public abstract class ChiseledBookShelfBlockEntityMixin {
 
-    @Shadow 
-    public abstract boolean acceptsItemType(ItemStack stack);
-
     @Shadow
-    public abstract NonNullList<ItemStack> getItems();
+    private NonNullList<ItemStack> items;
 
     @Inject(method = "setItem", at = @At("HEAD"))
     private void fwa$setItem(final int slot, final ItemStack stack, CallbackInfo ci) {
-        if(acceptsItemType(stack)){
+        if(stack.is(ItemTags.BOOKSHELF_BOOKS)){
             saveItem(slot);
         }
     }
@@ -38,7 +36,7 @@ public abstract class ChiseledBookShelfBlockEntityMixin {
         ChiseledBookShelfBlockEntity shelf = (ChiseledBookShelfBlockEntity) (Object) this;
         BlockPos blockPos = shelf.getBlockPos().immutable();
         NonNullList<ItemStack> oldItems = ScholarCompat.STORAGE.getOrDefault(blockPos, NonNullList.withSize(6, ItemStack.EMPTY));
-        oldItems.set(slot, getItems().get(slot).copy());
+        oldItems.set(slot, items.get(slot).copy());
         ScholarCompat.STORAGE.put(blockPos, oldItems);
     }
 }
