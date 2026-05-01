@@ -33,11 +33,11 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isHangingLantern(BlockState blockState){
-        return FancyWorldAnimationsClient.typeOf(blockState) == FancyWorldAnimationsClient.Type.LANTERN && blockState.getValue(BlockStateProperties.HANGING);
+        return FancyWorldAnimationsClient.typeOf(blockState) == FancyWorldAnimationsClient.Type.LANTERN && blockState.getValueOrElse(BlockStateProperties.HANGING, false);
     }
 
     public static boolean isActiveHangingLantern(BlockState blockState){
-        return isHangingLantern(blockState) && SettingsManager.LANTERN_STATE.getValue();
+        return isHangingLantern(blockState) && SettingsManager.LANTERN_STATE.getValue() && SettingsManager.MOD_TOGGLE.getValue();
     }
 
     public static int getChainCount(BlockPos blockPos){
