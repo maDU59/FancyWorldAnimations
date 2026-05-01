@@ -75,6 +75,7 @@ To edit the settings of the mod:
 <li>Every Compat (Wood Good)</li>
 <li>End Remastered</li>
 <li>Enderscape</li>
+<li>Scholar</li>
 </ul>
 
 </details>
