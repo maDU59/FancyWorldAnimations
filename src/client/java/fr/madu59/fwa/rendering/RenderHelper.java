@@ -139,7 +139,7 @@ public class RenderHelper {
             for(int i = start; i < parts.size(); ++i) {
                 BlockStateModelPart part = (BlockStateModelPart)parts.get(i);
                 if (!(part instanceof InvisibleBlockStateModelPart)) {
-                parts.set(i, new InvisibleBlockStateModelPart(part));
+                    parts.set(i, new InvisibleBlockStateModelPart(part));
                 }
             }
 
@@ -182,13 +182,13 @@ public class RenderHelper {
             if (quads.isEmpty()) {
                 return quads;
             } else {
-                List<BakedQuad> scaled = new ArrayList<BakedQuad>(quads.size());
+                List<BakedQuad> scaledQuads = new ArrayList<BakedQuad>(quads.size());
 
                 for(BakedQuad quad : quads) {
-                    scaled.add(scaleQuad(quad));
+                    scaledQuads.add(scaleQuad(quad));
                 }
 
-                return scaled;
+                return scaledQuads;
             }
         }
    }
