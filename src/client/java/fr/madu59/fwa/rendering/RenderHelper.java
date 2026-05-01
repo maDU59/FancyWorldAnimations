@@ -1,21 +1,29 @@
 package fr.madu59.fwa.rendering;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 
+import fr.madu59.fwa.utils.Backport;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 
 public class RenderHelper {
 
@@ -26,6 +34,7 @@ public class RenderHelper {
     private static float XShade = 0;
     private static Vector3f normal = new Vector3f();
     private static boolean shouldShade = true;
+    private static final float INVISIBLE_SCALE_VALUE = 0.0001f;
     private static final Direction[] DIRECTIONS_WITH_NULL = {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
@@ -59,17 +68,6 @@ public class RenderHelper {
         }
     }
 
-    // Does not seem to make any difference
-    // public static void renderModelVisibleOnly(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, BlockPos pos){
-    //     Vec3 dirV = camPos.subtract(pos.getCenter());
-    //     for (BlockStateModelPart part : parts){
-    //         renderQuads(buffer, pose, part.getQuads(null), a, r, g, b, light);
-    //         for(Direction dir : DIRECTIONS){
-    //             if(dirV.dot(dir.getUnitVec3()) >= 0) renderQuads(buffer, pose, part.getQuads(dir), a, r, g, b, light);
-    //         }
-    //     }
-    // }
-
     public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
         for (int i = 0; i < bakedQuads.size(); i++){
             renderQuad(buffer, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade);
@@ -102,4 +100,90 @@ public class RenderHelper {
             bs.endBatch();
         }
     }
+
+    public static BlockStateModel getInvisibleModel(BlockStateModel originalModel){
+        return (BlockStateModel)(originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
+    }
+
+    private static float scaleCoordinate(float value) {
+        return 0.5F + (value - 0.5F) * INVISIBLE_SCALE_VALUE;
+    }
+
+    private static int[] scaleVertices(int[] vertices) {
+        int[] scaledVertices = vertices.clone();
+        for (int i = 0; i < vertices.length; i += 8) {
+            float x = Float.intBitsToFloat(vertices[i]);
+            float y = Float.intBitsToFloat(vertices[i + 1]);
+            float z = Float.intBitsToFloat(vertices[i + 2]);
+
+            scaledVertices[i] = Float.floatToIntBits(scaleCoordinate(x));
+            scaledVertices[i + 1] = Float.floatToIntBits(scaleCoordinate(y));
+            scaledVertices[i + 2] = Float.floatToIntBits(scaleCoordinate(z));
+        }
+        return scaledVertices;
+    }
+
+    private static BakedQuad scaleQuad(BakedQuad quad) {
+        return new BakedQuad(scaleVertices(quad.vertices()), quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission());
+    }
+
+    private static final class InvisibleModel implements BlockStateModel{
+        private final BlockStateModel model;
+
+        private InvisibleModel(BlockStateModel originalModel) {
+            this.model = originalModel;
+        }
+
+        public void collectParts(RandomSource random, List<BlockModelPart> parts) {
+            int start = parts.size();
+            this.model.collectParts(random, parts);
+
+            for(int i = start; i < parts.size(); ++i) {
+                BlockModelPart part = (BlockModelPart)parts.get(i);
+                if (!(part instanceof InvisibleBlockStateModelPart)) {
+                    parts.set(i, new InvisibleBlockStateModelPart(part));
+                }
+            }
+
+        }
+
+        public TextureAtlasSprite particleIcon() {
+            return this.model.particleIcon();
+        }
+    }
+
+    private static final class InvisibleBlockStateModelPart implements BlockModelPart {
+        private final BlockModelPart part;
+        private final Map<Direction, List<BakedQuad>> directionalCache = new HashMap<Direction, List<BakedQuad>>();
+
+        private InvisibleBlockStateModelPart(BlockModelPart originalPart) {
+            this.part = originalPart;
+        }
+
+        public List<BakedQuad> getQuads(Direction direction) {
+            return this.directionalCache.computeIfAbsent(direction, (key) -> scaleQuads(this.part.getQuads(key)));
+        }
+
+        public boolean useAmbientOcclusion() {
+            return false;
+        }
+
+        public TextureAtlasSprite particleIcon() {
+            return this.part.particleIcon();
+        }
+
+        private static List<BakedQuad> scaleQuads(List<BakedQuad> quads) {
+            if (quads.isEmpty()) {
+                return quads;
+            } else {
+                List<BakedQuad> scaledQuads = new ArrayList<BakedQuad>(quads.size());
+
+                for(BakedQuad quad : quads) {
+                    scaledQuads.add(scaleQuad(quad));
+                }
+
+                return scaledQuads;
+            }
+        }
+   }
 }
