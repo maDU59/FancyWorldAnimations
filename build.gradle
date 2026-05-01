@@ -55,7 +55,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 
-	modImplementation "maven.modrinth:sodium:mc1.20.1-0.5.12-beta.2-fabric"
+	modImplementation "maven.modrinth:sodium:mc1.20.1-0.5.13-fabric"
 
     modImplementation("org.antlr:antlr4-runtime:4.13.1")
     modImplementation("io.github.douira:glsl-transformer:2.0.1")
