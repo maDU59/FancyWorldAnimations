@@ -1,8 +1,10 @@
 package fr.madu59.fwa.compat;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -14,18 +16,21 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.fml.loading.FMLLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.WritableBookItem;
+import net.minecraft.world.item.WrittenBookItem;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.Vec3;
 
 public class ModCompat {
 
@@ -36,8 +41,10 @@ public class ModCompat {
 
     private final static boolean IS_AMENDMENTS_LOADED = FMLLoader.getLoadingModList().getModFileById("amendments") != null;
     private final static boolean IS_IRIS_LOADED = FMLLoader.getLoadingModList().getModFileById("iris") != null || FMLLoader.getLoadingModList().getModFileById("oculus") != null;
+    private final static boolean IS_SODIUM_LOADED = FMLLoader.getLoadingModList().getModFileById("sodium") != null || FMLLoader.getLoadingModList().getModFileById("embeddium") != null;
     private final static boolean IS_MAP_ATLASES_LOADED = FMLLoader.getLoadingModList().getModFileById("map_atlases") != null;
     private final static boolean IS_END_REMASTERED_LOADED = FMLLoader.getLoadingModList().getModFileById("endrem") != null;
+    private final static boolean IS_SCHOLAR_LOADED = FMLLoader.getLoadingModList().getModFileById("scholar") != null;
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -70,8 +77,20 @@ public class ModCompat {
         return IS_IRIS_LOADED;
     }
 
+    public static boolean isSodiumLoaded(){
+        return IS_SODIUM_LOADED;
+    }
+
+    public static boolean isMapAtlasesLoaded(){
+        return IS_MAP_ATLASES_LOADED;
+    }
+
     public static boolean isEndRemasteredLoaded(){
         return IS_END_REMASTERED_LOADED;
+    }
+
+    public static boolean isScholarLoaded(){
+        return IS_SCHOLAR_LOADED;
     }
 
     // VAULT COMPATIBILITY
@@ -133,7 +152,7 @@ public class ModCompat {
          */
         public static ResourceLocation resolveTexture(BlockPos pos) {
 
-            if (!IS_MAP_ATLASES_LOADED) return DEFAULT_BOOK_TEXTURE;
+            if (!isMapAtlasesLoaded()) return DEFAULT_BOOK_TEXTURE;
 
             try {
                 Level level = Minecraft.getInstance().level;
@@ -219,6 +238,52 @@ public class ModCompat {
             }catch(Exception e){
                 return;
             }
+        }
+    }
+
+    // SCHOLAR COMPATIBILITY
+
+    public class ScholarCompat{
+        public static final ResourceLocation BOOKS_TEXTURE = ResourceLocation.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
+        public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
+        private static Method getDefaultTintColorForSlotMethod;
+        private static Field ITEM_COLORS_FIELD;
+
+        static{
+            if (isScholarLoaded()) {
+                try{
+                    Class<?> chiseledBookshelfColorsClass = Class.forName("io.github.mortuusars.scholar.client.chiseled_bookshelf.ChiseledBookshelfColors");
+                    getDefaultTintColorForSlotMethod = chiseledBookshelfColorsClass.getMethod("getDefaultTintColorForSlot", BlockState.class, int.class);
+                    ITEM_COLORS_FIELD = chiseledBookshelfColorsClass.getDeclaredField("ITEM_COLORS");
+                }catch(Exception e){
+                    getDefaultTintColorForSlotMethod = null;
+                    ITEM_COLORS_FIELD = null;
+                }
+            }
+            else{
+                getDefaultTintColorForSlotMethod = null;
+                ITEM_COLORS_FIELD = null;
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public static int getColor(ItemStack stack, BlockState state, int slot){
+            if (stack.isEmpty()) return -1;
+            else if (stack.getItem() instanceof WritableBookItem || stack.getItem() instanceof WrittenBookItem){
+                return DyedItemColor.getOrDefault(stack, 0xFF99452E);
+            }
+            else{
+                ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                try {
+                    return ((Map<ResourceLocation, Integer>)ITEM_COLORS_FIELD.get(null)).getOrDefault(itemId, (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot));
+                } catch (Exception e) {
+                    return -1;
+                }
+            }
+        }
+
+        public static ItemStack getBookshelfItemStack(BlockPos pos, int slot){
+            return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
         }
     }
 }

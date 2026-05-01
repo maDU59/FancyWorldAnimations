@@ -11,8 +11,9 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderChunkRegionMixin",
-		"sodium.LevelSliceMixin",
-		"iris.ShadowRendererMixin"
+		"sodium.BlockRendererMixin",
+		"iris.ShadowRendererMixin",
+		"scholar.ChiseledBookShelfBlockEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
