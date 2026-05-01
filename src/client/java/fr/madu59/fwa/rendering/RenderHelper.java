@@ -11,8 +11,6 @@ import org.joml.Vector3fc;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 
-import fr.madu59.fwa.utils.SwingingBlockHelper;
-
 import com.mojang.blaze3d.vertex.QuadInstance;
 
 import net.minecraft.client.Minecraft;
@@ -28,7 +26,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CardinalLighting;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderHelper {
 
