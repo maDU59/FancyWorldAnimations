@@ -52,7 +52,7 @@ dependencies {
 
 	localRuntime 'org.anarres:jcpp:1.4.14'
     localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
-	compileOnly "maven.modrinth:iris:1.10.9+26.1-fabric"
+	implementation "maven.modrinth:iris:1.10.9+26.1-fabric"
 }
 
 processResources {
