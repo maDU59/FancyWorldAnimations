@@ -3,8 +3,6 @@ package fr.madu59.fwa.compat;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import net.fabricmc.loader.api.FabricLoader;
-
 import java.util.List;
 import java.util.Set;
 
@@ -12,13 +10,13 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".sodium.")) {
-            return FabricLoader.getInstance().isModLoaded("sodium") || FabricLoader.getInstance().isModLoaded("embeddium");
+            return ModCompat.isSodiumLoaded();
         }
         if (mixinClassName.contains(".iris.")) {
-            return FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
+            return ModCompat.isIrisLoaded();
         }
         if (mixinClassName.contains(".scholar.")) {
-            return FabricLoader.getInstance().isModLoaded("scholar");
+            return ModCompat.isScholarLoaded();
         }
         return true;
     }

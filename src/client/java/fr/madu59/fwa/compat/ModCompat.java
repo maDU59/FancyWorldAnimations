@@ -42,6 +42,7 @@ public class ModCompat {
 
     private final static boolean IS_AMENDMENTS_LOADED = FabricLoader.getInstance().isModLoaded("amendments");
     private final static boolean IS_IRIS_LOADED = FabricLoader.getInstance().isModLoaded("iris") || FabricLoader.getInstance().isModLoaded("oculus");
+    private final static boolean IS_SODIUM_LOADED = FabricLoader.getInstance().isModLoaded("sodium") || FabricLoader.getInstance().isModLoaded("embeddium");
     private final static boolean IS_MAP_ATLASES_LOADED = FabricLoader.getInstance().isModLoaded("map_atlases");
     private final static boolean IS_END_REMASTERED_LOADED = FabricLoader.getInstance().isModLoaded("endrem");
     private final static boolean IS_SCHOLAR_LOADED = FabricLoader.getInstance().isModLoaded("scholar");
@@ -75,6 +76,10 @@ public class ModCompat {
 
     public static boolean isIrisLoaded(){
         return IS_IRIS_LOADED;
+    }
+
+    public static boolean isSodiumLoaded(){
+        return IS_SODIUM_LOADED;
     }
 
     public static boolean isMapAtlasesLoaded(){
@@ -242,8 +247,8 @@ public class ModCompat {
     public class ScholarCompat{
         public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
         public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
-        public static Method getDefaultTintColorForSlotMethod;
-        public static Field ITEM_COLORS_FIELD;
+        private static Method getDefaultTintColorForSlotMethod;
+        private static Field ITEM_COLORS_FIELD;
 
         static{
             if (isScholarLoaded()) {
