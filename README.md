@@ -84,7 +84,7 @@ To edit the settings of the mod:
 ## 📦 Modpack
 
 Feel free to add this mod in your modpacks. If you do so, telling me would also be nice.</br>
-In case of conflict with another mod, you can disable animations on specific blocks/mods using a config file in the config folder `fwa-blacklist.json`.</br>
+In case of conflict with another mod, you can disable animations on specific blocks/mods using a config file in the config folder `fwa-blacklist.json`. This file is not created by default, you need to create it if it doesn't exist</br>
 Example:
 ```json
 {
