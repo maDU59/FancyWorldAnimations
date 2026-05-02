@@ -105,7 +105,7 @@ public class FancyWorldAnimationsClient{
 		timer += Minecraft.getInstance().getFrameTimeNs();
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
-			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), frustum, tickDelta, false));
+			//render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), frustum, tickDelta, false));
 		}
     }
 

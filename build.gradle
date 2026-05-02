@@ -114,8 +114,8 @@ dependencies {
     implementation 'io.github.douira:glsl-transformer:3.0.0-pre3'
 	implementation "maven.modrinth:iris:1.10.9+26.1-neoforge"
 
-    compileOnly("net.caffeinemc:sodium-neoforge-mod:0.8.9+mc26.1.1")
-    runtimeOnly("net.caffeinemc:sodium-neoforge:0.8.9+mc26.1.1")
+    compileOnly("net.caffeinemc:sodium-neoforge-mod:0.8.10+mc26.1.2")
+    runtimeOnly("net.caffeinemc:sodium-neoforge:0.8.10+mc26.1.2")
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
