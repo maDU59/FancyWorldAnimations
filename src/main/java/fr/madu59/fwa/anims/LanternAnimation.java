@@ -34,17 +34,12 @@ public class LanternAnimation extends Animation{
     private float tiltZ = 0f;
     private float spin = 0f;
     private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
-    private PoseStack stack = new PoseStack();
     private int chainCount;
     private List<BlockStateModelPart> chainParts = new ArrayList<>();
     private final Quaternionf combined = new Quaternionf();
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
         chainCount = SwingingBlockHelper.getChainCount(position);
     }
 
@@ -53,7 +48,7 @@ public class LanternAnimation extends Animation{
         return false;
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.LANTERN_STATE.getValue();
     }
 
@@ -95,7 +90,7 @@ public class LanternAnimation extends Animation{
         extractRenderState(context);
         float swingScale = 0.7f;
         if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
-        float degToRad = (float) Math.PI / 180.0f;
+        float degToRad = 0.017453292519943295f;
         float tiltX = this.tiltX * swingScale * degToRad;
         float tiltZ = this.tiltZ * swingScale * degToRad;
         float spin = this.spin * Math.max(0.55F, swingScale) * degToRad;
@@ -122,9 +117,8 @@ public class LanternAnimation extends Animation{
             BlockState chainState = level.getBlockState(mutable);
             int light = LevelRenderer.getLightCoords(LevelRenderer.BrightnessGetter.DEFAULT ,(BlockAndLightGetter) level, chainState, mutable);
             chainParts.clear();
-            BlockStateModel chainModel;
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
-            chainModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
+            BlockStateModel chainModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             chainModel.collectParts(random, chainParts);
             RenderHelper.renderModel(buffer, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
@@ -143,6 +137,10 @@ public class LanternAnimation extends Animation{
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) level, position);
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        parts.clear();
+        model.collectParts(random, parts);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
         poseStack.popPose();

@@ -10,6 +10,7 @@ import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.ChiseledBookShelfAnimation;
 import fr.madu59.fwa.anims.ComposterAnimation;
 import fr.madu59.fwa.anims.DoorAnimation;
+import fr.madu59.fwa.anims.DripleafAnimation;
 import fr.madu59.fwa.anims.EndPortalFrameAnimation;
 import fr.madu59.fwa.anims.FenceGateAnimation;
 import fr.madu59.fwa.anims.JukeBoxAnimation;
@@ -17,6 +18,7 @@ import fr.madu59.fwa.anims.LanternAnimation;
 import fr.madu59.fwa.anims.LayeredCauldronAnimation;
 import fr.madu59.fwa.anims.LecternAnimation;
 import fr.madu59.fwa.anims.LeverAnimation;
+import fr.madu59.fwa.anims.RedstoneWireAnimation;
 import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
@@ -29,12 +31,15 @@ import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.BellBlock;
+import net.minecraft.world.level.block.BigDripleafBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CampfireBlock;
@@ -51,6 +56,7 @@ import net.minecraft.world.level.block.LavaCauldronBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
@@ -58,6 +64,7 @@ import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -76,6 +83,7 @@ public class FancyWorldAnimationsClient{
 
 	public static final Animations animations = new Animations();
 	private static Frustum frustum;
+	private static long timer = 0;
 
 	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
         NeoForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
@@ -96,6 +104,7 @@ public class FancyWorldAnimationsClient{
 
 	@SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
+		timer += Minecraft.getInstance().getFrameTimeNs();
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
 			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), frustum, tickDelta, false));
@@ -149,11 +158,12 @@ public class FancyWorldAnimationsClient{
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
+		if(!animation.hasInfiniteAnimation() && Minecraft.getInstance().gameRenderer.getMainCamera().position().distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
 	public static double getPartialTick() {
-		return System.nanoTime() / 50_000_000.0;
+		return timer / 50_000_000.0;
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -167,8 +177,15 @@ public class FancyWorldAnimationsClient{
 
 		RenderHelper.prepareFrame(context);
 
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
+		if(context.isShadow()) dist *= SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE.getValue();
+
+		dist = dist * dist;
+
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
+			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
 			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
@@ -193,6 +210,8 @@ public class FancyWorldAnimationsClient{
 			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || ((SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos)))) && SettingsManager.LANTERN_OVERRIDE.getValue()));
 		}
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
+		if(type == Type.DRIPLEAF) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof BigDripleafBlock && newState.getValue(BlockStateProperties.TILT) != oldState.getValue(BlockStateProperties.TILT);
+		if(type == Type.REDSTONE_WIRE) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof RedStoneWireBlock && newState.getValue(BlockStateProperties.POWER) != oldState.getValue(BlockStateProperties.POWER);
 		return oldIsOpen != newIsOpen;
 	}
 
@@ -247,6 +266,8 @@ public class FancyWorldAnimationsClient{
 			case VAULT: return new VaultAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case LANTERN: return new LanternAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			case CHAIN: return new ChainAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case DRIPLEAF: return new DripleafAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
+			case REDSTONE_WIRE: return new RedstoneWireAnimation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 			default: return new Animation(pos, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		}
 	}
@@ -271,6 +292,8 @@ public class FancyWorldAnimationsClient{
 		if(block instanceof VaultBlock) return Type.VAULT;
 		if(block instanceof LanternBlock) return Type.LANTERN;
 		if(block instanceof ChainBlock) return Type.CHAIN;
+		if(block instanceof BigDripleafBlock) return Type.DRIPLEAF;
+		if(block instanceof RedStoneWireBlock) return Type.REDSTONE_WIRE;
 		return ModCompat.typeOf(block);
 	}
 
@@ -397,6 +420,8 @@ public class FancyWorldAnimationsClient{
 		VAULT,
 		LANTERN,
 		CHAIN,
+		DRIPLEAF,
+		REDSTONE_WIRE,
 		USELESS
 	}
 }

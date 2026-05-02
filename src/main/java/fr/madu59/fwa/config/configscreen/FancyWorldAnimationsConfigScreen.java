@@ -1,6 +1,8 @@
 package fr.madu59.fwa.config.configscreen;
 
 import static net.minecraft.commands.Commands.literal;
+
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
@@ -40,6 +42,9 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         // Example: Add categories + buttons
         list.addCategory("fwa.config.category.general");
         list.addButton(SettingsManager.MOD_TOGGLE);
+        list.addSlider(SettingsManager.ANIMATION_RENDER_DISTANCE, 32, 1024, 16);
+        list.addSlider(SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE, 32, 1024, 16);
+        if(ModCompat.isIrisLoaded()) list.addSlider(SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE, 0.4f, 1.0f, 0.1f);
         list.addCategory("fwa.config.category.door");
         list.addButton(SettingsManager.DOOR_STATE);
         list.addButton(SettingsManager.DOOR_EASING);
@@ -83,6 +88,10 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.BUTTON_STATE);
         list.addButton(SettingsManager.BUTTON_EASING);
         list.addSlider(SettingsManager.BUTTON_SPEED, 0.5, 2.0, 0.1);
+        list.addCategory("fwa.config.category.redstone");
+        list.addButton(SettingsManager.REDSTONE_STATE);
+        list.addButton(SettingsManager.REDSTONE_EASING);
+        list.addSlider(SettingsManager.REDSTONE_SPEED, 0.5, 2.0, 0.1);
         list.addCategory("fwa.config.category.repeater");
         list.addButton(SettingsManager.REPEATER_STATE);
         list.addButton(SettingsManager.REPEATER_EASING);
@@ -111,7 +120,10 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.CHAIN_GROUNDED);
         list.addButton(SettingsManager.LANTERN_OVERRIDE);
         list.addButton(SettingsManager.CHAIN_SWING_LIMIT);
-        
+        list.addCategory("fwa.config.category.dripleaf");
+        list.addButton(SettingsManager.DRIPLEAF_STATE);
+        list.addButton(SettingsManager.DRIPLEAF_EASING);
+        list.addSlider(SettingsManager.DRIPLEAF_SPEED, 0.5, 2.0, 0.1);
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {
             this.minecraft.setScreen(this.parent);

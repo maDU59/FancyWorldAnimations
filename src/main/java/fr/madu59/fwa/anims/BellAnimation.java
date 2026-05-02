@@ -16,7 +16,6 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.bell.BellModel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -83,7 +82,7 @@ public class BellAnimation extends Animation{
         return FMLLoader.getCurrent().getLoadingModList().getModFileById("betterblockentities") != null;
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.BELL_INFINITE.getValue();
     }
 
@@ -176,8 +175,6 @@ public class BellAnimation extends Animation{
 
         context.getSubmitNodeCollector().submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), light, OverlayTexture.NO_OVERLAY, sprite);
 
-        if(context.getBufferSource() instanceof BufferSource bufferSource){
-            bufferSource.endBatch();
-        }
+        RenderHelper.endBatch(context.getBufferSource());
     }
 }

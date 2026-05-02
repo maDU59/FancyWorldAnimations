@@ -31,6 +31,27 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Integer> ANIMATION_RENDER_DISTANCE = loadOptionWithDefaults(
+        "animation_render_distance",
+        "fwa.config.option.animation_render_distance.name",
+        "fwa.config.option.animation_render_distance.description",
+        96
+    );
+
+    public static Option<Integer> INFINITE_ANIMATION_RENDER_DISTANCE = loadOptionWithDefaults(
+        "infinite_animation_render_distance",
+        "fwa.config.option.infinite_animation_render_distance.name",
+        "fwa.config.option.infinite_animation_render_distance.description",
+        256
+    );
+
+    public static Option<Float> SHADOW_ANIMATION_RENDER_DISTANCE = loadOptionWithDefaults(
+        "shadow_animation_render_distance",
+        "fwa.config.option.shadow_animation_render_distance.name",
+        "fwa.config.option.shadow_animation_render_distance.description",
+        0.8f
+    );
+
     public static Option<Boolean> DOOR_STATE = loadOptionWithDefaults(
         "door_state",
         "fwa.config.option.state.name",
@@ -265,6 +286,27 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> DRIPLEAF_STATE = loadOptionWithDefaults(
+        "dripleaf_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> DRIPLEAF_EASING = loadOptionWithDefaults(
+        "dripleaf_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.SPRINGY
+    );
+
+    public static Option<Double> DRIPLEAF_SPEED = loadOptionWithDefaults(
+        "dripleaf_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
     public static Option<Boolean> BUTTON_STATE = loadOptionWithDefaults(
         "button_state",
         "fwa.config.option.state.name",
@@ -281,6 +323,27 @@ public class SettingsManager {
 
     public static Option<Double> BUTTON_SPEED = loadOptionWithDefaults(
         "button_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
+    public static Option<Boolean> REDSTONE_STATE = loadOptionWithDefaults(
+        "redstone_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    ); 
+
+    public static Option<Curves.Door> REDSTONE_EASING = loadOptionWithDefaults(
+        "redstone_easing",
+        "fwa.config.option.easing.name",
+        "fwa.config.option.easing.description",
+        Curves.Door.LINEAR
+    );
+
+    public static Option<Double> REDSTONE_SPEED = loadOptionWithDefaults(
+        "redstone_speed",
         "fwa.config.option.speed.name",
         "fwa.config.option.speed.description",
         1.0
@@ -452,6 +515,9 @@ public class SettingsManager {
         }
         else if (defaultValue instanceof Double){
             return (T) Double.valueOf(loadedSettings.get(key));
+        }
+        else if (defaultValue instanceof Integer){
+            return (T) Integer.valueOf(loadedSettings.get(key));
         }
         else if (defaultValue instanceof Boolean){
             return (T) (Boolean) Boolean.parseBoolean(loadedSettings.get(key));

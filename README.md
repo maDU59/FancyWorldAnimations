@@ -41,6 +41,8 @@ It's the mod you never knew you needed until now, once you try it it's hard to g
 <li>Smooth lecterns</li>
 <li>Smooth campfires</li>
 <li>Smooth chiseled bookshelves</li>
+<li>Smooth big dripleaves</li>
+<li>Smooth redstone dusts</li>
 <li>Disc animation on Jukeboxes</li>
 <li>Idling lecterns</li>
 <li>Idling bells</li>
@@ -68,8 +70,12 @@ To edit the settings of the mod:
 
 <ul>
 <li>Dramatic Doors</li>
-<li>Create</li>
+<li>Map Atlases</li>
 <li>More Composter Variants</li>
+<li>Every Compat (Wood Good)</li>
+<li>End Remastered</li>
+<li>Enderscape</li>
+<li>Scholar</li>
 </ul>
 
 </details>
@@ -78,7 +84,7 @@ To edit the settings of the mod:
 ## 📦 Modpack
 
 Feel free to add this mod in your modpacks. If you do so, telling me would also be nice.</br>
-In case of conflict with another mod, you can disable animations on specific blocks/mods using a config file in the config folder `fwa-blacklist.json`.</br>
+In case of conflict with another mod, you can disable animations on specific blocks/mods using a config file in the config folder `fwa-blacklist.json`. This file is not created by default, you need to create it if it doesn't exist</br>
 Example:
 ```json
 {

@@ -73,7 +73,7 @@ public class JukeBoxAnimation extends Animation{
         return SettingsManager.JUKEBOX_STATE.getValue() && !ModCompat.isAmendmentsLoaded();
     }
 
-    public static boolean hasInfiniteAnimation(){
+    public boolean hasInfiniteAnimation(){
         return SettingsManager.JUKEBOX_INFINITE.getValue();
     }
 
