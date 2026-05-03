@@ -34,14 +34,12 @@ public class RenderHelper {
     private static float topShade = 0;
     private static float ZShade = 0;
     private static float XShade = 0;
-    private static Vector3f normal = new Vector3f();
     private static boolean shouldShade = true;
     private static final float INVISIBLE_SCALE_VALUE = 0.0001f;
     private static final Direction[] DIRECTIONS_WITH_NULL = {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
-    private static final QuadInstance quadInstance = new QuadInstance();
 
     public static void prepareFrame(AnimationRenderingContext context){
         if(!context.isShadow()){
@@ -85,6 +83,7 @@ public class RenderHelper {
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
         float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
 
+        QuadInstance quadInstance = new QuadInstance();
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
         buffer.putBakedQuad(pose, bakedQuad, quadInstance);
@@ -99,7 +98,7 @@ public class RenderHelper {
     public static float getShade(float nx, float ny, float nz, Pose pose){
         float shade = 1f;
         if(shouldShade){
-            normal.set(nx, ny, nz);
+            Vector3f normal = new Vector3f(nx, ny, nz);
             normal.mul(pose.normal());
             normal.normalize(); // Might not be needed
             float nx2 = normal.x() * normal.x();
