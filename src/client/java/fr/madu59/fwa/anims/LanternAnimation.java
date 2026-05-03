@@ -33,9 +33,9 @@ public class LanternAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
     private int chainCount;
-    private List<BlockStateModelPart> chainParts = new ArrayList<>();
+    private final List<BlockStateModelPart> chainParts = new ArrayList<>();
     private final Quaternionf combined = new Quaternionf();
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
