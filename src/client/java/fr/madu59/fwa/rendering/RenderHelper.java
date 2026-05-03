@@ -82,18 +82,8 @@ public class RenderHelper {
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
-        Float shade = 1f;
-        if(isShaded){
-            normal.set(bakedQuad.direction().getUnitVec3f());
-            normal.mul(pose.normal());
-            normal.normalize(); // Might not be needed
-            float nx2 = normal.x() * normal.x();
-            float ny2 = normal.y() * normal.y();
-            float nz2 = normal.z() * normal.z();
-
-            float yShade = normal.y() > 0 ? topShade : bottomShade;
-            shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
-        }
+        Vector3fc dir = bakedQuad.direction().getUnitVec3f();
+        float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
 
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
@@ -104,6 +94,22 @@ public class RenderHelper {
         if(bufferSource instanceof BufferSource bs){
             bs.endBatch();
         }
+    }
+
+    public static float getShade(float nx, float ny, float nz, Pose pose){
+        float shade = 1f;
+        if(shouldShade){
+            normal.set(nx, ny, nz);
+            normal.mul(pose.normal());
+            normal.normalize(); // Might not be needed
+            float nx2 = normal.x() * normal.x();
+            float ny2 = normal.y() * normal.y();
+            float nz2 = normal.z() * normal.z();
+
+            float yShade = normal.y() > 0 ? topShade : bottomShade;
+            shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
+        }
+        return shade;
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel){

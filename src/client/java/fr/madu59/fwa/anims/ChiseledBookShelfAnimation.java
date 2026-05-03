@@ -198,6 +198,11 @@ public class ChiseledBookShelfAnimation extends Animation{
         vMin = sprite.getV(vMin);
         vMax = sprite.getV(vMax);
 
+        float shade = RenderHelper.getShade(nx, ny, nz, pose);
+        r = (int)(r * shade);
+        g = (int)(g * shade);
+        b = (int)(b * shade);
+
         vertex(pose, buffer, x1, y1, z1, uMin, vMax, light, nx, ny, nz, r, g, b);
         vertex(pose, buffer, x4, y4, z4, uMax, vMax, light, nx, ny, nz, r, g, b);
         vertex(pose, buffer, x3, y3, z3, uMax, vMin, light, nx, ny, nz, r, g, b);
