@@ -33,7 +33,7 @@ public class LanternAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private final List<BlockModelPart> parts = new ArrayList<>();
     private int chainCount;
     private final Quaternionf combined = new Quaternionf();
     
