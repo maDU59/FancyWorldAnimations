@@ -73,7 +73,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
 	private static long startingTime = System.nanoTime();
-	private static long timer = System.nanoTime();
+	private static long timer = 0;
 	private static ResourceKey<Level> dimension;
 
 	@Override
