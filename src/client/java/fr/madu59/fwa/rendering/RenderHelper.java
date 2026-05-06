@@ -2,7 +2,6 @@ package fr.madu59.fwa.rendering;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -73,7 +72,7 @@ public class RenderHelper {
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
-        Vector3fc dir = bakedQuad.getDirection().step();
+        Vector3f dir = bakedQuad.getDirection().step();
         float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
 
         buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
