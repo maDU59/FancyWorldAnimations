@@ -73,6 +73,8 @@ import net.minecraft.world.phys.Vec3;
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
+	private static long startingTime = System.nanoTime();
+	private static long timer = 0;
 	private static ResourceKey<Level> dimension;
 
 	@Override
@@ -83,6 +85,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
             animations.animations.clear();
         });
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+			timer = System.nanoTime() - startingTime;
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
 				render(new AnimationRenderingContext(context.matrixStack(), context.camera().getPosition(), context.consumers(), context.frustum(), tickDelta, false));
@@ -142,7 +145,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	}
 
 	public static double getPartialTick() {
-		return System.nanoTime() / 50_000_000.0;
+		return timer / 50_000_000.0;
 	}
 
 	public static void render(AnimationRenderingContext context)

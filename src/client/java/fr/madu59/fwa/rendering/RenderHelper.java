@@ -29,7 +29,6 @@ public class RenderHelper {
     private static float topShade = 0;
     private static float ZShade = 0;
     private static float XShade = 0;
-    private static Vector3f normal = new Vector3f();
     private static boolean shouldShade = true;
     private static final float INVISIBLE_SCALE_VALUE = 0.0001f;
     private static final Direction[] DIRECTIONS_WITH_NULL = {
@@ -74,9 +73,22 @@ public class RenderHelper {
     }
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
-        Float shade = 1f;
-        if(isShaded){
-            normal.set(bakedQuad.getDirection().step());
+        Vector3fc dir = bakedQuad.getDirection().step();
+        float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
+
+        buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
+    }
+
+    public static void endBatch(MultiBufferSource bufferSource){
+        if(bufferSource instanceof BufferSource bs){
+            bs.endBatch();
+        }
+    }
+
+    public static float getShade(float nx, float ny, float nz, Pose pose){
+        float shade = 1f;
+        if(shouldShade){
+            Vector3f normal = new Vector3f(nx, ny, nz);
             normal.mul(pose.normal());
             normal.normalize(); // Might not be needed
             float nx2 = normal.x() * normal.x();
@@ -86,14 +98,7 @@ public class RenderHelper {
             float yShade = normal.y() > 0 ? topShade : bottomShade;
             shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
         }
-
-        buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
-    }
-
-    public static void endBatch(MultiBufferSource bufferSource){
-        if(bufferSource instanceof BufferSource bs){
-            bs.endBatch();
-        }
+        return shade;
     }
 
     public static BakedModel getInvisibleModel(BakedModel originalModel){
