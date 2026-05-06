@@ -4,6 +4,8 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.LanternAnimation;
+import fr.madu59.fwa.compat.Blacklist;
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -37,7 +39,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isActiveHangingLantern(BlockState blockState){
-        return isHangingLantern(blockState) && SettingsManager.LANTERN_STATE.getValue() && SettingsManager.MOD_TOGGLE.getValue();
+        return isHangingLantern(blockState) && SettingsManager.LANTERN_STATE.getValue() && SettingsManager.MOD_TOGGLE.getValue() && !Blacklist.isBlacklisted(blockState);
     }
 
     public static int getChainCount(BlockPos blockPos){
