@@ -82,6 +82,7 @@ public class FancyWorldAnimationsClient{
 
 	public static final Animations animations = new Animations();
 	private static Frustum frustum;
+	private static long startingTime = System.nanoTime();
 	private static long timer = 0;
 
 	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
@@ -108,7 +109,7 @@ public class FancyWorldAnimationsClient{
 
 	@SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
-		timer += Minecraft.getInstance().getFrameTimeNs();
+		timer = System.nanoTime() - startingTime;
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
 			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), frustum, tickDelta, false));
