@@ -33,7 +33,7 @@ public class ChainAnimation extends Animation{
     private float tiltZ = 0f;
     private float spin = 0f;
     private int chainCount = 0;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private final List<BlockModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
     private final Quaternionf combined = new Quaternionf();
     

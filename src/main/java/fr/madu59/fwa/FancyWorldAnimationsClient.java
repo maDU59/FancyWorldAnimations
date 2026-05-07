@@ -70,6 +70,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -81,6 +82,8 @@ import net.minecraft.world.phys.Vec3;
 public class FancyWorldAnimationsClient{
 
 	public static final Animations animations = new Animations();
+	private static long startingTime = System.nanoTime();
+	private static long timer = 0;
 	private static Frustum frustum;
 
 	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
@@ -101,7 +104,13 @@ public class FancyWorldAnimationsClient{
 	}
 
 	@SubscribeEvent
+    public static void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
+		frustum = event.getFrustum();
+	}
+
+	@SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
+		timer = System.nanoTime() - startingTime;
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
 			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), frustum, tickDelta, false));
@@ -160,7 +169,7 @@ public class FancyWorldAnimationsClient{
 	}
 
 	public static double getPartialTick() {
-		return System.nanoTime() / 50_000_000.0;
+		return timer / 50_000_000.0;
 	}
 
 	public static void render(AnimationRenderingContext context)
