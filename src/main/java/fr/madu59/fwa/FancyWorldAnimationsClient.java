@@ -34,6 +34,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.BigDripleafBlock;
 import net.minecraft.world.level.block.Block;
@@ -75,6 +77,8 @@ import net.minecraft.world.phys.Vec3;
 public class FancyWorldAnimationsClient{
 
 	public static final Animations animations = new Animations();
+	private static long startingTime = System.nanoTime();
+	private static long timer = 0;
 
 	public FancyWorldAnimationsClient(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
@@ -98,6 +102,7 @@ public class FancyWorldAnimationsClient{
 
 	@SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
+		timer = System.nanoTime() - startingTime;
 		if(SettingsManager.MOD_TOGGLE.getValue() && event.getStage() == Stage.AFTER_ENTITIES) {
 			double tickDelta = getPartialTick();
 			render(new AnimationRenderingContext(event.getPoseStack(), event.getCamera().getPosition(), Minecraft.getInstance().renderBuffers().bufferSource(), event.getFrustum(), tickDelta, false));
@@ -156,7 +161,7 @@ public class FancyWorldAnimationsClient{
 	}
 
 	public static double getPartialTick() {
-		return System.nanoTime() / 50_000_000.0;
+		return timer / 50_000_000.0;
 	}
 
 	public static void render(AnimationRenderingContext context)
