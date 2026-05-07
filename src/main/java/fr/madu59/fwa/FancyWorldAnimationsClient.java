@@ -70,6 +70,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -98,6 +99,11 @@ public class FancyWorldAnimationsClient{
 	@SubscribeEvent
 	public static void onLevelUnload(LevelEvent.Unload event){
 		animations.animations.clear();
+	}
+
+	@SubscribeEvent
+    public static void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
+		frustum = event.getFrustum();
 	}
 
 	@SubscribeEvent
