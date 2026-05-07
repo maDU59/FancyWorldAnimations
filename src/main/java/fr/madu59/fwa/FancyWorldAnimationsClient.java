@@ -81,7 +81,6 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 public class FancyWorldAnimationsClient{
 
 	public static final Animations animations = new Animations();
-	private static Frustum frustum;
 	private static long startingTime = System.nanoTime();
 	private static long timer = 0;
 
@@ -103,16 +102,11 @@ public class FancyWorldAnimationsClient{
 	}
 
 	@SubscribeEvent
-    public static void onExtractLevelRenderState(ExtractLevelRenderStateEvent event) {
-		frustum = event.getFrustum();
-	}
-
-	@SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent.AfterOpaqueBlocks event) {
 		timer = System.nanoTime() - startingTime;
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
-			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), frustum, tickDelta, false));
+			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), Minecraft.getInstance().gameRenderer.getMainCamera().getCullFrustum(), tickDelta, false));
 		}
     }
 
