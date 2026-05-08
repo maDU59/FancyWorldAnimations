@@ -5,7 +5,6 @@ import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.LanternAnimation;
 import fr.madu59.fwa.compat.Blacklist;
-import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -22,10 +21,6 @@ public class SwingingBlockHelper {
         return isVerticalChain(blockState) || isActiveHangingLantern(blockState);
     }
 
-    public static boolean isSwingingBlock(BlockState blockState){
-        return isVerticalChain(blockState) || isHangingLantern(blockState);
-    }
-
     public static boolean isVerticalChain(BlockState blockState){
         return blockState.getBlock() instanceof ChainBlock && blockState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
     }
@@ -34,7 +29,7 @@ public class SwingingBlockHelper {
         return animation instanceof ChainAnimation;
     }
 
-    public static boolean isHangingLantern(BlockState blockState){
+    private static boolean isHangingLantern(BlockState blockState){
         return FancyWorldAnimationsClient.typeOf(blockState) == FancyWorldAnimationsClient.Type.LANTERN && blockState.getValueOrElse(BlockStateProperties.HANGING, false);
     }
 
@@ -61,12 +56,12 @@ public class SwingingBlockHelper {
 
     public static boolean isLast(BlockPos blockPos){
         Animation anim = FancyWorldAnimationsClient.animations.animations.get(blockPos.below());
-        return !isSwingingBlock(Minecraft.getInstance().level.getBlockState(blockPos.below())) && !(anim instanceof LanternAnimation || anim instanceof ChainAnimation);
+        return !isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(blockPos.below())) && !(anim instanceof LanternAnimation || anim instanceof ChainAnimation);
     }
 
     public static BlockPos getLast(BlockPos blockPos){
         MutableBlockPos pos = blockPos.mutable();
-        while (isSwingingBlock(Minecraft.getInstance().level.getBlockState(pos))){
+        while (isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(pos))){
             pos.move(0,-1,0);
         }
         return pos.move(0,1,0);
@@ -85,7 +80,7 @@ public class SwingingBlockHelper {
         while (anim != null){
             pos.move(0,-1,0);
             anim = FancyWorldAnimationsClient.animations.animations.get(pos);
-            if (anim != null && isHangingLantern(anim.getDefaultState())) break;
+            if (anim != null && isActiveHangingLantern(anim.getDefaultState())) break;
         }
         if(anim == null) {
             pos.move(0,1,0);
