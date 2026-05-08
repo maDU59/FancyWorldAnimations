@@ -268,6 +268,12 @@ public class ModCompat {
 
         @SuppressWarnings("unchecked")
         public static int getColor(ItemStack stack, BlockState state, int slot){
+            if(slot < 0 || slot > 5) 
+                try { 
+                    return (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot);
+                } catch (Exception e) {
+                    return -1;
+                }
             if (stack.isEmpty()) return -1;
             else if (stack.getItem() instanceof WritableBookItem || stack.getItem() instanceof WrittenBookItem){
                 return DyedItemColor.getOrDefault(stack, 0xFF99452E);
@@ -283,6 +289,7 @@ public class ModCompat {
         }
 
         public static ItemStack getBookshelfItemStack(BlockPos pos, int slot){
+            if(slot < 0 || slot > 5) return ItemStack.EMPTY;
             return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
         }
     }
