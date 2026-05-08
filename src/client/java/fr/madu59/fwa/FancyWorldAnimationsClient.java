@@ -193,7 +193,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if (oldState.getBlock() != newState.getBlock() && ((newState.getBlock() instanceof LavaCauldronBlock && oldState.getBlock() instanceof CauldronBlock) || (oldState.getBlock() instanceof LavaCauldronBlock && newState.getBlock() instanceof CauldronBlock))) return true;
 			return false;
 		}
-		if(type == Type.LANTERN) return SwingingBlockHelper.isHangingLantern(newState);
+		if(type == Type.LANTERN) return SwingingBlockHelper.isActiveHangingLantern(newState);
 		if(type == Type.CHAIN) {
 			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || ((SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos)))) && SettingsManager.LANTERN_OVERRIDE.getValue()));
 		}
@@ -330,7 +330,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static void propagateChain(ClientLevel level, BlockPos blockPos, BlockState newState){
 		if(SettingsManager.CHAIN_STATE.getValue()){
-			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
+			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isActiveSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
 				BlockPos abovePos = blockPos.above();
 				while(true) {
 					Animation anim = animations.animations.get(abovePos);
@@ -339,7 +339,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 					abovePos = abovePos.above();
 				}
 			}
-			if(newState.isAir() || (SwingingBlockHelper.isSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
+			if(newState.isAir() || (SwingingBlockHelper.isActiveSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
 				BlockPos abovePos = blockPos.above();
 				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
@@ -349,7 +349,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			}
 		}
 		if(!SettingsManager.CHAIN_STATE.getValue()){
-			if(!SwingingBlockHelper.isHangingLantern(newState) && !SwingingBlockHelper.isHangingLantern(level.getBlockState(SwingingBlockHelper.getLast(blockPos)))){
+			if(!SwingingBlockHelper.isActiveHangingLantern(newState) && !SwingingBlockHelper.isActiveHangingLantern(level.getBlockState(SwingingBlockHelper.getLast(blockPos)))){
 				BlockPos abovePos = blockPos.above();
 				while(true) {
 					Animation anim = animations.animations.get(abovePos);
@@ -381,7 +381,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			}
 		}
 		BlockPos belowPos = blockPos.below();
-		if(SwingingBlockHelper.isSwingingBlock(level.getBlockState(belowPos))){
+		if(SwingingBlockHelper.isActiveSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
 			Animation anim = animations.animations.get(lastPos);
 			if (anim != null) anim.needUpdate();
