@@ -139,7 +139,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
-		if(!animation.hasInfiniteAnimation() && Minecraft.getInstance().gameRenderer.getMainCamera().position().distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) return;
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 500000*500000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
