@@ -18,7 +18,6 @@
         "dawnoftimebuilder:spruce_paper_door", 
         "dawnoftimebuilder:paper_door",
         "northstar:titanium_space_door",
-        "northstar:iron_space_door",
-        "bountifulfares:ceramic_lever"
+        "northstar:iron_space_door"
     ]
 }
