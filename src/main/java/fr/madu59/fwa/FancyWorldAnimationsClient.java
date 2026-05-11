@@ -56,6 +56,7 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
@@ -129,12 +130,7 @@ public class FancyWorldAnimationsClient{
 
 		Type type = typeOf(oldState, newState);
 
-		if(type == Type.USELESS){
-			animations.removeAt(blockPos);
-			return;
-		}
-
-		if(!isSameType(type, newState)){
+		if(type == Type.USELESS || !isSameType(type, newState) || newState.getRenderShape() == RenderShape.INVISIBLE){
 			animations.removeAt(blockPos);
 			return;
 		}
