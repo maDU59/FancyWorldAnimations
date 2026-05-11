@@ -59,6 +59,7 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.TripWireHookBlock;
@@ -106,12 +107,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		Type type = typeOf(oldState, newState);
 
-		if(type == Type.USELESS){
-			animations.removeAt(blockPos);
-			return;
-		}
-
-		if(!isSameType(type, newState)){
+		if(type == Type.USELESS || !isSameType(type, newState) || newState.getRenderShape() == RenderShape.INVISIBLE){
 			animations.removeAt(blockPos);
 			return;
 		}
@@ -136,7 +132,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
-		if(!animation.hasInfiniteAnimation() && Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) return;
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 500000*500000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
