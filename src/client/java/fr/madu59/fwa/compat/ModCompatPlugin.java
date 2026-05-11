@@ -19,6 +19,12 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains(".scholar.")) {
             return FabricLoader.getInstance().isModLoaded("scholar");
         }
+        if (mixinClassName.contains(".create.")) {
+            return FabricLoader.getInstance().isModLoaded("create");
+        }
+        if (mixinClassName.contains(".sable.")) {
+            return FabricLoader.getInstance().isModLoaded("sable");
+        }
         return true;
     }
 

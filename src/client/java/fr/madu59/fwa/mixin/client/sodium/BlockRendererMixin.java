@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.rendering.RenderHelper;
 
 @Mixin(
@@ -23,7 +24,7 @@ public class BlockRendererMixin {
         ordinal = 0
     )
     private BlockStateModel fwa$render(BlockStateModel originalModel, BlockStateModel model, BlockState state, BlockPos pos, BlockPos origin) {
-        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel) : originalModel;
+        return !ModCompat.areAnimationsTemporarylyDisabled() && FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel) : originalModel;
     }
 
 }
