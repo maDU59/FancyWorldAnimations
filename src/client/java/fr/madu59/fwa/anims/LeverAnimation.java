@@ -191,7 +191,7 @@ public class LeverAnimation extends Animation{
 
         float pivot = 0.0625f;
 
-        if (handle.size() > 4 && handle.size() < 7){
+        if (handle.size() > 4){
 
             Vector3f middlePoint = null;
             Vector3f handleVector = null;
@@ -206,7 +206,7 @@ public class LeverAnimation extends Animation{
                 if(Math.abs(edge1.lengthSquared() - edge2.lengthSquared()) < 0.001f){
                     middlePoint = ModelSplitHelper.middlePoint(quad);
                 }
-                else{
+                else if(Math.abs(edge1.lengthSquared() - edge2.lengthSquared()) > 0.001f){
                     if (edge1.lengthSquared() > edge2.lengthSquared()) handleVector = edge1;
                     else handleVector = edge2;
                 }
