@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
@@ -17,7 +16,7 @@ public abstract class RenderSectionRegionMixin {
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     private void fwa$hideAnimatedBlocks(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        if (!ModCompat.areAnimationsTemporarylyDisabled() && FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
+        if (FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) {
             cir.setReturnValue(Blocks.AIR.defaultBlockState());
         }
     }

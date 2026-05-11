@@ -49,8 +49,6 @@ public class ModCompat {
 
     private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
 
-    private static boolean animationsTemporarylyDisabled = false;
-
     public ModCompat(){
         registerVaultKeys();
     }
@@ -121,20 +119,6 @@ public class ModCompat {
     public static boolean isAnimatedModdedBlock(BlockState state){
         if(WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()))) return true;
         return false;
-    }
-
-    // COMPATIBILITY FOR MODS NEEDING THE VANILLA WORLD WITH NON-HIDDEN BLOCKS (E.G. SABLE)
-
-    public static void disableAnimationsTemporaryly(){
-        animationsTemporarylyDisabled = true;
-    }
-
-    public static void endAnimationsDisabled(){
-        animationsTemporarylyDisabled = false;
-    }
-
-    public static boolean areAnimationsTemporarylyDisabled(){
-        return animationsTemporarylyDisabled;
     }
 
     // MAP ATLASES COMPATIBILITY
