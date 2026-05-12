@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.tools.ant.types.ResourceLocation;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
@@ -32,14 +30,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
 public class ModCompat {
 
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
 
-    public final static ResourceLocation ALEXSCAVES_GINGERBREAD_DOOR = ResourceLocation.tryParse("alexscaves:gingerbread_door");
+    public final static Identifier ALEXSCAVES_GINGERBREAD_DOOR = Identifier.tryParse("alexscaves:gingerbread_door");
 
     public final static Identifier WW_DISPLAY_LANTERNS = Identifier.tryParse("wilderwild:display_lantern");
     public final static Identifier ENDREM_ANCIENT_PORTAL_FRAME = Identifier.tryParse("endrem:ancient_portal_frame");
@@ -66,9 +63,6 @@ public class ModCompat {
     }
 
     public static boolean isOpen(BlockState state, Block block){
-        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd") || ALEXSCAVES_GINGERBREAD_DOOR.equals(blockId)) return state.getValue(BlockStateProperties.OPEN);
-        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return state.getValue(BlockStateProperties.EYE);
         return false;
     }
 
