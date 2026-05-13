@@ -16,11 +16,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,7 +29,6 @@ public class DoorAnimation extends Animation{
 
     private final BlockStateModel model;
     private List<BlockModelPart> parts = new ArrayList<>();
-    private final RenderType renderType;
     private final float dX;
     private final float dZ;
     private final float pivotX;
@@ -44,9 +40,6 @@ public class DoorAnimation extends Animation{
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         model.collectParts(random, parts);
-        String path = BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()).getPath();
-        if(path.contains("stained") || path.contains("tinted")) renderType = RenderTypes.translucentMovingBlock();
-        else renderType = RenderTypes.cutoutMovingBlock();
 
         BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);

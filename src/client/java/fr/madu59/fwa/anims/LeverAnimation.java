@@ -99,7 +99,7 @@ public class LeverAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = RenderHelper.getBuffer(renderType);
 
         RenderHelper.renderQuads(buffer, poseStack.last(), lever.baseQuadList(), 1f, 1f, 1f, 1f, light);
 

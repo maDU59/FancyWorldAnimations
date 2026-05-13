@@ -2,7 +2,8 @@ package fr.madu59.fwa.anims;
 
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
-
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -16,6 +17,7 @@ public class Animation {
     protected final BlockState defaultState;
     protected final BlockState oldState;
     protected final BlockState newState;
+    protected final RenderType renderType;
     protected double toRemoveTick = 0.0;
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
@@ -31,6 +33,7 @@ public class Animation {
         this.newIsOpen = newIsOpen;
         this.oldState = oldState;
         this.newState = newState;
+        this.renderType = ItemBlockRenderTypes.getRenderType(newState);
     }
 
     public boolean isUnique() {
