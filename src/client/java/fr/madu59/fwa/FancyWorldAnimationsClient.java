@@ -213,18 +213,18 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	private static boolean isOpen(BlockState state, Type type)
 	{
 		Block block = state.getBlock();
-		if(type == Type.DOOR) return state.getValue(BlockStateProperties.OPEN);
-		if(type == Type.TRAPDOOR) return state.getValue(BlockStateProperties.OPEN);
-		if(type == Type.FENCE_GATE) return state.getValue(BlockStateProperties.OPEN);
-		if(type == Type.LEVER) return state.getValue(BlockStateProperties.POWERED);
-		if(type == Type.LECTERN) return state.getValue(BlockStateProperties.HAS_BOOK);
-		if(type == Type.BUTTON) return state.getValue(BlockStateProperties.POWERED);
-		if(type == Type.JUKEBOX) return state.getValue(BlockStateProperties.HAS_RECORD);
-		if(type == Type.END_PORTAL_FRAME) return state.getValue(BlockStateProperties.EYE);
+		if(type == Type.DOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
+		if(type == Type.TRAPDOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
+		if(type == Type.FENCE_GATE) return state.getValueOrElse(BlockStateProperties.OPEN, false);
+		if(type == Type.LEVER) return state.getValueOrElse(BlockStateProperties.POWERED, false);
+		if(type == Type.LECTERN) return state.getValueOrElse(BlockStateProperties.HAS_BOOK, false);
+		if(type == Type.BUTTON) return state.getValueOrElse(BlockStateProperties.POWERED, false);
+		if(type == Type.JUKEBOX) return state.getValueOrElse(BlockStateProperties.HAS_RECORD, false);
+		if(type == Type.END_PORTAL_FRAME) return state.getValueOrElse(BlockStateProperties.EYE, false);
 		if(type == Type.BELL) return true;
-		if(type == Type.CAMPFIRE) return state.getValue(CampfireBlock.LIT);
-		if(type == Type.TRIPWIRE_HOOK) return state.getValue(BlockStateProperties.ATTACHED);
-		if(type == Type.VAULT) return state.getValue(BlockStateProperties.VAULT_STATE) == VaultState.UNLOCKING;
+		if(type == Type.CAMPFIRE) return state.getValueOrElse(CampfireBlock.LIT, false);
+		if(type == Type.TRIPWIRE_HOOK) return state.getValueOrElse(BlockStateProperties.ATTACHED, false);
+		if(type == Type.VAULT) return state.getValueOrElse(BlockStateProperties.VAULT_STATE, VaultState.INACTIVE) == VaultState.UNLOCKING;
 		return ModCompat.isOpen(state, block);
 	}
 
