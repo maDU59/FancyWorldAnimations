@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -84,10 +83,9 @@ public class RedstoneWireAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
     
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = RenderHelper.getBuffer();
 
         float[] color = getColor(context.getNowTick(), newR, newG, newB, oldR, oldG, oldB);
 
-        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, color[0], color[1], color[2], light);
+        RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, color[0], color[1], color[2], light);
     }
 }

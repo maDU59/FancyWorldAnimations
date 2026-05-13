@@ -7,7 +7,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
@@ -99,9 +98,7 @@ public class LeverAnimation extends Animation{
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
-
-        RenderHelper.renderQuads(buffer, poseStack.last(), lever.baseQuadList(), 1f, 1f, 1f, 1f, light);
+        RenderHelper.renderQuads(context.getBufferSource(), poseStack.last(), lever.baseQuadList(), 1f, 1f, 1f, 1f, light);
 
         double angle = getAngle(context.getNowTick(), facing);
 
@@ -151,7 +148,7 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
-        RenderHelper.renderQuads(buffer, poseStack.last(), lever.handleQuadList(), 1f, 1f, 1f, 1f, light);
+        RenderHelper.renderQuads(context.getBufferSource(), poseStack.last(), lever.handleQuadList(), 1f, 1f, 1f, 1f, light);
     }
 
     public Lever splitLeverQuads(List<BakedQuad> quads, Direction facing, AttachFace face){

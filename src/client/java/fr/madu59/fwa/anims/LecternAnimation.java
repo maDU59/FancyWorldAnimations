@@ -7,7 +7,6 @@ import com.mojang.math.Axis;
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -99,7 +98,7 @@ public class LecternAnimation extends Animation {
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 
-        VertexConsumer buffer = RenderHelper.getBuffer(RenderTypes.entityCutout(textureId));
+        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.entityCutout(textureId));
         
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         BookModel.State bookState = new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));

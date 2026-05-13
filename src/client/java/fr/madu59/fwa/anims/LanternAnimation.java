@@ -6,7 +6,6 @@ import java.util.List;
 import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
@@ -17,6 +16,7 @@ import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
@@ -84,7 +84,7 @@ public class LanternAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         if (needUpdate) update();
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
@@ -120,7 +120,7 @@ public class LanternAnimation extends Animation{
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             BlockStateModel chainModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             chainModel.collectParts(random, chainParts);
-            RenderHelper.renderModel(buffer, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(bufferSource, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);
@@ -141,7 +141,7 @@ public class LanternAnimation extends Animation{
         BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         parts.clear();
         model.collectParts(random, parts);
-        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
         poseStack.popPose();
     }
