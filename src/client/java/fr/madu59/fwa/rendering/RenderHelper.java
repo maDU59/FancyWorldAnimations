@@ -20,14 +20,11 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 
 public class RenderHelper {
 
-    private static MultiBufferSource bufferSource;
     private static float bottomShade = 0;
     private static float topShade = 0;
     private static float ZShade = 0;
@@ -48,15 +45,6 @@ public class RenderHelper {
             XShade = level.getShade(Direction.EAST, true);
         }
         shouldShade = !context.isShadow();
-        bufferSource = context.getBufferSource();
-    }
-
-    public static VertexConsumer getBuffer(){
-        return getBuffer(RenderTypes.cutoutMovingBlock());
-    }
-
-    public static VertexConsumer getBuffer(RenderType renderType){
-        return bufferSource.getBuffer(renderType);
     }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light){

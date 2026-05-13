@@ -1,5 +1,7 @@
 package fr.madu59.fwa.anims;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -136,5 +138,13 @@ public class Animation {
     }
 
     public void render(AnimationRenderingContext context) {
+    }
+
+    protected VertexConsumer getBuffer(AnimationRenderingContext context){
+        return context.getBufferSource().getBuffer(this.renderType);
+    }
+
+    protected VertexConsumer getBuffer(AnimationRenderingContext context, RenderType renderType){
+        return context.getBufferSource().getBuffer(renderType);
     }
 }

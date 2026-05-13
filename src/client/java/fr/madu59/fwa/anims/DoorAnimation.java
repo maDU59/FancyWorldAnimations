@@ -134,7 +134,7 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = RenderHelper.getBuffer(renderType);
+        VertexConsumer buffer = getBuffer(context);
         RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

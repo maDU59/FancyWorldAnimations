@@ -154,7 +154,7 @@ public class BellAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position);
 
         if(shouldUseFallbackRender()){
-            RenderHelper.renderModel(RenderHelper.getBuffer(renderType), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(getBuffer(context), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
 
         float ticks = bellBlockEntity.ticks + Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);

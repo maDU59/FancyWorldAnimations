@@ -98,7 +98,7 @@ public class LecternAnimation extends Animation {
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.entityCutout(textureId));
+        VertexConsumer buffer = getBuffer(context, RenderTypes.entityCutout(textureId));
         
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
         BookModel.State bookState = new BookModel.State(0f, getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick), (float)getAngle(Curves.ease(getProgress(nowTick), getCurve())));
