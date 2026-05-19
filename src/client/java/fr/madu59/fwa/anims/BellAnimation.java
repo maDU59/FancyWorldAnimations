@@ -167,7 +167,7 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        bellBody.render(poseStack, sprite.wrap(RenderHelper.getBuffer()), light, OverlayTexture.NO_OVERLAY, -1);
+        bellBody.render(poseStack, sprite.wrap(getBuffer(context)), light, OverlayTexture.NO_OVERLAY, -1);
 
         RenderHelper.endBatch(context.getBufferSource());
     }
