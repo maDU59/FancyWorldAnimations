@@ -94,7 +94,7 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            VertexConsumer buffer = RenderHelper.getBuffer();
+            VertexConsumer buffer = getBuffer(context);
             RenderHelper.renderModel(buffer, poseStack.last(), model, 1f, 1f, 1f, 1f, light, random, defaultState);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 1f, 1f, 1f, 1f);
@@ -104,10 +104,10 @@ public class EndPortalFrameAnimation extends Animation{
 
         }
         else{
-
-            VertexConsumer buffer = RenderHelper.getBuffer(RenderType.translucentMovingBlock());
             float time = (float)(context.getNowTick() - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
+
+            VertexConsumer buffer = getBuffer(context, RenderType.translucentMovingBlock());
 
             renderFilteredQuads(poseStack, buffer, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 0f, 1f, 0f, alpha);
             for(Direction dir : Direction.values()){

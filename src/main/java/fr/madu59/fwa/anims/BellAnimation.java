@@ -151,8 +151,7 @@ public class BellAnimation extends Animation{
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
         if(shouldUseFallbackRender()){
-            VertexConsumer buffer = RenderHelper.getBuffer();
-            RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
+            RenderHelper.renderModel(getBuffer(context), poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
         }
 
         setupAnim(bellBlockEntity, Math.min(Math.max(Minecraft.getInstance().getFrameTime(), 0f), 1.0f));
@@ -165,7 +164,7 @@ public class BellAnimation extends Animation{
             bellBody = rotateBell(bellBody, rot, facing, attachment);
         }
 
-        bellBody.render(poseStack, sprite.wrap(RenderHelper.getBuffer()), light, OverlayTexture.NO_OVERLAY);
+        bellBody.render(poseStack, sprite.wrap(getBuffer(context)), light, OverlayTexture.NO_OVERLAY);
 
         RenderHelper.endBatch(context.getBufferSource());
     }
