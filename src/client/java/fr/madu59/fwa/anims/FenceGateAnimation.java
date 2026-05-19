@@ -89,7 +89,7 @@ public class FenceGateAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
 
         renderQuads(poseStack, buffer, fenceGate.postQuadList(), light);
 

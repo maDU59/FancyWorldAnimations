@@ -136,7 +136,7 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
         RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
     }
 }
