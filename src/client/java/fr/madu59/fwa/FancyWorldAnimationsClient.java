@@ -30,6 +30,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -213,18 +214,18 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	private static boolean isOpen(BlockState state, Type type)
 	{
 		Block block = state.getBlock();
-		if(type == Type.DOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
-		if(type == Type.TRAPDOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
-		if(type == Type.FENCE_GATE) return state.getValueOrElse(BlockStateProperties.OPEN, false);
-		if(type == Type.LEVER) return state.getValueOrElse(BlockStateProperties.POWERED, false);
-		if(type == Type.LECTERN) return state.getValueOrElse(BlockStateProperties.HAS_BOOK, false);
-		if(type == Type.BUTTON) return state.getValueOrElse(BlockStateProperties.POWERED, false);
-		if(type == Type.JUKEBOX) return state.getValueOrElse(BlockStateProperties.HAS_RECORD, false);
-		if(type == Type.END_PORTAL_FRAME) return state.getValueOrElse(BlockStateProperties.EYE, false);
+		if(type == Type.DOOR) return Backport.getValueOrElse(state, BlockStateProperties.OPEN, false);
+		if(type == Type.TRAPDOOR) return Backport.getValueOrElse(state, BlockStateProperties.OPEN, false);
+		if(type == Type.FENCE_GATE) return Backport.getValueOrElse(state, BlockStateProperties.OPEN, false);
+		if(type == Type.LEVER) return Backport.getValueOrElse(state, BlockStateProperties.POWERED, false);
+		if(type == Type.LECTERN) return Backport.getValueOrElse(state, BlockStateProperties.HAS_BOOK, false);
+		if(type == Type.BUTTON) return Backport.getValueOrElse(state, BlockStateProperties.POWERED, false);
+		if(type == Type.JUKEBOX) return Backport.getValueOrElse(state, BlockStateProperties.HAS_RECORD, false);
+		if(type == Type.END_PORTAL_FRAME) return Backport.getValueOrElse(state, BlockStateProperties.EYE, false);
 		if(type == Type.BELL) return true;
-		if(type == Type.CAMPFIRE) return state.getValueOrElse(CampfireBlock.LIT, false);
-		if(type == Type.TRIPWIRE_HOOK) return state.getValueOrElse(BlockStateProperties.ATTACHED, false);
-		if(type == Type.VAULT) return state.getValueOrElse(BlockStateProperties.VAULT_STATE, VaultState.INACTIVE) == VaultState.UNLOCKING;
+		if(type == Type.CAMPFIRE) return Backport.getValueOrElse(state, CampfireBlock.LIT, false);
+		if(type == Type.TRIPWIRE_HOOK) return Backport.getValueOrElse(state, BlockStateProperties.ATTACHED, false);
+		if(type == Type.VAULT) return Backport.getValueOrElse(state, BlockStateProperties.VAULT_STATE, VaultState.INACTIVE) == VaultState.UNLOCKING;
 		return ModCompat.isOpen(state, block);
 	}
 

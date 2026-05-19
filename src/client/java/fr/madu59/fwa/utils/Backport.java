@@ -3,6 +3,8 @@ package fr.madu59.fwa.utils;
 import org.joml.Vector3f;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public class Backport {
     public static Vector3f getPos(BakedQuad quad, int vertexIndex) {
@@ -14,5 +16,9 @@ public class Backport {
         float z = Float.intBitsToFloat(vertexData[offset + 2]);
         
         return new Vector3f(x, y, z);
+    }
+
+    public static <T extends Comparable<T>> T getValueOrElse(BlockState state, Property<T> property, T defaultValue) {
+        return state.hasProperty(property) ? state.getValue(property) : defaultValue;
     }
 }
