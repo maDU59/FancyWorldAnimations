@@ -93,7 +93,7 @@ public class ChainAnimation extends Animation{
         float swingScale = 0.7F;
         if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float prevFactor = 0.0F;
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         float degToRad = 0.017453292519943295f;
