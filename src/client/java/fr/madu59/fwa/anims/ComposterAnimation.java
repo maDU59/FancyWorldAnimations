@@ -67,7 +67,7 @@ public class ComposterAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
         
         for(BlockModelPart part: parts){
             renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
