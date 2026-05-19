@@ -27,7 +27,6 @@ import net.minecraft.util.RandomSource;
 
 public class RenderHelper {
 
-    private static MultiBufferSource bufferSource;
     private static float bottomShade = 0;
     private static float topShade = 0;
     private static float ZShade = 0;
@@ -48,15 +47,6 @@ public class RenderHelper {
             XShade = level.getShade(Direction.EAST, true);
         }
         shouldShade = !context.isShadow();
-        bufferSource = context.getBufferSource();
-    }
-
-    public static VertexConsumer getBuffer(){
-        return getBuffer(RenderType.cutoutMipped());
-    }
-
-    public static VertexConsumer getBuffer(RenderType renderType){
-        return bufferSource.getBuffer(renderType);
     }
 
     public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light){
