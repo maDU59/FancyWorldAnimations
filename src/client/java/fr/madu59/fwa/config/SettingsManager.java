@@ -473,6 +473,13 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> SHULKERBOX_STATE = loadOptionWithDefaults(
+        "shulkerbox_state",
+        "fwa.config.option.state.name",
+        "fwa.config.option.state.description",
+        true
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {
