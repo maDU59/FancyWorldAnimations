@@ -30,12 +30,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
 public class ModCompat {
 
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
+
+    public final static ResourceLocation ALEXSCAVES_GINGERBREAD_DOOR = ResourceLocation.tryParse("alexscaves:gingerbread_door");
 
     public final static ResourceLocation WW_DISPLAY_LANTERNS = ResourceLocation.tryParse("wilderwild:display_lantern");
     public final static ResourceLocation ENDREM_ANCIENT_PORTAL_FRAME = ResourceLocation.tryParse("endrem:ancient_portal_frame");
@@ -55,16 +56,13 @@ public class ModCompat {
     
     public static Type typeOf(Block block){
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return Type.DOOR;
+        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd") || ALEXSCAVES_GINGERBREAD_DOOR.equals(blockId)) return Type.DOOR;
         if(WW_DISPLAY_LANTERNS.equals(blockId)) return Type.LANTERN;
         if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return Type.END_PORTAL_FRAME;
         return Type.USELESS;
     }
 
     public static boolean isOpen(BlockState state, Block block){
-        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return state.getValue(BlockStateProperties.OPEN);
-        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return state.getValue(BlockStateProperties.EYE);
         return false;
     }
 

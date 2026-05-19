@@ -82,7 +82,7 @@ public class RedstoneWireAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
     
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
 
         float[] color = getColor(context.getNowTick(), newR, newG, newB, oldR, oldG, oldB);
 
