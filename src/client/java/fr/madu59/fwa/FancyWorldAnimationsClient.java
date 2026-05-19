@@ -212,7 +212,6 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static boolean isOpen(BlockState state, Type type)
 	{
-		Block block = state.getBlock();
 		if(type == Type.DOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
 		if(type == Type.TRAPDOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
 		if(type == Type.FENCE_GATE) return state.getValueOrElse(BlockStateProperties.OPEN, false);
@@ -225,7 +224,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.CAMPFIRE) return state.getValueOrElse(CampfireBlock.LIT, false);
 		if(type == Type.TRIPWIRE_HOOK) return state.getValueOrElse(BlockStateProperties.ATTACHED, false);
 		if(type == Type.VAULT) return state.getValueOrElse(BlockStateProperties.VAULT_STATE, VaultState.INACTIVE) == VaultState.UNLOCKING;
-		return ModCompat.isOpen(state, block);
+		return ModCompat.isOpen(state, type);
 	}
 
 	private static Animation createAnimation(BlockPos pos, Type type, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)

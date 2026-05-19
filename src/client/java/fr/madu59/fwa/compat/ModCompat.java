@@ -62,7 +62,7 @@ public class ModCompat {
         return Type.USELESS;
     }
 
-    public static boolean isOpen(BlockState state, Block block){
+    public static boolean isOpen(BlockState state, Type type){
         return false;
     }
 
