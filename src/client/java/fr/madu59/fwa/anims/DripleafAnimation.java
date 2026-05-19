@@ -70,7 +70,7 @@ public class DripleafAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
 
         renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), false, light);
         for(Direction dir : Direction.values()){

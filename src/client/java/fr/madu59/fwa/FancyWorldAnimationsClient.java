@@ -29,6 +29,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -116,8 +117,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			return;
 		}
 
-		boolean oldIsOpen = isOpen(oldState);
-		boolean newIsOpen = isOpen(newState);
+		boolean oldIsOpen = isOpen(oldState, type);
+		boolean newIsOpen = isOpen(newState, type);
 
 		double startTick = getPartialTick();
 
@@ -206,7 +207,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		poseStack.popPose();
 	}
 
-	private static boolean isOpen(BlockState state)
+	private static boolean isOpen(BlockState state, Type type)
 	{
 		Block block = state.getBlock();
 		if(block instanceof DoorBlock) return state.getValue(BlockStateProperties.OPEN);
@@ -219,7 +220,6 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(block instanceof EndPortalFrameBlock) return state.getValue(BlockStateProperties.EYE);
 		if(block instanceof BellBlock) return true;
 		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
-		if(block instanceof TripWireHookBlock) return state.getValue(BlockStateProperties.ATTACHED);
 		return ModCompat.isOpen(state, block);
 	}
 
