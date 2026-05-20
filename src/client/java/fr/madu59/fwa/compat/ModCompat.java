@@ -40,6 +40,7 @@ public class ModCompat {
     private final static boolean IS_MAP_ATLASES_LOADED = FabricLoader.getInstance().isModLoaded("map_atlases");
     private final static boolean IS_END_REMASTERED_LOADED = FabricLoader.getInstance().isModLoaded("endrem");
     private final static boolean IS_SCHOLAR_LOADED = FabricLoader.getInstance().isModLoaded("scholar");
+    private final static boolean IS_COPPERATIVE_LOADED = FabricLoader.getInstance().isModLoaded("copperative");
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -55,7 +56,7 @@ public class ModCompat {
         return Type.USELESS;
     }
 
-    public static boolean isOpen(BlockState state, Block block){
+    public static boolean isOpen(BlockState state, Type type){
         return false;
     }
 
@@ -83,6 +84,10 @@ public class ModCompat {
 
     public static boolean isScholarLoaded(){
         return IS_SCHOLAR_LOADED;
+    }
+
+    public static boolean isCopperativeLoaded(){
+        return IS_COPPERATIVE_LOADED;
     }
 
     // VAULT COMPATIBILITY
