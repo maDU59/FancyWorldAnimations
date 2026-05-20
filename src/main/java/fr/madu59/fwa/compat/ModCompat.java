@@ -30,11 +30,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ModCompat {
 
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
+
+    public final static ResourceLocation ALEXSCAVES_GINGERBREAD_DOOR = ResourceLocation.tryParse("alexscaves:gingerbread_door");
 
     public final static ResourceLocation WW_DISPLAY_LANTERNS = ResourceLocation.tryParse("wilderwild:display_lantern");
     public final static ResourceLocation ENDREM_ANCIENT_PORTAL_FRAME = ResourceLocation.tryParse("endrem:ancient_portal_frame");
@@ -45,6 +46,7 @@ public class ModCompat {
     private final static boolean IS_MAP_ATLASES_LOADED = FMLLoader.getLoadingModList().getModFileById("map_atlases") != null;
     private final static boolean IS_END_REMASTERED_LOADED = FMLLoader.getLoadingModList().getModFileById("endrem") != null;
     private final static boolean IS_SCHOLAR_LOADED = FMLLoader.getLoadingModList().getModFileById("scholar") != null;
+    private final static boolean IS_COPPERATIVE_LOADED = FMLLoader.getLoadingModList().getModFileById("copperative") != null;
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -54,16 +56,13 @@ public class ModCompat {
     
     public static Type typeOf(Block block){
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return Type.DOOR;
+        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd") || ALEXSCAVES_GINGERBREAD_DOOR.equals(blockId)) return Type.DOOR;
         if(WW_DISPLAY_LANTERNS.equals(blockId)) return Type.LANTERN;
         if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return Type.END_PORTAL_FRAME;
         return Type.USELESS;
     }
 
-    public static boolean isOpen(BlockState state, Block block){
-        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if (DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return state.getValue(BlockStateProperties.OPEN);
-        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return state.getValue(BlockStateProperties.EYE);
+    public static boolean isOpen(BlockState state, Type type){
         return false;
     }
 
@@ -91,6 +90,10 @@ public class ModCompat {
 
     public static boolean isScholarLoaded(){
         return IS_SCHOLAR_LOADED;
+    }
+
+    public static boolean isCopperativeLoaded(){
+        return IS_COPPERATIVE_LOADED;
     }
 
     // VAULT COMPATIBILITY
