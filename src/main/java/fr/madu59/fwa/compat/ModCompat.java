@@ -42,6 +42,7 @@ public class ModCompat {
     private final static boolean IS_MAP_ATLASES_LOADED = FMLLoader.getLoadingModList().getModFileById("map_atlases") != null;
     private final static boolean IS_END_REMASTERED_LOADED = FMLLoader.getLoadingModList().getModFileById("endrem") != null;
     private final static boolean IS_SCHOLAR_LOADED = FMLLoader.getLoadingModList().getModFileById("scholar") != null;
+    private final static boolean IS_COPPERATIVE_LOADED = FMLLoader.getLoadingModList().getModFileById("copperative") != null;
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -57,7 +58,7 @@ public class ModCompat {
         return Type.USELESS;
     }
 
-    public static boolean isOpen(BlockState state, Block block){
+    public static boolean isOpen(BlockState state, Type type){
         return false;
     }
 
@@ -85,6 +86,10 @@ public class ModCompat {
 
     public static boolean isScholarLoaded(){
         return IS_SCHOLAR_LOADED;
+    }
+
+    public static boolean isCopperativeLoaded(){
+        return IS_COPPERATIVE_LOADED;
     }
 
     // VAULT COMPATIBILITY

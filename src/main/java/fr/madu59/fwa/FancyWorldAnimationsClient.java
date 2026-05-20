@@ -223,18 +223,18 @@ public class FancyWorldAnimationsClient{
 
 	private static boolean isOpen(BlockState state, Type type)
 	{
-		Block block = state.getBlock();
-		if(block instanceof DoorBlock) return state.getValue(BlockStateProperties.OPEN);
-		if(block instanceof TrapDoorBlock) return state.getValue(BlockStateProperties.OPEN);
-		if(block instanceof FenceGateBlock) return state.getValue(BlockStateProperties.OPEN);
-		if(block instanceof LeverBlock) return state.getValue(BlockStateProperties.POWERED);
-		if(block instanceof LecternBlock) return state.getValue(BlockStateProperties.HAS_BOOK);
-		if(block instanceof ButtonBlock) return state.getValue(BlockStateProperties.POWERED);
-		if(block instanceof JukeboxBlock) return state.getValue(BlockStateProperties.HAS_RECORD);
-		if(block instanceof EndPortalFrameBlock) return state.getValue(BlockStateProperties.EYE);
-		if(block instanceof BellBlock) return true;
-		if(block instanceof CampfireBlock) return state.getValue(CampfireBlock.LIT);
-		return ModCompat.isOpen(state, block);
+		if(type == Type.DOOR) return Backport.getValueOrElse(state, BlockStateProperties.OPEN, false);
+		if(type == Type.TRAPDOOR) return Backport.getValueOrElse(state, BlockStateProperties.OPEN, false);
+		if(type == Type.FENCE_GATE) return Backport.getValueOrElse(state, BlockStateProperties.OPEN, false);
+		if(type == Type.LEVER) return Backport.getValueOrElse(state, BlockStateProperties.POWERED, false);
+		if(type == Type.LECTERN) return Backport.getValueOrElse(state, BlockStateProperties.HAS_BOOK, false);
+		if(type == Type.BUTTON) return Backport.getValueOrElse(state, BlockStateProperties.POWERED, false);
+		if(type == Type.JUKEBOX) return Backport.getValueOrElse(state, BlockStateProperties.HAS_RECORD, false);
+		if(type == Type.END_PORTAL_FRAME) return Backport.getValueOrElse(state, BlockStateProperties.EYE, false);
+		if(type == Type.BELL) return true;
+		if(type == Type.CAMPFIRE) return Backport.getValueOrElse(state, CampfireBlock.LIT, false);
+		if(type == Type.TRIPWIRE_HOOK) return Backport.getValueOrElse(state, BlockStateProperties.ATTACHED, false);
+		return ModCompat.isOpen(state, type);
 	}
 
 	private static Animation createAnimation(BlockPos pos, Type type, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState)

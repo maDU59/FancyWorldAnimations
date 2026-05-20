@@ -21,6 +21,7 @@
     "fwa.config.category.chain":"CHAINS",
     "fwa.config.category.dripleaf":"DRIPLEAVES",
     "fwa.config.category.redstone":"REDSTONE WIRES",
+    "fwa.config.category.shulkerbox":"SHULKER BOXES",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.animation_render_distance.name":"Triggered animations render distance",

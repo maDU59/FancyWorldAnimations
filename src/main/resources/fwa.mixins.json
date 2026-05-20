@@ -13,6 +13,7 @@
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderChunkRegionMixin",
+		"ShulkerBoxModelMixin",
 		"sodium.BlockRenderContextMixin",
 		"iris.ShadowRendererMixin",
 		"scholar.ChiseledBookShelfBlockEntityMixin"
