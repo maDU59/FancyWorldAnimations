@@ -87,7 +87,7 @@ public class LayeredCauldronAnimation extends Animation{
 
         int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        VertexConsumer buffer = getBuffer(context);
         BlockModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);

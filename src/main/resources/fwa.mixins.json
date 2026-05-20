@@ -13,6 +13,7 @@
 		"RenderSectionRegionMixin",
 		"ModelMixin",
 		"ModelPartAccessor",
+		"ShulkerBoxModelMixin",
 		"sodium.BlockRendererMixin",
 		"iris.ShadowRendererMixin",
 		"scholar.ChiseledBookShelfBlockEntityMixin"
