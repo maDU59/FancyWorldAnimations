@@ -115,6 +115,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.addButton(SettingsManager.CHEST_EASING);
         list.addCategory("fwa.config.category.shulkerbox");
         list.addButton(SettingsManager.SHULKERBOX_STATE);
+        list.addSlider(SettingsManager.SHULKERBOX_SPEED, 0.5, 2.0, 0.1);
         list.addCategory("fwa.config.category.lantern");
         list.addButton(SettingsManager.LANTERN_STATE);
         list.addCategory("fwa.config.category.chain");
