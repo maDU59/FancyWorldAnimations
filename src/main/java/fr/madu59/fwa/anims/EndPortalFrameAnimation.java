@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
@@ -14,9 +13,9 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -83,43 +82,41 @@ public class EndPortalFrameAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
         BlockStateModelPart part = eyeParts.get(0);
+        MultiBufferSource bufferSource = context.getBufferSource();
 
         if(newIsOpen){
 
-            VertexConsumer buffer = RenderHelper.getBuffer();
-            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1f, 1f, 1f, 1f, light);
+            RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1f, 1f, 1f, 1f, light);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
             if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
                 ModCompat.EndRemasteredCompat.renderEndPortalFrameAnimation(context, poseStack, position, light);
             }
             else{
-                renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
+                renderFilteredQuads(poseStack, bufferSource, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
                 for(Direction dir : Direction.values()){
-                    renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light, 1f, 1f, 1f, 1f);
+                    renderFilteredQuads(poseStack, bufferSource, part.getQuads(dir), true, light, 1f, 1f, 1f, 1f);
                 }
             }
 
         }
         else{
-
-            VertexConsumer buffer = RenderHelper.getBuffer(RenderTypes.translucentMovingBlock());
             float time = (float)(context.getNowTick() - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
 
-            renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 0f, 1f, 0f, alpha);
+            renderFilteredQuads(poseStack, bufferSource, part.getQuads(null), true, light, 0f, 1f, 0f, alpha);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light, 0f, 1f, 0f, alpha);
+                renderFilteredQuads(poseStack, bufferSource, part.getQuads(dir), true, light, 0f, 1f, 0f, alpha);
             }
 
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
+    private void renderFilteredQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, a, r, g, b, light);
+                RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, a, r, g, b, light);
             }
         }
     }

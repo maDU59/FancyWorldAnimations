@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -87,7 +86,6 @@ public class ButtonAnimation extends Animation{
         model.collectParts(null, parts);
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = RenderHelper.getBuffer();
-        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

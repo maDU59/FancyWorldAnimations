@@ -6,7 +6,6 @@ import java.util.List;
 import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
@@ -17,6 +16,7 @@ import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
@@ -100,7 +100,7 @@ public class ChainAnimation extends Animation{
         float swingScale = 0.7F;
         if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float prevFactor = 0.0F;
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         float degToRad = 0.017453292519943295f;
@@ -132,7 +132,7 @@ public class ChainAnimation extends Animation{
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             model.collectParts(random, parts);
-            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);

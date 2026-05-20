@@ -19,7 +19,6 @@ import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
@@ -29,7 +28,6 @@ import net.minecraft.world.level.CardinalLighting;
 
 public class RenderHelper {
 
-    private static MultiBufferSource bufferSource;
     private static float bottomShade = 0;
     private static float topShade = 0;
     private static float ZShade = 0;
@@ -50,42 +48,34 @@ public class RenderHelper {
             XShade = cardinalLighting.byFace(Direction.EAST);
         }
         shouldShade = !context.isShadow();
-        bufferSource = context.getBufferSource();
     }
 
-    public static VertexConsumer getBuffer(){
-        return getBuffer(RenderTypes.cutoutMovingBlock());
-    }
-
-    public static VertexConsumer getBuffer(RenderType renderType){
-        return bufferSource.getBuffer(renderType);
-    }
-
-    public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
+    public static void renderModel(MultiBufferSource bufferSource, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
         for (int i = 0; i < parts.size(); i++){
             for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                renderQuads(buffer, pose, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light);
+                renderQuads(bufferSource, pose, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light);
             }
         }
     }
 
-    public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
+    public static void renderQuads(MultiBufferSource bufferSource, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
         for (int i = 0; i < bakedQuads.size(); i++){
-            renderQuad(buffer, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade);
+            renderQuad(bufferSource, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade);
         }
     }
 
-    public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
-        renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, shouldShade);
+    public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
+        renderQuad(bufferSource, pose, bakedQuad, a, r, g, b, light, shouldShade);
     }
 
-    public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
+    public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
         float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
 
         QuadInstance quadInstance = new QuadInstance();
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
+        VertexConsumer buffer = a < 1.0f? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bufferSource.getBuffer(bakedQuad.materialInfo().itemRenderType());
         buffer.putBakedQuad(pose, bakedQuad, quadInstance);
     }
 

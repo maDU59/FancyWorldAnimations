@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
@@ -16,6 +15,7 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -87,25 +87,23 @@ public class LayeredCauldronAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
-
-        VertexConsumer buffer = RenderHelper.getBuffer();
         BlockStateModelPart part = parts.get(0);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(dir), false, light);
         }
 
         float dy = getPosition(context.getNowTick(), getHeight(newBlockState), getHeight(oldBlockState));
         poseStack.translate(0,dy,0);
 
-        renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(dir), true, light);
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantLiquid, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, boolean wantLiquid, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             String last = path.split("/")[path.split("/").length-1];
@@ -125,7 +123,7 @@ public class LayeredCauldronAnimation extends Animation{
                     }
                 }
 
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, r, g, b, light);
+                RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, r, g, b, light);
             }
         }
     }

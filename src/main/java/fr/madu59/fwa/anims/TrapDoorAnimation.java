@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
@@ -141,7 +140,6 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
-        VertexConsumer buffer = RenderHelper.getBuffer();
-        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

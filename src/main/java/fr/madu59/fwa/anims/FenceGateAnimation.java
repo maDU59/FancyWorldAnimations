@@ -6,7 +6,6 @@ import java.util.List;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
@@ -16,6 +15,7 @@ import fr.madu59.fwa.utils.ModelSplitHelper;
 import fr.madu59.fwa.utils.ModelSplitHelper.FenceGate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -91,9 +91,9 @@ public class FenceGateAnimation extends Animation{
 
         int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
 
-        VertexConsumer buffer = RenderHelper.getBuffer();
+        MultiBufferSource bufferSource = context.getBufferSource();
 
-        renderQuads(poseStack, buffer, fenceGate.postQuadList(), light);
+        renderQuads(poseStack, bufferSource, fenceGate.postQuadList(), light);
 
         boolean onAxisZ = (facing.getAxis() == Axis.Z);
         float leftPivotX = onAxisZ ? (1.0f / 16.0f) : 0.5f;
@@ -108,8 +108,7 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
-
-        renderQuads(poseStack, buffer, fenceGate.leftQuadList(), light);
+        renderQuads(poseStack, bufferSource, fenceGate.leftQuadList(), light);
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
@@ -118,12 +117,12 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(rightPivotX, 0.0f, rightPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
         poseStack.translate(-rightPivotX, 0.0f, -rightPivotZ);
-        renderQuads(poseStack, buffer, fenceGate.rightQuadList(), light);
+        renderQuads(poseStack, bufferSource, fenceGate.rightQuadList(), light);
     }
 
-    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
+    private void renderQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, int light) {
         for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 
