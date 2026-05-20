@@ -28,7 +28,7 @@ public abstract class ShulkerBoxModelMixin {
         if (progress == 1.0f && SettingsManager.SHULKERBOX_STATE.getValue()) {
             if(timerStart == 0) timerStart = FancyWorldAnimationsClient.getPartialTick();
             double timer = FancyWorldAnimationsClient.getPartialTick() - timerStart;
-            lid.setPos(x, y + (float)((Math.sin(timer * 0.1 * SettingsManager.SHULKERBOX_SPEED.getValue()) - 0.5) * 0.3 * Math.clamp(timer * 0.04, 0.0f, 1.0f)), z);
+            lid.setPos(x, y + (float)((Math.sin(timer * 0.1 * SettingsManager.SHULKERBOX_SPEED.getValue()) - 0.5) * 0.3 * Math.min(Math.max(timer * 0.04, 0.0f), 1.0f)), z);
         }
         else{
             if(progress != 0.0f) timerStart = 0.0;
