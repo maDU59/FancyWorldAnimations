@@ -7,20 +7,22 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.blockentity.ShulkerBoxRenderer;
 
 @Mixin(targets = "net.minecraft.client.renderer.blockentity.ShulkerBoxRenderer$ShulkerBoxModel")
 public abstract class ShulkerBoxModelMixin {
 
     double timer = 0;
     double timerStart = 0;
+    ShulkerBoxRenderer renderer;
 
-    @Redirect(method = "setupAnim",
+    @Redirect(method = "animate",
         at = @At(
             value = "INVOKE", 
             target = "Lnet/minecraft/client/model/geom/ModelPart;setPos(FFF)V"
         )
     )
-    private void fwa$setupAnim(ModelPart lid, float x, float y, float z, final Float progress) {
+    private void fwa$animate(ModelPart lid, float x, float y, float z, float progress) {
         if (progress == 1.0f && SettingsManager.SHULKERBOX_STATE.getValue()) {
             if(timerStart == 0) timerStart = FancyWorldAnimationsClient.getPartialTick();
             timer = FancyWorldAnimationsClient.getPartialTick() - timerStart;
