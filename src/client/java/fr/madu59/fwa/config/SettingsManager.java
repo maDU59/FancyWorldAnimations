@@ -480,6 +480,13 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Double> SHULKERBOX_SPEED = loadOptionWithDefaults(
+        "shulkerbox_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {
