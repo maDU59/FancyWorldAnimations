@@ -70,12 +70,12 @@ public class RenderHelper {
 
     public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
-        float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
+        float shade = isShaded? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
 
         QuadInstance quadInstance = new QuadInstance();
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
-        VertexConsumer buffer = a < 1.0f? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bufferSource.getBuffer(bakedQuad.materialInfo().itemRenderType());
+        VertexConsumer buffer = a < 1.0f? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bakedQuad.materialInfo().sprite().transparency().isOpaque()? bufferSource.getBuffer(RenderTypes.cutoutMovingBlock()) : bufferSource.getBuffer(RenderTypes.translucentMovingBlock());
         buffer.putBakedQuad(pose, bakedQuad, quadInstance);
     }
 
