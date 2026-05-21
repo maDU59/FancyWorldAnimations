@@ -63,6 +63,7 @@ import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -149,8 +150,9 @@ public class FancyWorldAnimationsClient{
 				animations.removeAt(blockPos);
 			}
 		}
-
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
+
+		startTick = syncDoors(startTick, blockPos, newState, type);
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
@@ -393,6 +395,28 @@ public class FancyWorldAnimationsClient{
 			Animation anim = animations.animations.get(lastPos);
 			if (anim != null) anim.needUpdate();
 		}
+	}
+
+	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type){
+		if(type == Type.DOOR){
+			if(newState.getValueOrElse(DoorBlock.HALF, DoubleBlockHalf.LOWER) == DoubleBlockHalf.LOWER){
+				BlockPos abovePos = blockPos.above();
+				BlockState aboveState = Minecraft.getInstance().level.getBlockState(abovePos);
+				if(aboveState.getBlock() instanceof DoorBlock){
+					Animation anim = animations.animations.get(abovePos);
+					if(anim != null) startTick = anim.getStartTick();
+				}
+			}
+			else{
+				BlockPos belowPos = blockPos.below();
+				BlockState belowState = Minecraft.getInstance().level.getBlockState(belowPos);
+				if(belowState.getBlock() instanceof DoorBlock){
+					Animation anim = animations.animations.get(belowPos);
+					if(anim != null) startTick = anim.getStartTick();
+				}
+			}
+		}
+		return startTick;
 	}
 
 	public static enum Type
