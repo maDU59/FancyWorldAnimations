@@ -63,7 +63,7 @@ public class RenderHelper {
 
     public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
         Vector3f dir = bakedQuad.getDirection().step();
-        float shade = getShade(dir.x(), dir.y(), dir.z(), pose);
+        float shade = isShaded? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
 
         buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
     }
