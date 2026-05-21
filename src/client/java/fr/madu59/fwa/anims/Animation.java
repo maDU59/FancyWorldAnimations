@@ -35,7 +35,7 @@ public class Animation {
         this.newIsOpen = newIsOpen;
         this.oldState = oldState;
         this.newState = newState;
-        this.renderType = ItemBlockRenderTypes.getRenderType(newState);
+        this.renderType = ItemBlockRenderTypes.getMovingBlockRenderType(newState);
     }
 
     public boolean isUnique() {
