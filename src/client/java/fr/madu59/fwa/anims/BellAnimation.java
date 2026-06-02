@@ -12,7 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.BellModel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -20,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
@@ -145,7 +143,7 @@ public class BellAnimation extends Animation{
         TextureAtlasSprite sprite = client.getTextureAtlas(atlasId).apply(textureId);
         PoseStack poseStack = context.getPoseStack();
 
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) client.level, position);
+        int light = getLight();
 
         if(shouldUseFallbackRender()){
             RenderHelper.renderModel(getBuffer(context), poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
