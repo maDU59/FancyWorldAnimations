@@ -108,7 +108,7 @@ public class ModCompat {
 
     private static void disableIncompatibleOptions(){
         if(isMoreCullingLoaded()){
-            ConfigAdditions.disableOption("moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", () -> false);
+            //ConfigAdditions.disableOption("moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", () -> false);
         }
     }
 
