@@ -82,6 +82,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BlacklistReloadListener());
 		FancyWorldAnimationsConfigScreen.registerCommand();
+		ModCompat.init();
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPacketListener, client) -> {
             animations.animations.clear();
         });
