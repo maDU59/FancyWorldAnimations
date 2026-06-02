@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import ca.fxco.moreculling.api.config.ConfigAdditions;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
@@ -41,11 +42,13 @@ public class ModCompat {
     private final static boolean IS_END_REMASTERED_LOADED = FabricLoader.getInstance().isModLoaded("endrem");
     private final static boolean IS_SCHOLAR_LOADED = FabricLoader.getInstance().isModLoaded("scholar");
     private final static boolean IS_COPPERATIVE_LOADED = FabricLoader.getInstance().isModLoaded("copperative");
+    private final static boolean IS_MORECULLING_LOADED = FabricLoader.getInstance().isModLoaded("moreculling");
 
     private final static Map<ResourceLocation, ItemStack> VAULT_KEYS = new HashMap<>();
 
-    public ModCompat(){
+    public static void init(){
         registerVaultKeys();
+        disableIncompatibleOptions();
     }
     
     public static Type typeOf(Block block){
@@ -88,6 +91,18 @@ public class ModCompat {
 
     public static boolean isCopperativeLoaded(){
         return IS_COPPERATIVE_LOADED;
+    }
+
+    public static boolean isMoreCullingLoaded(){
+        return IS_MORECULLING_LOADED;
+    }
+
+    // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
+
+    private static void disableIncompatibleOptions(){
+        if(isMoreCullingLoaded()){
+            //ConfigAdditions.disableOption("moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", () -> false);
+        }
     }
 
     // VAULT COMPATIBILITY
