@@ -22,6 +22,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -322,11 +323,14 @@ public class ModCompat {
 
     public class FlashBackCompat{
         public static Class<?> replayServerClass;
+        private static Method getVisualMillisMethod;
 
         static{
             if (isFlashBackLoaded()) {
                 try{
                     replayServerClass = Class.forName("com.moulberry.flashback.playback.ReplayServer");
+                    Class<?> flashBackClass = Class.forName("com.moulberry.flashback.FlashBack");
+                    getVisualMillisMethod = flashBackClass.getMethod("getVisualMillis");
                 }catch(Exception e){
                     replayServerClass = null;
                 }
@@ -340,7 +344,7 @@ public class ModCompat {
             if (replayServerClass == null) return defaultValue;
             try{
                 if(replayServerClass.isInstance(Minecraft.getInstance().getSingleplayerServer())){
-                    return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+                    return (Double) getVisualMillisMethod.invoke(null) / 50L;
                 }
                 else{
                     return defaultValue;
