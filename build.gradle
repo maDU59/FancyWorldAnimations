@@ -48,7 +48,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
-	implementation "net.caffeinemc:sodium-fabric:0.8.9+mc26.1.1"
+	implementation "net.caffeinemc:sodium-fabric:0.8.12+mc26.1.2"
 
 	localRuntime 'org.anarres:jcpp:1.4.14'
     localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
