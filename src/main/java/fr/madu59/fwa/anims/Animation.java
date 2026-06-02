@@ -6,9 +6,15 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 public class Animation {
 
@@ -35,7 +41,12 @@ public class Animation {
         this.newIsOpen = newIsOpen;
         this.oldState = oldState;
         this.newState = newState;
-        this.renderType = ItemBlockRenderTypes.getMovingBlockRenderType(newState);
+        this.renderType = getRenderType(newState);
+    }
+
+    public RenderType getRenderType(BlockState state){
+        ChunkSectionLayer chunkSectionLayer = ItemBlockRenderTypes.getChunkRenderType(state);
+        return chunkSectionLayer == ChunkSectionLayer.TRANSLUCENT ? RenderTypes.translucentMovingBlock() : RenderTypes.cutoutMovingBlock();
     }
 
     public boolean isUnique() {
@@ -146,5 +157,21 @@ public class Animation {
 
     protected VertexConsumer getBuffer(AnimationRenderingContext context, RenderType renderType){
         return context.getBufferSource().getBuffer(renderType);
+    }
+    
+    public int getLight(){
+        return getLight(position, newState);
+    }
+
+    public int getLight(BlockPos pos, BlockState state){
+        return LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndTintGetter) Minecraft.getInstance().level, state, pos);
+    }
+
+    public int getLight(BlockPos pos){
+        return LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, pos);
+    }
+
+    public int getRelativeLight(Direction dir){
+        return getLight(position.relative(dir));
     }
 }

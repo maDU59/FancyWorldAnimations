@@ -117,6 +117,8 @@ dependencies {
     compileOnly("net.caffeinemc:sodium-neoforge-mod:0.8.4+mc1.21.11")
     runtimeOnly("net.caffeinemc:sodium-neoforge:0.8.4+mc1.21.11")
 
+    compileOnly "maven.modrinth:moreculling:mr2DZuwq"
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
