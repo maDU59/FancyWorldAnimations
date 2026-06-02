@@ -13,7 +13,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 public class Animation {
 
@@ -44,8 +43,8 @@ public class Animation {
     }
 
     public RenderType getRenderType(BlockState state){
-        ChunkSectionLayer chunkSectionLayer = ItemBlockRenderTypes.getChunkRenderType(state);
-        return chunkSectionLayer == ChunkSectionLayer.TRANSLUCENT ? RenderType.translucentMovingBlock() : RenderType.cutoutMipped();
+        RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
+      return renderType == RenderType.translucent() ? RenderType.translucentMovingBlock() : RenderType.cutoutMipped();
     }
 
     public boolean isUnique() {
