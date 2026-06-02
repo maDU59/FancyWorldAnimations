@@ -162,7 +162,7 @@ public class Animation {
     }
 
     public int getLight(BlockPos pos, BlockState state){
-        return LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndTintGetter) Minecraft.getInstance().level, state, pos);
+        return LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, state, pos);
     }
 
     public int getLight(BlockPos pos){
