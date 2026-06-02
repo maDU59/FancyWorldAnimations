@@ -13,14 +13,12 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -109,7 +107,7 @@ public class LanternAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             BlockState chainState = level.getBlockState(mutable);
-            int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, chainState, mutable);
+            int light = getLight(mutable, chainState);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             RenderHelper.renderModel(buffer, poseStack.last(), Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState), 1.0f, 1.0f, 1.0f, 1.0f, light, random, chainState);
             poseStack.popPose();
@@ -127,7 +125,7 @@ public class LanternAnimation extends Animation{
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);
         poseStack.translate(0.0F, 0.03F, 0.0F);
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) level, position);
+        int light = getLight();
         BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);

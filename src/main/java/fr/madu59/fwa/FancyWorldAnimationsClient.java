@@ -31,6 +31,9 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -86,6 +89,7 @@ public class FancyWorldAnimationsClient{
 	public FancyWorldAnimationsClient(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
 		bus.addListener(this::onRegisterClientReloadListeners);
+		ModCompat.init();
         ModLoadingContext.get().registerExtensionPoint(
 			ConfigScreenHandler.ConfigScreenFactory.class, 
 			() -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> (
