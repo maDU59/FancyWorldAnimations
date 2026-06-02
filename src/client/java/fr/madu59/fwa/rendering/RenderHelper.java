@@ -75,7 +75,7 @@ public class RenderHelper {
         QuadInstance quadInstance = new QuadInstance();
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
-        VertexConsumer buffer = a < 1.0f? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bakedQuad.materialInfo().sprite().transparency().isOpaque()? bufferSource.getBuffer(RenderTypes.cutoutMovingBlock()) : bufferSource.getBuffer(RenderTypes.translucentMovingBlock());
+        VertexConsumer buffer = a < 1.0f? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bakedQuad.materialInfo().sprite().transparency().hasTranslucent()? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
         buffer.putBakedQuad(pose, bakedQuad, quadInstance);
     }
 
