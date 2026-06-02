@@ -5,10 +5,14 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.chunk.SectionCompiler;
 
 public class Animation {
 
@@ -35,7 +39,12 @@ public class Animation {
         this.newIsOpen = newIsOpen;
         this.oldState = oldState;
         this.newState = newState;
-        this.renderType = ItemBlockRenderTypes.getMovingBlockRenderType(newState);
+        this.renderType = getRenderType(newState);
+    }
+
+    public RenderType getRenderType(BlockState state){
+        ChunkSectionLayer chunkSectionLayer = ItemBlockRenderTypes.getChunkRenderType(state);
+        return chunkSectionLayer == ChunkSectionLayer.TRANSLUCENT ? RenderTypes.translucentMovingBlock() : RenderTypes.cutoutMovingBlock();
     }
 
     public boolean isUnique() {
