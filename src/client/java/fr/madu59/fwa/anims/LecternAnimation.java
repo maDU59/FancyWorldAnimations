@@ -12,13 +12,11 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.BookModel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -100,7 +98,7 @@ public class LecternAnimation extends Animation {
 
         VertexConsumer buffer = getBuffer(context, RenderType.entityCutout(textureId));
         
-        int light = LevelRenderer.getLightColor((BlockAndTintGetter) Minecraft.getInstance().level, position);
+        int light = getLight();
         BookModel.State bookState = new BookModel.State(0f, getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick), (float)getAngle(Curves.ease(getProgress(nowTick), getCurve())));
         bookModel.setupAnim(bookState);
         poseStack.translate(0.5F, 1.0625F, 0.5F);
