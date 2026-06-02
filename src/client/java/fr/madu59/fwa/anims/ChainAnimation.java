@@ -13,13 +13,11 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -122,7 +120,7 @@ public class ChainAnimation extends Animation{
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             BlockState chainState = level.getBlockState(mutable);
-            int light = LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndTintGetter) level, chainState, mutable);
+            int light = getLight(mutable, chainState);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getBlockRenderer().getBlockModel(chainState);
             RenderHelper.renderModel(buffer, poseStack.last(), model.collectParts(random), 1.0f, 1.0f, 1.0f, 1.0f, light);
