@@ -14,7 +14,6 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -22,7 +21,6 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.LavaCauldronBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
@@ -86,7 +84,7 @@ public class LayeredCauldronAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
+        int light = getLight();
         BlockStateModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), false, light);

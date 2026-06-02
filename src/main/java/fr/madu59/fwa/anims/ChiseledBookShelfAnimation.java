@@ -15,7 +15,6 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,7 +22,6 @@ import net.minecraft.client.resources.model.sprite.AtlasManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -141,7 +139,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         float v1 = 1 - (y - 3f/16f + h);
         float v2 = v1 + h;
 
-        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position.relative(facing));
+        int light = getRelativeLight(facing);
         VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
 
         for(int i = 0; i < sprites.size(); i++){

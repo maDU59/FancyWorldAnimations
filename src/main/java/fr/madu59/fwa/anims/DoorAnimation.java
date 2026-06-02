@@ -12,13 +12,11 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
@@ -132,7 +130,7 @@ public class DoorAnimation extends Animation{
         poseStack.mulPose(Axis.YP.rotationDegrees((float)angle));
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
-        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position);
+        int light = getLight();
         RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

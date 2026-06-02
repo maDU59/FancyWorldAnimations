@@ -8,7 +8,6 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.server.IntegratedServer;
@@ -18,7 +17,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
@@ -118,7 +116,7 @@ public class VaultAnimation extends Animation{
 
         float scale = 1;
 
-        int light = LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, position.above());
+        int light = getRelativeLight(facing);
 
         poseStack.translate(0.5f, 0.5f, 0.5f);
         float angle = facing.toYRot();

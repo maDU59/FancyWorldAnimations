@@ -15,7 +15,6 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -23,7 +22,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -128,7 +126,7 @@ public class ChainAnimation extends Animation{
             poseStack.translate(-0.5F, -1.0F, -0.5F);
             parts.clear();
             BlockState chainState = level.getBlockState(mutable);
-            int light = LevelRenderer.getLightCoords(LevelRenderer.BrightnessGetter.DEFAULT ,(BlockAndLightGetter) level, chainState, mutable);
+            int light = getLight(mutable, chainState);
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             model.collectParts(random, parts);

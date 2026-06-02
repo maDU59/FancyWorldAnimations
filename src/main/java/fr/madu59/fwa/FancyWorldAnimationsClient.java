@@ -88,6 +88,7 @@ public class FancyWorldAnimationsClient{
 
 	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
         NeoForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
+		ModCompat.init();
         container.registerExtensionPoint(IConfigScreenFactory.class, (client, parent) -> {
             return new FancyWorldAnimationsConfigScreen(parent);
         });
