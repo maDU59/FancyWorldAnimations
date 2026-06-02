@@ -115,6 +115,9 @@ dependencies {
 	implementation "maven.modrinth:iris:1.8.8+1.21.1-neoforge"
 
     implementation("maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
+	compileOnly "maven.modrinth:moreculling:tFPgktUw"
+	implementation "maven.modrinth:blueprint:5JOCYuQM"
+	implementation "maven.modrinth:caverns-and-chasms:xDwRcEoZ"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
