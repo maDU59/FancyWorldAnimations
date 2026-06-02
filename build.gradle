@@ -172,7 +172,6 @@ dependencies {
 
     implementation 'org.anarres:jcpp:1.4.14'
 	implementation fg.deobf("maven.modrinth:oculus:1.20.1-1.8.0")
-	compileOnly "maven.modrinth:moreculling:tFPgktUw"
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
