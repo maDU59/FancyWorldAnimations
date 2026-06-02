@@ -50,6 +50,7 @@ public class ModCompat {
     private final static boolean IS_SCHOLAR_LOADED = FabricLoader.getInstance().isModLoaded("scholar");
     private final static boolean IS_COPPERATIVE_LOADED = FabricLoader.getInstance().isModLoaded("copperative");
     private final static boolean IS_MORECULLING_LOADED = FabricLoader.getInstance().isModLoaded("moreculling");
+    private final static boolean IS_FLASHBACK_LOADED = FabricLoader.getInstance().isModLoaded("flashback");
 
     private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
 
@@ -102,6 +103,10 @@ public class ModCompat {
 
     public static boolean isMoreCullingLoaded(){
         return IS_MORECULLING_LOADED;
+    }
+
+    public static boolean isFlashBackLoaded(){
+        return IS_FLASHBACK_LOADED;
     }
 
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
@@ -310,6 +315,39 @@ public class ModCompat {
         public static ItemStack getBookshelfItemStack(BlockPos pos, int slot){
             if(slot < 0 || slot > 5) return ItemStack.EMPTY;
             return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
+        }
+    }
+
+    // FLASHBACK COMPATIBILITY
+
+    public class FlashBackCompat{
+        public static Class<?> replayServerClass;
+
+        static{
+            if (isFlashBackLoaded()) {
+                try{
+                    replayServerClass = Class.forName("com.moulberry.flashback.playback.ReplayServer");
+                }catch(Exception e){
+                    replayServerClass = null;
+                }
+            }
+            else{
+                replayServerClass = null;
+            }
+        }
+
+        public static double getPartialTick(double defaultValue){
+            if (replayServerClass == null) return defaultValue;
+            try{
+                if(replayServerClass.isInstance(Minecraft.getInstance().getSingleplayerServer())){
+                    return (double) Minecraft.getInstance().level.getGameTime() + (double) Math.clamp(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
+                }
+                else{
+                    return defaultValue;
+                }
+            }catch(Exception e){
+                return defaultValue;
+            }
         }
     }
 }
