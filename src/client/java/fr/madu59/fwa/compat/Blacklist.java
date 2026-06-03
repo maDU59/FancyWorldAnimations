@@ -10,6 +10,7 @@ import java.util.Set;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.madu59.fwa.api.config.AnimationDisabler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -66,7 +67,7 @@ public class Blacklist {
     public static boolean isBlacklisted(BlockState state) {
         Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         String mod = id.getNamespace();
-        return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod);
+        return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod) || AnimationDisabler.getDisabledBlocks().contains(id) || AnimationDisabler.getDisabledMods().contains(mod);
     }
 }
 
