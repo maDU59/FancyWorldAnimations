@@ -10,7 +10,7 @@ import java.util.Set;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import fr.madu59.fwa.api.config.AnimationDisabler;
+import fr.madu59.fwa.api.animations.AnimationDisabler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;

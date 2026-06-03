@@ -1,4 +1,4 @@
-package fr.madu59.fwa.api.config;
+package fr.madu59.fwa.api.animations;
 
 import org.jetbrains.annotations.ApiStatus;
 
