@@ -15,7 +15,7 @@ public class AnimationDisabler {
     /*
      * Disables animations for a specific mod.
      * @param modId The ID of the mod for which to disable animations.
-     * @since 1.2.24
+     * @since 1.2.25
      */
     public static void disableForMod(String modId){
         disabledMods.add(modId);
@@ -24,7 +24,7 @@ public class AnimationDisabler {
     /*
      * Disables animations for a specific block.
      * @param blockId The ID of the block for which to disable animations.
-     * @since 1.2.24
+     * @since 1.2.25
      */
     public static void disableForBlock(Identifier blockId){
         disabledBlocks.add(blockId);
@@ -33,7 +33,7 @@ public class AnimationDisabler {
     /*
      * Returns a list of all disabled mods.
      * @return A list of disabled mod IDs.
-     * @since 1.2.24
+     * @since 1.2.25
      */
     @ApiStatus.Internal
     public static List<String> getDisabledMods(){
@@ -43,7 +43,7 @@ public class AnimationDisabler {
     /*
      * Returns a list of all disabled blocks.
      * @return A list of disabled block IDs.
-     * @since 1.2.24
+     * @since 1.2.25
      */
     @ApiStatus.Internal
     public static List<Identifier> getDisabledBlocks(){
