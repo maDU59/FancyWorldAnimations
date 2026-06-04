@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import ca.fxco.moreculling.api.config.ConfigAdditions;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
@@ -49,10 +48,9 @@ public class ModCompat {
     private final static boolean IS_END_REMASTERED_LOADED = PlatformHelper.isModLoaded("endrem");
     private final static boolean IS_SCHOLAR_LOADED = PlatformHelper.isModLoaded("scholar");
     private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
-    private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
 
-    private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
+    private final static Map<Identifier, Identifier> VAULT_KEYS = new HashMap<>();
 
     public static void init(){
         registerVaultKeys();
@@ -107,10 +105,6 @@ public class ModCompat {
         return IS_COPPERATIVE_LOADED;
     }
 
-    public static boolean isMoreCullingLoaded(){
-        return IS_MORECULLING_LOADED;
-    }
-
     public static boolean isFlashbackLoaded(){
         return IS_FLASHBACK_LOADED;
     }
@@ -118,15 +112,13 @@ public class ModCompat {
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
 
     private static void disableIncompatibleOptions(){
-        if(isMoreCullingLoaded()){
-            //ConfigAdditions.disableOption("moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", () -> false);
-        }
+
     }
 
     // VAULT COMPATIBILITY
 
     public static ItemStack getVaultKeyItem(Block block){
-        ItemStack itemStack = VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block));
+        ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getOptional(VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block))).orElse(null));
         if (itemStack != null && !itemStack.isEmpty()) return itemStack;
         else return new ItemStack(Items.TRIAL_KEY);
     }
@@ -140,7 +132,7 @@ public class ModCompat {
     }
 
     public static void registerVaultKey(Identifier vaultId, Identifier itemId){
-        VAULT_KEYS.put(vaultId, BuiltInRegistries.ITEM.get(itemId).map(ItemStack::new).orElse(ItemStack.EMPTY));
+        VAULT_KEYS.put(vaultId, itemId);
     }
 
     // IDLING MODDED BLOCKS COMPATIBILITY
