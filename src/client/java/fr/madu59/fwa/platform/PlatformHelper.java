@@ -1,5 +1,7 @@
 package fr.madu59.fwa.platform;
 
+import java.nio.file.Path;
+
 import net.fabricmc.loader.api.FabricLoader;
 
 public class PlatformHelper {
@@ -10,5 +12,9 @@ public class PlatformHelper {
     
     public static boolean isModLoaded(String modId){
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    public static Path getConfigDir(){
+        return FabricLoader.getInstance().getConfigDir();
     }
 }

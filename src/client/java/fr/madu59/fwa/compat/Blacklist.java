@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import fr.madu59.fwa.api.animations.AnimationDisabler;
-import net.fabricmc.loader.api.FabricLoader;
+import fr.madu59.fwa.platform.PlatformHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -21,7 +21,7 @@ public class Blacklist {
     private static final Set<Identifier> BLOCKS_BLACKLIST = new HashSet<>();
     private static final Set<String> MODS_BLACKLIST = new HashSet<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("fwa-blacklist.json");
+    private static final Path CONFIG_PATH = PlatformHelper.getConfigDir().resolve("fwa-blacklist.json");
 
     public static void load() {
         BLOCKS_BLACKLIST.clear();
