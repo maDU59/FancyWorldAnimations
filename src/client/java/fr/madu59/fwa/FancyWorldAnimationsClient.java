@@ -24,7 +24,7 @@ import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.compat.ModCompat;
-import fr.madu59.fwa.compat.ModCompat.FlashBackCompat;
+import fr.madu59.fwa.compat.ModCompat.FlashbackCompat;
 import fr.madu59.fwa.compat.Blacklist;
 import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
@@ -146,8 +146,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static double getPartialTick() {
 		double delta =  timer / 50_000_000.0;
-		if (ModCompat.isFlashBackLoaded()) {
-			delta = FlashBackCompat.getPartialTick(delta);
+		if (ModCompat.isFlashbackLoaded()) {
+			delta = FlashbackCompat.getPartialTick(delta);
 		}
 		return delta;
 	}

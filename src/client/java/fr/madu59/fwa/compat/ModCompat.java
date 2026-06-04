@@ -22,7 +22,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -106,7 +105,7 @@ public class ModCompat {
         return IS_MORECULLING_LOADED;
     }
 
-    public static boolean isFlashBackLoaded(){
+    public static boolean isFlashbackLoaded(){
         return IS_FLASHBACK_LOADED;
     }
 
@@ -123,7 +122,7 @@ public class ModCompat {
     public static ItemStack getVaultKeyItem(Block block){
         ItemStack itemStack = VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block));
         if (itemStack != null) return itemStack;
-        else return new ItemStack(Items.TRIAL_KEY);
+        else return Items.TRIAL_KEY.getDefaultInstance();
     }
 
     private static void registerVaultKeys(){
@@ -135,7 +134,7 @@ public class ModCompat {
     }
 
     public static void registerVaultKey(Identifier vaultId, Identifier itemId){
-        VAULT_KEYS.put(vaultId, BuiltInRegistries.ITEM.get(itemId).map(ItemStack::new).orElse(ItemStack.EMPTY));
+        VAULT_KEYS.put(vaultId, BuiltInRegistries.ITEM.get(itemId).map(ItemStack::new).orElse(Items.TRIAL_KEY.getDefaultInstance()));
     }
 
     // IDLING MODDED BLOCKS COMPATIBILITY
@@ -321,27 +320,29 @@ public class ModCompat {
 
     // FLASHBACK COMPATIBILITY
 
-    public class FlashBackCompat{
+    public class FlashbackCompat{
         public static Class<?> replayServerClass;
         private static Method getVisualMillisMethod;
 
         static{
-            if (isFlashBackLoaded()) {
+            if (isFlashbackLoaded()) {
                 try{
                     replayServerClass = Class.forName("com.moulberry.flashback.playback.ReplayServer");
-                    Class<?> flashBackClass = Class.forName("com.moulberry.flashback.FlashBack");
-                    getVisualMillisMethod = flashBackClass.getMethod("getVisualMillis");
+                    Class<?> flashbackClass = Class.forName("com.moulberry.flashback.Flashback");
+                    getVisualMillisMethod = flashbackClass.getMethod("getVisualMillis");
                 }catch(Exception e){
                     replayServerClass = null;
+                    getVisualMillisMethod = null;
                 }
             }
             else{
                 replayServerClass = null;
+                getVisualMillisMethod = null;
             }
         }
 
         public static double getPartialTick(double defaultValue){
-            if (replayServerClass == null) return defaultValue;
+            if (replayServerClass == null || getVisualMillisMethod == null) return defaultValue;
             try{
                 if(replayServerClass.isInstance(Minecraft.getInstance().getSingleplayerServer())){
                     return (Double) getVisualMillisMethod.invoke(null) / 50L;
