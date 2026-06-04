@@ -23,7 +23,9 @@ import fr.madu59.fwa.anims.RepeaterAnimation;
 import fr.madu59.fwa.anims.TrapDoorAnimation;
 import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
+import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.compat.ModCompat;
+import fr.madu59.fwa.compat.ModCompat.FlashbackCompat;
 import fr.madu59.fwa.compat.Blacklist;
 import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
@@ -35,6 +37,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.BigDripleafBlock;
@@ -162,7 +165,11 @@ public class FancyWorldAnimationsClient{
 	}
 
 	public static double getPartialTick() {
-		return timer / 50_000_000.0;
+		double delta =  timer / 50_000_000.0;
+		if (ModCompat.isFlashbackLoaded()) {
+			delta = FlashbackCompat.getPartialTick(delta);
+		}
+		return delta;
 	}
 
 	public static void render(AnimationRenderingContext context)
@@ -272,6 +279,8 @@ public class FancyWorldAnimationsClient{
 
 	public static Type typeOf(BlockState state){
 		Block block = state.getBlock();
+		Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
+        if(AnimationAdditions.hasAnimation(blockId)) return AnimationAdditions.getAnimationType(blockId);
 		if(block instanceof DoorBlock) return Type.DOOR;
 		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
 		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
