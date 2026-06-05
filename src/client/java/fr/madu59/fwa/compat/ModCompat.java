@@ -128,7 +128,7 @@ public class ModCompat {
     // VAULT COMPATIBILITY
 
     public static ItemStack getVaultKeyItem(Block block){
-        ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getOptional(VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block))).orElse(null));
+        ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getOptional(VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block))).orElse(Items.TRIAL_KEY));
         if (itemStack != null && !itemStack.isEmpty()) return itemStack;
         else return new ItemStack(Items.TRIAL_KEY);
     }
@@ -329,31 +329,35 @@ public class ModCompat {
     // FLASHBACK COMPATIBILITY
 
     public class FlashbackCompat{
-        public static Class<?> replayServerClass;
-        private static Method getVisualMillisMethod;
+        private static Method getVisualMillis;
+        private static Method isExporting;
 
         static{
             if (isFlashbackLoaded()) {
                 try{
-                    replayServerClass = Class.forName("com.moulberry.flashback.playback.ReplayServer");
                     Class<?> flashbackClass = Class.forName("com.moulberry.flashback.Flashback");
-                    getVisualMillisMethod = flashbackClass.getMethod("getVisualMillis");
+                    getVisualMillis = flashbackClass.getMethod("getVisualMillis");
+                    isExporting = flashbackClass.getMethod("isExporting");
                 }catch(Exception e){
-                    replayServerClass = null;
-                    getVisualMillisMethod = null;
+                    isExporting = null;
+                    getVisualMillis = null;
                 }
             }
             else{
-                replayServerClass = null;
-                getVisualMillisMethod = null;
+                isExporting = null;
+                getVisualMillis = null;
             }
         }
 
         public static double getPartialTick(double defaultValue){
-            if (replayServerClass == null || getVisualMillisMethod == null) return defaultValue;
+            if (isExporting == null || getVisualMillis == null) return defaultValue;
             try{
-                if(replayServerClass.isInstance(Minecraft.getInstance().getSingleplayerServer())){
-                    return (Double) getVisualMillisMethod.invoke(null) / 50L;
+                if(Boolean.TRUE.equals(isExporting.invoke(null))){
+                    Object millis = getVisualMillis.invoke(null);
+                    if(millis instanceof Number number){
+                        return number.doubleValue() / 50.0;
+                    }
+                    return defaultValue;
                 }
                 else{
                     return defaultValue;
