@@ -5,9 +5,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
@@ -22,6 +24,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -48,6 +51,7 @@ public class ModCompat {
     private final static boolean IS_END_REMASTERED_LOADED = PlatformHelper.isModLoaded("endrem");
     private final static boolean IS_SCHOLAR_LOADED = PlatformHelper.isModLoaded("scholar");
     private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
+    private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
 
     private final static Map<Identifier, Identifier> VAULT_KEYS = new HashMap<>();
@@ -105,6 +109,10 @@ public class ModCompat {
         return IS_COPPERATIVE_LOADED;
     }
 
+    public static boolean isMoreCullingLoaded(){
+        return IS_MORECULLING_LOADED;
+    }
+
     public static boolean isFlashbackLoaded(){
         return IS_FLASHBACK_LOADED;
     }
@@ -112,7 +120,9 @@ public class ModCompat {
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
 
     private static void disableIncompatibleOptions(){
-
+        if(isMoreCullingLoaded()){
+            MoreCullingCompat.disableBlockStateCulling();
+        }
     }
 
     // VAULT COMPATIBILITY
@@ -350,6 +360,22 @@ public class ModCompat {
                 }
             }catch(Exception e){
                 return defaultValue;
+            }
+        }
+    }
+
+    // MORE CULLING COMPATIBILITY
+
+    public class MoreCullingCompat{
+        
+        public static void disableBlockStateCulling(){
+            try{
+                Class<?> configAdditionsClass = Class.forName("ca.fxco.moreculling.api.config.ConfigAdditions");
+                Method disableOptionMethod = configAdditionsClass.getMethod("disableOption", String.class, String.class, BooleanSupplier.class, Object.class);
+                disableOptionMethod.invoke(null, "moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", (BooleanSupplier) () -> false, false);
+                FancyWorldAnimations.LOGGER.info("Successfully disabled MoreCulling's blockStateCulling!");
+            }catch(Exception e){
+                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling, visual issues may appear!");
             }
         }
     }
