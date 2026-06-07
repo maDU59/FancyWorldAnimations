@@ -1,6 +1,7 @@
 plugins {
 	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
+	id "me.modmuss50.mod-publish-plugin" version "2.0.0"
 }
 
 version = project.mod_version
@@ -102,4 +103,40 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+publishMods {
+    file = jar.archiveFile
+    changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText.get()
+    type = STABLE
+	version = project.mod_version
+    modLoaders.add("fabric")
+	modLoaders.add("quilt")
+
+    curseforge {
+		displayName = file.map { it.asFile.name }
+        projectId = project.curseforge_id
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        
+		minecraftVersionRange {
+            start = "1.21.6"
+            end = "1.21.8"
+        }
+
+        client = true
+        server = false
+        requires("fabric-api")
+    }
+    modrinth {
+		displayName = "Fancy World Animations $project.mod_version"
+        projectId = project.modrinth_id
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+
+		minecraftVersionRange {
+            start = "1.21.6"
+            end = "1.21.8"
+        }
+
+		requires("fabric-api")
+    }
 }
