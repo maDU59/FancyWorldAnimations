@@ -119,8 +119,8 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         
 		minecraftVersionRange {
-            start = "26.1"
-            end = "26.1.2"
+            start = "1.21.11"
+            end = "1.21.11"
         }
 
         client = true
@@ -132,8 +132,8 @@ publishMods {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 
 		minecraftVersionRange {
-            start = "26.1"
-            end = "26.1.2"
+            start = "1.21.11"
+            end = "1.21.11"
         }
 
 		requires("fabric-api")
