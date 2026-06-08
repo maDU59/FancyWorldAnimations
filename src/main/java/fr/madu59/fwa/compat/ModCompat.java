@@ -5,19 +5,23 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import ca.fxco.moreculling.api.config.ConfigAdditions;
+import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.neoforged.fml.loading.FMLLoader;
+import fr.madu59.fwa.api.animations.AnimationAdditions;
+import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -38,36 +42,42 @@ public class ModCompat {
     public final static String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
 
     public final static Identifier ALEXSCAVES_GINGERBREAD_DOOR = Identifier.tryParse("alexscaves:gingerbread_door");
-
     public final static Identifier WW_DISPLAY_LANTERNS = Identifier.tryParse("wilderwild:display_lantern");
     public final static Identifier ENDREM_ANCIENT_PORTAL_FRAME = Identifier.tryParse("endrem:ancient_portal_frame");
 
-    private final static boolean IS_AMENDMENTS_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("amendments") != null;
-    private final static boolean IS_IRIS_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("iris") != null || FMLLoader.getCurrent().getLoadingModList().getModFileById("oculus") != null;
-    private final static boolean IS_SODIUM_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("sodium") != null || FMLLoader.getCurrent().getLoadingModList().getModFileById("embeddium") != null;
-    private final static boolean IS_MAP_ATLASES_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("map_atlases") != null;
-    private final static boolean IS_END_REMASTERED_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("endrem") != null;
-    private final static boolean IS_SCHOLAR_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("scholar") != null;
-    private final static boolean IS_COPPERATIVE_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("copperative") != null;
-    private final static boolean IS_MORECULLING_LOADED = FMLLoader.getCurrent().getLoadingModList().getModFileById("moreculling") != null;
+    private final static boolean IS_AMENDMENTS_LOADED = PlatformHelper.isModLoaded("amendments");
+    private final static boolean IS_IRIS_LOADED = PlatformHelper.isModLoaded("iris") || PlatformHelper.isModLoaded("oculus");
+    private final static boolean IS_SODIUM_LOADED = PlatformHelper.isModLoaded("sodium") || PlatformHelper.isModLoaded("embeddium");
+    private final static boolean IS_MAP_ATLASES_LOADED = PlatformHelper.isModLoaded("map_atlases");
+    private final static boolean IS_END_REMASTERED_LOADED = PlatformHelper.isModLoaded("endrem");
+    private final static boolean IS_SCHOLAR_LOADED = PlatformHelper.isModLoaded("scholar");
+    private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
+    private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
+    private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
 
-    private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
+    private final static Map<Identifier, Identifier> VAULT_KEYS = new HashMap<>();
 
     public static void init(){
         registerVaultKeys();
+        registerAnimations();
         disableIncompatibleOptions();
     }
     
     public static Type typeOf(Block block){
         Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd") || ALEXSCAVES_GINGERBREAD_DOOR.equals(blockId)) return Type.DOOR;
-        if(WW_DISPLAY_LANTERNS.equals(blockId)) return Type.LANTERN;
-        if(ENDREM_ANCIENT_PORTAL_FRAME.equals(blockId)) return Type.END_PORTAL_FRAME;
+        if(DRAMATIC_DOORS_NAMESPACE.equals(blockId.getNamespace()) || blockId.toString().startsWith("everycomp:dd")) return Type.DOOR;
         return Type.USELESS;
     }
 
     public static boolean isOpen(BlockState state, Type type){
         return false;
+    }
+
+    private static void registerAnimations(){
+        AnimationAdditions.registerAnimationForBlock(Identifier.tryParse("minecraft:air"), Type.USELESS);
+        AnimationAdditions.registerAnimationForBlock(WW_DISPLAY_LANTERNS, Type.LANTERN);
+        AnimationAdditions.registerAnimationForBlock(ENDREM_ANCIENT_PORTAL_FRAME, Type.END_PORTAL_FRAME);
+        AnimationAdditions.registerAnimationForBlock(ALEXSCAVES_GINGERBREAD_DOOR, Type.DOOR);
     }
 
     // LOADED MODS CHECK
@@ -104,19 +114,23 @@ public class ModCompat {
         return IS_MORECULLING_LOADED;
     }
 
+    public static boolean isFlashbackLoaded(){
+        return IS_FLASHBACK_LOADED;
+    }
+
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
 
     private static void disableIncompatibleOptions(){
         if(isMoreCullingLoaded()){
-            //ConfigAdditions.disableOption("moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", () -> false);
+            MoreCullingCompat.disableBlockStateCulling();
         }
     }
 
     // VAULT COMPATIBILITY
 
     public static ItemStack getVaultKeyItem(Block block){
-        ItemStack itemStack = VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block));
-        if (itemStack != null) return itemStack;
+        ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getOptional(VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block))).orElse(Items.TRIAL_KEY));
+        if (itemStack != null && !itemStack.isEmpty()) return itemStack;
         else return new ItemStack(Items.TRIAL_KEY);
     }
 
@@ -129,7 +143,7 @@ public class ModCompat {
     }
 
     public static void registerVaultKey(Identifier vaultId, Identifier itemId){
-        VAULT_KEYS.put(vaultId, BuiltInRegistries.ITEM.get(itemId).map(ItemStack::new).orElse(ItemStack.EMPTY));
+        VAULT_KEYS.put(vaultId, itemId);
     }
 
     // IDLING MODDED BLOCKS COMPATIBILITY
@@ -220,19 +234,27 @@ public class ModCompat {
 
     public class EndRemasteredCompat{
         private static Method renderMethod;
+        private static Method extractMethod;
+        private static Class<?> ancientPortalStateClass;
 
         static {
             if (isEndRemasteredLoaded()) {
                 try{
                     Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
+                    ancientPortalStateClass = Class.forName("com.teamremastered.endrem.client.AncientPortalState");
                     Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
-                    renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
+                    renderMethod = ancientPortalRendererClass.getMethod("submit", ancientPortalStateClass, PoseStack.class, SubmitNodeCollector.class, CameraRenderState.class);
+                    extractMethod = ancientPortalRendererClass.getMethod("extractRenderState", ancientPortalFrameEntityClass, ancientPortalStateClass, float.class, Vec3.class, ModelFeatureRenderer.CrumblingOverlay.class);
                 }catch(Exception e){
                     renderMethod = null;
+                    extractMethod = null;
+                    ancientPortalStateClass = null;
                 }
             }
             else{
                 renderMethod = null;
+                extractMethod = null;
+                ancientPortalStateClass = null;
             }
         }
 
@@ -249,10 +271,12 @@ public class ModCompat {
             if (be == null) return;
 
             try{
-                BlockEntityRenderDispatcher dispatcher = net.minecraft.client.Minecraft.getInstance().getBlockEntityRenderDispatcher();
+                BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
                 Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
 
-                renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, new Vec3(0, 0, 0));
+                Object portalState = ancientPortalStateClass.getConstructor().newInstance();
+                extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
+                renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
                 RenderHelper.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
@@ -310,6 +334,64 @@ public class ModCompat {
         public static ItemStack getBookshelfItemStack(BlockPos pos, int slot){
             if(slot < 0 || slot > 5) return ItemStack.EMPTY;
             return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
+        }
+    }
+
+    // FLASHBACK COMPATIBILITY
+
+    public class FlashbackCompat{
+        private static Method getVisualMillis;
+        private static Method isExporting;
+
+        static{
+            if (isFlashbackLoaded()) {
+                try{
+                    Class<?> flashbackClass = Class.forName("com.moulberry.flashback.Flashback");
+                    getVisualMillis = flashbackClass.getMethod("getVisualMillis");
+                    isExporting = flashbackClass.getMethod("isExporting");
+                }catch(Exception e){
+                    isExporting = null;
+                    getVisualMillis = null;
+                }
+            }
+            else{
+                isExporting = null;
+                getVisualMillis = null;
+            }
+        }
+
+        public static double getPartialTick(double defaultValue){
+            if (isExporting == null || getVisualMillis == null) return defaultValue;
+            try{
+                if(Boolean.TRUE.equals(isExporting.invoke(null))){
+                    Object millis = getVisualMillis.invoke(null);
+                    if(millis instanceof Number number){
+                        return number.doubleValue() / 50.0;
+                    }
+                    return defaultValue;
+                }
+                else{
+                    return defaultValue;
+                }
+            }catch(Exception e){
+                return defaultValue;
+            }
+        }
+    }
+
+    // MORE CULLING COMPATIBILITY
+
+    public class MoreCullingCompat{
+        
+        public static void disableBlockStateCulling(){
+            try{
+                Class<?> configAdditionsClass = Class.forName("ca.fxco.moreculling.api.config.ConfigAdditions");
+                Method disableOptionMethod = configAdditionsClass.getMethod("disableOption", String.class, String.class, BooleanSupplier.class, Object.class);
+                disableOptionMethod.invoke(null, "moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", (BooleanSupplier) () -> false, false);
+                FancyWorldAnimations.LOGGER.info("Successfully disabled MoreCulling's blockStateCulling!");
+            }catch(Exception e){
+                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling, visual issues may appear!");
+            }
         }
     }
 }
