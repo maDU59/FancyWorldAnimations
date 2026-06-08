@@ -1,2 +1,4 @@
 # What's new:
-- Fixed End Remastered compatibility on 1.21.9+
+- Hopefully fixed a crash with MoreCulling depending on the loading order
+- Fixed bell animations not playing
+- Fixed some sliders not working correctly
