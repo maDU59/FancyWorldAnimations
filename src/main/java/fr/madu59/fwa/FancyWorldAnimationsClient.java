@@ -35,7 +35,6 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -75,7 +74,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
-import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -112,7 +110,7 @@ public class FancyWorldAnimationsClient{
 		timer = System.nanoTime() - startingTime;
 		if(SettingsManager.MOD_TOGGLE.getValue()) {
 			double tickDelta = getPartialTick();
-			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera().position(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), Minecraft.getInstance().gameRenderer.getMainCamera().getCullFrustum(), tickDelta, false));
+			render(new AnimationRenderingContext(event.getPoseStack(), Minecraft.getInstance().gameRenderer.getMainCamera(), Minecraft.getInstance().renderBuffers().bufferSource(), Minecraft.getInstance().gameRenderer.getSubmitNodeStorage(), Minecraft.getInstance().gameRenderer.getMainCamera().getCullFrustum(), event.getLevelRenderState().cameraRenderState, tickDelta, false));
 		}
     }
 

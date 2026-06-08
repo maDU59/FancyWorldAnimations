@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimationRenderingContext {
@@ -18,8 +19,9 @@ public class AnimationRenderingContext {
     private final Vec3 cameraPos;
     private final boolean isShadow;
     private final Frustum frustum;
+    private final CameraRenderState cameraRenderState;
 
-    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, Frustum frustum, double nowTick, boolean isShadow) {
+    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, Frustum frustum, CameraRenderState cameraRenderState, double nowTick, boolean isShadow) {
         this.poseStack = poseStack;
         this.bufferSource = bufferSource;
         this.submitNodeCollector = submitNodeCollector;
@@ -28,6 +30,7 @@ public class AnimationRenderingContext {
         this.cameraPos = camera.position();
         this.isShadow = isShadow;
         this.frustum = frustum;
+        this.cameraRenderState = cameraRenderState;
     }
 
     public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, Frustum frustum, double nowTick, boolean isShadow) {
@@ -39,6 +42,9 @@ public class AnimationRenderingContext {
         this.cameraPos = cameraPos;
         this.isShadow = isShadow;
         this.frustum = frustum;
+        CameraRenderState cameraRenderState = new CameraRenderState();
+        Minecraft.getInstance().gameRenderer.getMainCamera().extractRenderState(cameraRenderState, 0);
+        this.cameraRenderState = cameraRenderState;
     }
 
     public PoseStack getPoseStack() {
@@ -71,5 +77,9 @@ public class AnimationRenderingContext {
 
     public Frustum getFrustum(){
         return frustum;
+    }
+
+    public CameraRenderState getCameraRenderState(){
+        return cameraRenderState;
     }
 }

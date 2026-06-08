@@ -5,10 +5,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import ca.fxco.moreculling.api.config.ConfigAdditions;
+import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import net.minecraft.core.registries.BuiltInRegistries;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
@@ -16,9 +17,11 @@ import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -52,7 +55,7 @@ public class ModCompat {
     private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
 
-    private final static Map<Identifier, ItemStack> VAULT_KEYS = new HashMap<>();
+    private final static Map<Identifier, Identifier> VAULT_KEYS = new HashMap<>();
 
     public static void init(){
         registerVaultKeys();
@@ -119,14 +122,14 @@ public class ModCompat {
 
     private static void disableIncompatibleOptions(){
         if(isMoreCullingLoaded()){
-            //ConfigAdditions.disableOption("moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", () -> false);
+            MoreCullingCompat.disableBlockStateCulling();
         }
     }
 
     // VAULT COMPATIBILITY
 
     public static ItemStack getVaultKeyItem(Block block){
-        ItemStack itemStack = VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block));
+        ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getOptional(VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block))).orElse(Items.TRIAL_KEY));
         if (itemStack != null && !itemStack.isEmpty()) return itemStack;
         else return new ItemStack(Items.TRIAL_KEY);
     }
@@ -140,7 +143,7 @@ public class ModCompat {
     }
 
     public static void registerVaultKey(Identifier vaultId, Identifier itemId){
-        VAULT_KEYS.put(vaultId, BuiltInRegistries.ITEM.get(itemId).map(ItemStack::new).orElse(ItemStack.EMPTY));
+        VAULT_KEYS.put(vaultId, itemId);
     }
 
     // IDLING MODDED BLOCKS COMPATIBILITY
@@ -231,19 +234,27 @@ public class ModCompat {
 
     public class EndRemasteredCompat{
         private static Method renderMethod;
+        private static Method extractMethod;
+        private static Class<?> ancientPortalStateClass;
 
         static {
             if (isEndRemasteredLoaded()) {
                 try{
                     Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
+                    ancientPortalStateClass = Class.forName("com.teamremastered.endrem.client.AncientPortalState");
                     Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
-                    renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
+                    renderMethod = ancientPortalRendererClass.getMethod("submit", ancientPortalStateClass, PoseStack.class, SubmitNodeCollector.class, CameraRenderState.class);
+                    extractMethod = ancientPortalRendererClass.getMethod("extractRenderState", ancientPortalFrameEntityClass, ancientPortalStateClass, float.class, Vec3.class, ModelFeatureRenderer.CrumblingOverlay.class);
                 }catch(Exception e){
                     renderMethod = null;
+                    extractMethod = null;
+                    ancientPortalStateClass = null;
                 }
             }
             else{
                 renderMethod = null;
+                extractMethod = null;
+                ancientPortalStateClass = null;
             }
         }
 
@@ -260,10 +271,12 @@ public class ModCompat {
             if (be == null) return;
 
             try{
-                BlockEntityRenderDispatcher dispatcher = net.minecraft.client.Minecraft.getInstance().getBlockEntityRenderDispatcher();
+                BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
                 Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
 
-                renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, new Vec3(0, 0, 0));
+                Object portalState = ancientPortalStateClass.getConstructor().newInstance();
+                extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
+                renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
                 RenderHelper.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
@@ -327,37 +340,57 @@ public class ModCompat {
     // FLASHBACK COMPATIBILITY
 
     public class FlashbackCompat{
-        public static Class<?> replayServerClass;
-        private static Method getVisualMillisMethod;
+        private static Method getVisualMillis;
+        private static Method isExporting;
 
         static{
             if (isFlashbackLoaded()) {
                 try{
-                    replayServerClass = Class.forName("com.moulberry.flashback.playback.ReplayServer");
                     Class<?> flashbackClass = Class.forName("com.moulberry.flashback.Flashback");
-                    getVisualMillisMethod = flashbackClass.getMethod("getVisualMillis");
+                    getVisualMillis = flashbackClass.getMethod("getVisualMillis");
+                    isExporting = flashbackClass.getMethod("isExporting");
                 }catch(Exception e){
-                    replayServerClass = null;
-                    getVisualMillisMethod = null;
+                    isExporting = null;
+                    getVisualMillis = null;
                 }
             }
             else{
-                replayServerClass = null;
-                getVisualMillisMethod = null;
+                isExporting = null;
+                getVisualMillis = null;
             }
         }
 
         public static double getPartialTick(double defaultValue){
-            if (replayServerClass == null || getVisualMillisMethod == null) return defaultValue;
+            if (isExporting == null || getVisualMillis == null) return defaultValue;
             try{
-                if(replayServerClass.isInstance(Minecraft.getInstance().getSingleplayerServer())){
-                    return (Double) getVisualMillisMethod.invoke(null) / 50L;
+                if(Boolean.TRUE.equals(isExporting.invoke(null))){
+                    Object millis = getVisualMillis.invoke(null);
+                    if(millis instanceof Number number){
+                        return number.doubleValue() / 50.0;
+                    }
+                    return defaultValue;
                 }
                 else{
                     return defaultValue;
                 }
             }catch(Exception e){
                 return defaultValue;
+            }
+        }
+    }
+
+    // MORE CULLING COMPATIBILITY
+
+    public class MoreCullingCompat{
+        
+        public static void disableBlockStateCulling(){
+            try{
+                Class<?> configAdditionsClass = Class.forName("ca.fxco.moreculling.api.config.ConfigAdditions");
+                Method disableOptionMethod = configAdditionsClass.getMethod("disableOption", String.class, String.class, BooleanSupplier.class, Object.class);
+                disableOptionMethod.invoke(null, "moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", (BooleanSupplier) () -> false, false);
+                FancyWorldAnimations.LOGGER.info("Successfully disabled MoreCulling's blockStateCulling!");
+            }catch(Exception e){
+                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling, visual issues may appear!");
             }
         }
     }
