@@ -99,7 +99,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			timer = System.nanoTime() - startingTime;
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera().position(), context.consumers(), context.commandQueue(), frustum, tickDelta, false));
+				render(new AnimationRenderingContext(context.matrices(), context.gameRenderer().getMainCamera(), context.consumers(), context.commandQueue(), frustum, context.worldState().cameraRenderState, tickDelta, false));
 			}
 		});
 	}
