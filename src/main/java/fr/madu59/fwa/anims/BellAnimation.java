@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import net.minecraft.client.Minecraft;
@@ -68,7 +69,7 @@ public class BellAnimation extends Animation{
     }
 
     private boolean shouldUseFallbackRender() {
-        return FMLLoader.getLoadingModList().getModFileById("betterblockentities") != null;
+        return PlatformHelper.isModLoaded("betterblockentities");
     }
 
     public boolean hasInfiniteAnimation(){

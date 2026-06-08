@@ -4,8 +4,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import net.minecraftforge.fml.loading.FMLLoader;
-
+import fr.madu59.fwa.platform.PlatformHelper;
 import java.util.List;
 import java.util.Set;
 
@@ -13,13 +12,13 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".sodium.")) {
-            return FMLLoader.getLoadingModList().getModFileById("sodium") != null || FMLLoader.getLoadingModList().getModFileById("embeddium") != null;
+            return PlatformHelper.isModLoaded("sodium") || PlatformHelper.isModLoaded("embeddium");
         }
         if (mixinClassName.contains(".iris.")) {
-            return FMLLoader.getLoadingModList().getModFileById("iris") != null || FMLLoader.getLoadingModList().getModFileById("oculus") != null;
+            return PlatformHelper.isModLoaded("iris") || PlatformHelper.isModLoaded("oculus");
         }
         if (mixinClassName.contains(".scholar.")) {
-            return FMLLoader.getLoadingModList().getModFileById("scholar") != null;
+            return PlatformHelper.isModLoaded("scholar");
         }
         return true;
     }

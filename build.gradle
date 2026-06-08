@@ -13,6 +13,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id "me.modmuss50.mod-publish-plugin" version "2.0.0"
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -228,4 +229,37 @@ tasks.named('jar', Jar).configure {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+publishMods {
+    file = jar.archiveFile
+    changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText.get()
+    type = STABLE
+	version = project.mod_version
+    modLoaders.add("forge")
+	modLoaders.add("neoforge")
+
+    curseforge {
+		displayName = file.map { it.asFile.name }
+        projectId = project.curseforge_id
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        
+		minecraftVersionRange {
+            start = "1.20.1"
+            end = "1.20.1"
+        }
+
+        client = true
+        server = false
+    }
+    modrinth {
+		displayName = "Fancy World Animations $project.mod_version"
+        projectId = project.modrinth_id
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+
+		minecraftVersionRange {
+            start = "1.20.1"
+            end = "1.20.1"
+        }
+    }
 }

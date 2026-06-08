@@ -10,6 +10,8 @@ import java.util.Set;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.madu59.fwa.api.animations.AnimationDisabler;
+import fr.madu59.fwa.platform.PlatformHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +22,7 @@ public class Blacklist {
     private static final Set<ResourceLocation> BLOCKS_BLACKLIST = new HashSet<>();
     private static final Set<String> MODS_BLACKLIST = new HashSet<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FMLPaths.CONFIGDIR.get().resolve("fwa-blacklist.json");
+    private static final Path CONFIG_PATH = PlatformHelper.getConfigDir().resolve("fwa-blacklist.json");
 
     public static void load() {
         BLOCKS_BLACKLIST.clear();
@@ -66,7 +68,7 @@ public class Blacklist {
     public static boolean isBlacklisted(BlockState state) {
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         String mod = id.getNamespace();
-        return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod);
+        return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod) || AnimationDisabler.getDisabledBlocks().contains(id) || AnimationDisabler.getDisabledMods().contains(mod);
     }
 }
 
