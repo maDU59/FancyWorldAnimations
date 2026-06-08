@@ -36,6 +36,7 @@ import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -88,7 +89,9 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BlacklistReloadListener());
 		FancyWorldAnimationsConfigScreen.registerCommand();
-		ModCompat.init();
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            ModCompat.init(); 
+        });
 		ClientPlayConnectionEvents.DISCONNECT.register((clientPacketListener, client) -> {
             animations.animations.clear();
         });
@@ -206,6 +209,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.CHAIN) {
 			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || ((SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos)))) && SettingsManager.LANTERN_OVERRIDE.getValue()));
 		}
+		if(type == Type.BELL) return true;
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		if(type == Type.DRIPLEAF) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof BigDripleafBlock && newState.getValue(BlockStateProperties.TILT) != oldState.getValue(BlockStateProperties.TILT);
 		if(type == Type.REDSTONE_WIRE) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof RedStoneWireBlock && newState.getValue(BlockStateProperties.POWER) != oldState.getValue(BlockStateProperties.POWER);
