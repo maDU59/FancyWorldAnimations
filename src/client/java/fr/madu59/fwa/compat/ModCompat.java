@@ -16,15 +16,16 @@ import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -233,19 +234,27 @@ public class ModCompat {
 
     public class EndRemasteredCompat{
         private static Method renderMethod;
+        private static Method extractMethod;
+        private static Class<?> ancientPortalStateClass;
 
         static {
             if (isEndRemasteredLoaded()) {
                 try{
                     Class<?> ancientPortalRendererClass = Class.forName("com.teamremastered.endrem.client.AncientPortalRenderer");
+                    ancientPortalStateClass = Class.forName("com.teamremastered.endrem.client.AncientPortalState");
                     Class<?> ancientPortalFrameEntityClass = Class.forName("com.teamremastered.endrem.block.AncientPortalFrameEntity");
-                    renderMethod = ancientPortalRendererClass.getMethod("render", ancientPortalFrameEntityClass, float.class, PoseStack.class, MultiBufferSource.class, int.class, int.class, Vec3.class);
+                    renderMethod = ancientPortalRendererClass.getMethod("submit", ancientPortalStateClass, PoseStack.class, SubmitNodeCollector.class, CameraRenderState.class);
+                    extractMethod = ancientPortalRendererClass.getMethod("extractRenderState", ancientPortalFrameEntityClass, ancientPortalStateClass, float.class, Vec3.class, ModelFeatureRenderer.CrumblingOverlay.class);
                 }catch(Exception e){
                     renderMethod = null;
+                    extractMethod = null;
+                    ancientPortalStateClass = null;
                 }
             }
             else{
                 renderMethod = null;
+                extractMethod = null;
+                ancientPortalStateClass = null;
             }
         }
 
@@ -262,10 +271,12 @@ public class ModCompat {
             if (be == null) return;
 
             try{
-                BlockEntityRenderDispatcher dispatcher = net.minecraft.client.Minecraft.getInstance().getBlockEntityRenderDispatcher();
+                BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
                 Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
 
-                renderMethod.invoke(rendererInstance, be, (float)context.getNowTick(), poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY, new Vec3(0, 0, 0));
+                Object portalState = ancientPortalStateClass.getConstructor().newInstance();
+                extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
+                renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
                 RenderHelper.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
