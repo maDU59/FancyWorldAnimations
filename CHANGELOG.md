@@ -1,2 +1,4 @@
 # What's new:
-- Reworked the config screen, it looks the same but is more optimised, easier to set-up, allow for more features and is far more future-proof
+- Hopefully fixed a crash with MoreCulling depending on the loading order
+- Fixed bell animations not playing
+- Fixed some sliders not working correctly
