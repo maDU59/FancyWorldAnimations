@@ -75,6 +75,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
 import net.neoforged.neoforge.common.NeoForge;
@@ -95,7 +96,6 @@ public class FancyWorldAnimationsClient{
 	public FancyWorldAnimationsClient(ModContainer container, IEventBus bus){
         NeoForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
 		bus.addListener(this::onRegisterClientReloadListeners);
-		ModCompat.init();
         container.registerExtensionPoint(IConfigScreenFactory.class, (client, parent) -> {
             return new FancyWorldAnimationsConfigScreen(parent);
 		});
@@ -104,6 +104,11 @@ public class FancyWorldAnimationsClient{
     public void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(new BlacklistReloadListener());
     }
+
+	@SubscribeEvent
+	public static void onClientSetup(FMLClientSetupEvent event){
+		ModCompat.init();
+	}
 
 	@SubscribeEvent
 	public static void onLevelUnload(LevelEvent.Unload event){
@@ -218,6 +223,7 @@ public class FancyWorldAnimationsClient{
 		if(type == Type.CHAIN) {
 			return SwingingBlockHelper.isVerticalChain(newState) && (!SettingsManager.CHAIN_GROUNDED.getValue() || !SwingingBlockHelper.isLastGrounded(pos)) && (SettingsManager.CHAIN_STATE.getValue() || ((SwingingBlockHelper.isActiveHangingLantern(SwingingBlockHelper.getLastAnimation(pos)) || SwingingBlockHelper.isActiveHangingLantern(Minecraft.getInstance().level.getBlockState(SwingingBlockHelper.getLast(pos)))) && SettingsManager.LANTERN_OVERRIDE.getValue()));
 		}
+		if(type == Type.BELL) return true;
 		if(type == Type.COMPOSTER) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof ComposterBlock && newState.getValue(BlockStateProperties.LEVEL_COMPOSTER) != oldState.getValue(BlockStateProperties.LEVEL_COMPOSTER);
 		if(type == Type.DRIPLEAF) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof BigDripleafBlock && newState.getValue(BlockStateProperties.TILT) != oldState.getValue(BlockStateProperties.TILT);
 		if(type == Type.REDSTONE_WIRE) return oldState.getBlock() == newState.getBlock() && newState.getBlock() instanceof RedStoneWireBlock && newState.getValue(BlockStateProperties.POWER) != oldState.getValue(BlockStateProperties.POWER);
