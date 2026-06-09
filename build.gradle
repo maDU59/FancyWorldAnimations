@@ -33,6 +33,14 @@ repositories {
         name = "sodium"
         url = "https://maven.caffeinemc.net/releases"
     }
+	maven { 
+        name = "CodeMC"
+        url = "https://repo.codemc.org/repository/maven-public/" 
+    }
+    maven { 
+        name = "JitPack"
+        url = "https://jitpack.io" 
+    }
 }
 
 base {
@@ -116,6 +124,8 @@ dependencies {
 	implementation "maven.modrinth:iris:1.8.8+1.21.1-neoforge"
 
     implementation("maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
+
+	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
