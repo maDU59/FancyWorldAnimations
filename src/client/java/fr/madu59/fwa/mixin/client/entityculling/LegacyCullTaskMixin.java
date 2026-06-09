@@ -16,7 +16,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 @Mixin(targets = "dev.tr7zw.entityculling.CullTask", remap = false)
-public class CullTaskMixin {
+public class LegacyCullTaskMixin {
 
     private Vec3d aabbMin = new Vec3d(0, 0, 0);
     private Vec3d aabbMax = new Vec3d(0, 0, 0);
@@ -27,8 +27,8 @@ public class CullTaskMixin {
     @Shadow
     private int hitboxLimit;
 
-    @Inject(method = "cullEntities(Lnet/minecraft/world/phys/Vec3;Lcom/logisticscraft/occlusionculling/util/Vec3d;)V", at = @At("TAIL"), require = 0, remap = false)
-    public void fwa$cullAnimations(Vec3 camPos, Vec3d camera, CallbackInfo ci){
+    @Inject(method = "cullEntities(Lnet/minecraft/world/phys/Vec3;Lcom/logisticscraft/occlusionculling/util/Vec3d;Z)V", at = @At("TAIL"), require = 0, remap = false)
+    public void fwa$cullAnimations(Vec3 camPos, Vec3d camera, boolean isSpectator, CallbackInfo ci){
         fwa$cullAnimations(camPos, camera);
     }
 
