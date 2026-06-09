@@ -15,7 +15,8 @@
 		"sodium.BlockRendererMixin",
 		"iris.ShadowRendererMixin",
 		"scholar.ChiseledBookShelfBlockEntityMixin",
-		"entityculling.CullTaskMixin"
+		"entityculling.CullTaskMixin",
+		"entityculling.LegacyCullTaskMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
