@@ -181,7 +181,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
 			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
-			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
+			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
 		}
