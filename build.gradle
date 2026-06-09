@@ -27,6 +27,14 @@ repositories {
         name = "sodium"
         url = "https://maven.caffeinemc.net/releases"
     }
+	maven { 
+        name = "CodeMC"
+        url = "https://repo.codemc.org/repository/maven-public/" 
+    }
+    maven { 
+        name = "JitPack"
+        url = "https://jitpack.io" 
+    }
 }
 
 loom {
@@ -56,6 +64,7 @@ dependencies {
     modImplementation("io.github.douira:glsl-transformer:2.0.1")
     modImplementation("org.anarres:jcpp:1.4.14")
 	modImplementation "maven.modrinth:iris:1.8.8+1.21.4-fabric"
+	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
 }
 
 processResources {
