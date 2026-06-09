@@ -60,8 +60,8 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public AABB getBoundingBox(){
-        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    public void updateBoundingBox(){
+        this.boundingBox = new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
     }
 
     @Override
@@ -75,6 +75,7 @@ public class LanternAnimation extends Animation{
     public void update(){
         if(!SettingsManager.CHAIN_STATE.getValue() && !SettingsManager.LANTERN_OVERRIDE.getValue()) chainCount = 1;
         else chainCount = SwingingBlockHelper.getChainCount(position);
+        updateBoundingBox();
         needUpdate = false;
     }
 
