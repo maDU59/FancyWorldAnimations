@@ -88,8 +88,8 @@ public class VaultAnimation extends Animation{
     }
 
     @Override
-    public AABB getBoundingBox(){
-        return new AABB(position.getCenter().add(-1.5, -1.5, -1.5), position.getCenter().add(1.5, 1.5, 1.5));
+    public void updateBoundingBox(){
+        this.boundingBox = new AABB(position.getCenter().add(-1.5, -1.5, -1.5), position.getCenter().add(1.5, 1.5, 1.5));
     }
 
     @Override
