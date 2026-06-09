@@ -27,9 +27,12 @@ public class Animation {
     protected double toRemoveTick = 0.0;
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
+    protected AABB boundingBox;
 
     protected Boolean isLast;
     protected boolean needUpdate = true;
+
+    protected boolean isOcclusionCulled = false;
 
     public Animation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         this.position = position;
@@ -40,6 +43,7 @@ public class Animation {
         this.oldState = oldState;
         this.newState = newState;
         this.renderType = getRenderType(newState);
+        updateBoundingBox();
     }
 
     public RenderType getRenderType(BlockState state){
@@ -127,8 +131,12 @@ public class Animation {
         return Math.clamp((nowTick - this.startTick) / duration, 0.0, 1.0);
     }
 
+    public void updateBoundingBox(){
+        boundingBox = new AABB(position);
+    }
+
     public AABB getBoundingBox(){
-        return new AABB(position);
+        return boundingBox;
     }
 
     protected BlockState getDefaultState(BlockState state){
@@ -171,5 +179,13 @@ public class Animation {
 
     public int getRelativeLight(Direction dir){
         return getLight(position.relative(dir));
+    }
+
+    public boolean isOcclusionCulled(){
+        return this.isOcclusionCulled;
+    }
+
+    public void setIsOcclusionCulled(boolean isOcclusionCulled){
+        this.isOcclusionCulled = isOcclusionCulled;
     }
 }
