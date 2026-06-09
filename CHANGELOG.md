@@ -1,4 +1,3 @@
 # What's new:
-- Hopefully fixed a crash with MoreCulling depending on the loading order
-- Fixed bell animations not playing
-- Fixed some sliders not working correctly
+- Added compatibility with EntityCulling's occlusion culling, this means improved performances when both mods are used
+- Improved frustum culling checks by caching bounding boxes

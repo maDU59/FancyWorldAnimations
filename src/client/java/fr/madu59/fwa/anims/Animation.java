@@ -27,7 +27,7 @@ public class Animation {
     protected Boolean isLast;
     protected boolean needUpdate = true;
 
-    protected boolean isOcclusionCulled;
+    protected boolean isOcclusionCulled = false;
 
     public Animation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         this.position = position;

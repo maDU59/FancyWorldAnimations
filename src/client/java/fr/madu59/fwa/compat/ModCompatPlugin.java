@@ -20,6 +20,9 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains(".scholar.")) {
             return PlatformHelper.isModLoaded("scholar");
         }
+        if (mixinClassName.contains(".entityculling.")) {
+            return PlatformHelper.isModLoaded("entityculling");
+        }
         return true;
     }
 
