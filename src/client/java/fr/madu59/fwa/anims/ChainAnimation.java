@@ -67,8 +67,8 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
-    public AABB getBoundingBox(){
-        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    public void updateBoundingBox(){
+        this.boundingBox = new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
     }
 
     public void update(){
@@ -77,6 +77,7 @@ public class ChainAnimation extends Animation{
             isLast = SwingingBlockHelper.isLast(position);
             if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
         }
+        updateBoundingBox();
         chainCount = SwingingBlockHelper.getChainCount(position);
         needUpdate = false;
     }
