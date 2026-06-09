@@ -7,11 +7,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.logisticscraft.occlusionculling.OcclusionCullingInstance;
 import com.logisticscraft.occlusionculling.util.Vec3d;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.anims.Animation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -27,8 +29,8 @@ public abstract class CullTaskMixin {
     @Shadow
     private int hitboxLimit;
 
-    @Inject(method = "cullEntities(Lnet/minecraft/world/phys/Vec3;Lcom/logisticscraft/occlusionculling/util/Vec3d;)V", at = @At("TAIL"), require = 0, remap = false)
-    public void fwa$cullAnimations(Vec3 camPos, Vec3d camera, CallbackInfo ci){
+    @Inject(method = "cullEntities", at = @At("TAIL"), require = 0, remap = false)
+    public void fwa$cullAnimations(CallbackInfo ci, @Local(argsOnly = true) Vec3 camPos, @Local(argsOnly = true) Vec3d camera){
         fwa$cullAnimations(camPos, camera);
     }
 
