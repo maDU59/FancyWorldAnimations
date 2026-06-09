@@ -154,6 +154,7 @@ repositories {
         url = "https://maven.caffeinemc.net/releases"
     }
     maven { url 'https://jitpack.io' }
+	maven { url 'https://repo.codemc.org/repository/maven-public/'}
 }
 
 dependencies {
@@ -173,6 +174,7 @@ dependencies {
 
     implementation 'org.anarres:jcpp:1.4.14'
 	implementation fg.deobf("maven.modrinth:oculus:1.20.1-1.8.0")
+	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

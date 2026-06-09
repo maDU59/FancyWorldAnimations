@@ -16,7 +16,8 @@
 		"ShulkerBoxModelMixin",
 		"sodium.BlockRenderContextMixin",
 		"iris.ShadowRendererMixin",
-		"scholar.ChiseledBookShelfBlockEntityMixin"
+		"scholar.ChiseledBookShelfBlockEntityMixin",
+		"entityculling.CullTaskMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
