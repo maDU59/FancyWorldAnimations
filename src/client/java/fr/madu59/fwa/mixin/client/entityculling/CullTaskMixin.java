@@ -16,7 +16,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 @Mixin(targets = "dev.tr7zw.entityculling.CullTask", remap = false)
-public class CullTaskMixin {
+public abstract class CullTaskMixin {
 
     private Vec3d aabbMin = new Vec3d(0, 0, 0);
     private Vec3d aabbMax = new Vec3d(0, 0, 0);
