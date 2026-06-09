@@ -153,7 +153,7 @@ public class ModCompat {
 
     // MAP ATLASES COMPATIBILITY
 
-    public class MapAtlasesCompat{
+    public static class MapAtlasesCompat{
 
         // DEFAULT TEXTURE FOR BOOKS
         private static final ResourceLocation DEFAULT_BOOK_TEXTURE =
@@ -230,7 +230,7 @@ public class ModCompat {
 
     // END REMASTERED COMPATIBILITY
 
-    public class EndRemasteredCompat{
+    public static class EndRemasteredCompat{
         private static Method renderMethod;
 
         static {
@@ -274,7 +274,7 @@ public class ModCompat {
 
     // SCHOLAR COMPATIBILITY
 
-    public class ScholarCompat{
+    public static class ScholarCompat{
         public static final ResourceLocation BOOKS_TEXTURE = ResourceLocation.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
         public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
         private static Method getDefaultTintColorForSlotMethod;
@@ -327,7 +327,7 @@ public class ModCompat {
 
     // FLASHBACK COMPATIBILITY
 
-    public class FlashbackCompat{
+    public static class FlashbackCompat{
         private static Method getVisualMillis;
         private static Method isExporting;
 
@@ -369,7 +369,7 @@ public class ModCompat {
 
     // MORE CULLING COMPATIBILITY
 
-    public class MoreCullingCompat{
+    public static class MoreCullingCompat{
         
         public static void disableBlockStateCulling(){
             try{
