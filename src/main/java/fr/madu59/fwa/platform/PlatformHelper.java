@@ -8,7 +8,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 public class PlatformHelper {
 
     public static String getPlatformName(){
-        return "Fabric";
+        return "Neoforge";
     }
     
     public static boolean isModLoaded(String modId){
