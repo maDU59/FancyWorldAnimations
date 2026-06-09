@@ -77,8 +77,8 @@ public class ChainAnimation extends Animation{
             isLast = SwingingBlockHelper.isLast(position);
             if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
         }
-        updateBoundingBox();
         chainCount = SwingingBlockHelper.getChainCount(position);
+        updateBoundingBox();
         needUpdate = false;
     }
 
