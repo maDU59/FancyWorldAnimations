@@ -1,3 +1,3 @@
 # What's new:
-- Added compatibility with EntityCulling's occlusion culling, this means improved performances when both mods are used
-- Improved frustum culling checks by caching bounding boxes
+- Added Domum Ornamentum to the baked in blacklist due to animatons not working correctly
+- Added an API to override the baked in blacklist, in case compatibility layers are made by external people
