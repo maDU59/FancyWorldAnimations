@@ -33,7 +33,6 @@ public class RenderHelper {
     private static float ZShade = 0;
     private static float XShade = 0;
     private static boolean shouldShade = true;
-    private static final float INVISIBLE_SCALE_VALUE = 0.0001f;
     private static final Direction[] DIRECTIONS_WITH_NULL = {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
@@ -102,34 +101,30 @@ public class RenderHelper {
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel){
-        return (BlockStateModel)(originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
+        return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
     }
 
     private static float scaleCoordinate(float value) {
-      return 0.5F + (value - 0.5F) * INVISIBLE_SCALE_VALUE;
-   }
+        return 0.5F + (value - 0.5F) * 0002f;
+    }
 
-   private static Vector3fc scalePosition(Vector3fc position) {
-      return new Vector3f(scaleCoordinate(position.x()), scaleCoordinate(position.y()), scaleCoordinate(position.z()));
-   }
+    private static Vector3fc scalePosition(Vector3fc position) {
+        return new Vector3f(scaleCoordinate(position.x()), scaleCoordinate(position.y()), scaleCoordinate(position.z()));
+    }
 
     private static BakedQuad scaleQuad(BakedQuad quad) {
-      return new BakedQuad(scalePosition(quad.position0()), scalePosition(quad.position1()), scalePosition(quad.position2()), scalePosition(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo());
-   }
+        return new BakedQuad(scalePosition(quad.position0()), scalePosition(quad.position1()), scalePosition(quad.position2()), scalePosition(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo());
+    }
 
-    private static final class InvisibleModel implements BlockStateModel{
-        private final BlockStateModel model;
+    private record InvisibleModel(BlockStateModel model) implements BlockStateModel{
 
-        private InvisibleModel(BlockStateModel originalModel) {
-            this.model = originalModel;
-        }
-
+        @Override
         public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
             int start = parts.size();
             this.model.collectParts(random, parts);
 
             for(int i = start; i < parts.size(); ++i) {
-                BlockStateModelPart part = (BlockStateModelPart)parts.get(i);
+                BlockStateModelPart part = parts.get(i);
                 if (!(part instanceof InvisibleBlockStateModelPart)) {
                     parts.set(i, new InvisibleBlockStateModelPart(part));
                 }
@@ -137,10 +132,12 @@ public class RenderHelper {
 
         }
 
+        @Override
         public Material.Baked particleMaterial() {
             return this.model.particleMaterial();
         }
 
+        @Override
         public int materialFlags() {
             return this.model.materialFlags();
         }
@@ -148,24 +145,28 @@ public class RenderHelper {
 
     private static final class InvisibleBlockStateModelPart implements BlockStateModelPart {
         private final BlockStateModelPart part;
-        private final Map<Direction, List<BakedQuad>> directionalCache = new HashMap<Direction, List<BakedQuad>>();
+        private final Map<Direction, List<BakedQuad>> directions = new HashMap<Direction, List<BakedQuad>>();
 
         private InvisibleBlockStateModelPart(BlockStateModelPart originalPart) {
             this.part = originalPart;
         }
 
+        @Override
         public List<BakedQuad> getQuads(Direction direction) {
-            return this.directionalCache.computeIfAbsent(direction, (key) -> scaleQuads(this.part.getQuads(key)));
+            return this.directions.computeIfAbsent(direction, (k) -> scaleQuads(this.part.getQuads(k)));
         }
 
+        @Override
         public boolean useAmbientOcclusion() {
             return false;
         }
 
+        @Override
         public Material.Baked particleMaterial() {
             return this.part.particleMaterial();
         }
 
+        @Override
         public int materialFlags() {
             return this.part.materialFlags();
         }
