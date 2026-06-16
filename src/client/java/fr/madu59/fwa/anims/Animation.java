@@ -3,9 +3,9 @@ package fr.madu59.fwa.anims;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -151,11 +151,11 @@ public class Animation {
     }
 
     public int getLight(BlockPos pos, BlockState state){
-        return LevelRenderer.getLightCoords(LevelRenderer.BrightnessGetter.DEFAULT, (BlockAndLightGetter) Minecraft.getInstance().level, state, pos);
+        return LightCoordsUtil.getLightCoords(LightCoordsUtil.BrightnessGetter.DEFAULT, (BlockAndLightGetter) Minecraft.getInstance().level, state, pos);
     }
 
     public int getLight(BlockPos pos){
-        return LevelRenderer.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, pos);
+        return LightCoordsUtil.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, pos);
     }
 
     public int getRelativeLight(Direction dir){

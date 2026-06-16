@@ -277,7 +277,7 @@ public class ModCompat {
                 Object portalState = ancientPortalStateClass.getConstructor().newInstance();
                 extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
                 renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
-                RenderHelper.endBatch(context.getBufferSource());
+                // RenderHelper.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
             }

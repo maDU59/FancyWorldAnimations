@@ -11,7 +11,6 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -71,11 +70,9 @@ public class CampfireAnimation extends Animation{
         
         int light = getLight();
 
-        MultiBufferSource bufferSource = context.getBufferSource();
-
-        renderFilteredQuads(poseStack, bufferSource, part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, bufferSource, part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, part.getQuads(dir), false, light);
         }
 
         float scaleY;
@@ -91,17 +88,17 @@ public class CampfireAnimation extends Animation{
         poseStack.scale(scaleXZ,scaleY,scaleXZ);
         poseStack.translate(-0.5f,-1f/16f,-0.5f);
 
-        renderFilteredQuads(poseStack, bufferSource, part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, bufferSource, part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, part.getQuads(dir), true, light);
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, boolean wantFire, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantFire, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
-                RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

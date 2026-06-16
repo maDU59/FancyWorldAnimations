@@ -138,6 +138,6 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = getLight();
-        RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

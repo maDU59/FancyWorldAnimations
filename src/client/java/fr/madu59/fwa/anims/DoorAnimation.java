@@ -131,6 +131,6 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = getLight();
-        RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
     }
 }

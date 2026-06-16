@@ -152,7 +152,7 @@ public class BellAnimation extends Animation{
         int light = getLight();
 
         if(shouldUseFallbackRender()){
-            RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
 
         float ticks = bellBlockEntity.ticks + Math.clamp(client.getDeltaTracker().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f);
@@ -170,7 +170,5 @@ public class BellAnimation extends Animation{
         }
 
         context.getSubmitNodeCollector().submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), light, OverlayTexture.NO_OVERLAY, sprite);
-
-        RenderHelper.endBatch(context.getBufferSource());
     }
 }

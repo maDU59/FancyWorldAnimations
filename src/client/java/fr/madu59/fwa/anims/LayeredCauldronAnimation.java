@@ -14,7 +14,6 @@ import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -87,21 +86,21 @@ public class LayeredCauldronAnimation extends Animation{
         int light = getLight();
         BlockStateModelPart part = parts.get(0);
 
-        renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, part.getQuads(dir), false, light);
         }
 
         float dy = getPosition(context.getNowTick(), getHeight(newBlockState), getHeight(oldBlockState));
         poseStack.translate(0,dy,0);
 
-        renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, part.getQuads(dir), true, light);
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, boolean wantLiquid, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantLiquid, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             String last = path.split("/")[path.split("/").length-1];
@@ -121,7 +120,7 @@ public class LayeredCauldronAnimation extends Animation{
                     }
                 }
 
-                RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, r, g, b, light);
+                RenderHelper.renderQuad(poseStack, quad, 1.0f, r, g, b, light);
             }
         }
     }

@@ -8,7 +8,7 @@ import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.core.BlockPos;
 
 public class Animations{
@@ -22,14 +22,14 @@ public class Animations{
     public void removeSafeAt(BlockPos blockPos) {
         Animation animation = getAt(blockPos);
         if(animation == null) return;
-        LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+        LevelExtractor levelExtractor = Minecraft.getInstance().levelExtractor;
         animation.markForRemoval();
-        ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(blockPos.getX() >> 4, blockPos.getY() >> 4, blockPos.getZ() >> 4, true);
+        ((SetSectionDirtyInvoker) levelExtractor).fwa$setSectionDirty(blockPos.getX() >> 4, blockPos.getY() >> 4, blockPos.getZ() >> 4, true);
     }
 
     public void clean(double nowTick) {
         ClientLevel level = Minecraft.getInstance().level;
-        LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+        LevelExtractor levelExtractor = Minecraft.getInstance().levelExtractor;
         Iterator<Animation> it = this.animations.values().iterator();
         while (it.hasNext()) {
             Animation animation = it.next();
@@ -42,7 +42,7 @@ public class Animations{
                 }
                 else if (animation.isFinished(nowTick)) {
                     animation.markForRemoval();
-                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
+                    ((SetSectionDirtyInvoker) levelExtractor).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
                 }
             }
             else{

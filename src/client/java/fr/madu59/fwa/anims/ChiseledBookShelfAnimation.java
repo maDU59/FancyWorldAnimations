@@ -104,8 +104,6 @@ public class ChiseledBookShelfAnimation extends Animation{
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 
-        PoseStack.Pose entry = poseStack.last();
-
         float w = 4f/16f;
         float h = (slot == 0 || slot == 4)? 5f/16f : 6f/16f;
         float d = 5f/15f;
@@ -134,53 +132,55 @@ public class ChiseledBookShelfAnimation extends Animation{
         poseStack.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
         poseStack.translate(-w / 2f, -(6f/16f) / 2f, -d / 2f);
 
-        float u1 = 1f/16f + ((slot) % 3) * 5f/16f;
-        float u2 = u1 + w;
-        float v1 = 1 - (y - 3f/16f + h);
-        float v2 = v1 + h;
+        context.getSubmitNodeCollector().submitCustomGeometry(poseStack, RenderTypes.cutoutMovingBlock(), (PoseStack.Pose pose, VertexConsumer buffer) -> {
 
-        int light = getRelativeLight(facing);
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.cutoutMovingBlock());
+            float u1 = 1f/16f + ((slot) % 3) * 5f/16f;
+            float u2 = u1 + w;
+            float v1 = 1 - (y - 3f/16f + h);
+            float v2 = v1 + h;
 
-        for(int i = 0; i < sprites.size(); i++){
+            int light = getRelativeLight(facing);
 
-            TextureAtlasSprite sprite = sprites.get(i);
-            int color = colors.get(i);
+            for(int i = 0; i < sprites.size(); i++){
 
-            int r = 255;
-            int g = 255;
-            int b = 255;
-            if(color != -1){
-                r = color >> 16 & 255;
-                g = color >> 8 & 255;
-                b = color & 255;
+                TextureAtlasSprite sprite = sprites.get(i);
+                int color = colors.get(i);
+
+                int r = 255;
+                int g = 255;
+                int b = 255;
+                if(color != -1){
+                    r = color >> 16 & 255;
+                    g = color >> 8 & 255;
+                    b = color & 255;
+                }
+
+                
+                writeQuad(pose, buffer, 
+                    0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 
+                    u1, v1, u2, v2, light, 0, 0, -1, sprite, r, g, b);
+
+                writeQuad(pose, buffer, 
+                    w, 0, 0,  w, h, 0,  0, h, 0,  0, 0, 0, 
+                    u1, v1, u2, v2, light, 0, 0, 1, sprite, r, g, b);
+
+                writeQuad(pose, buffer, 
+                    0, h, d,  0, h, 0,  w, h, 0,  w, h, d, 
+                    u1, v1, u2, v2, light, 0, -1, 0, sprite, r, g, b);
+
+                writeQuad(pose, buffer, 
+                    0, 0, 0,  0, 0, d,  w, 0, d,  w, 0, 0, 
+                    u1, v1, u2, v2, light, 0, 1, 0, sprite, r, g, b);
+
+                writeQuad(pose, buffer, 
+                    w, 0, d,  w, h, d,  w, h, 0,  w, 0, 0, 
+                    u1, v1, u2, v2, light, -1, 0, 0, sprite, r, g, b);
+
+                writeQuad(pose, buffer, 
+                    0, 0, 0,  0, h, 0,  0, h, d,  0, 0, d, 
+                    u1, v1, u2, v2, light, 1, 0, 0, sprite, r, g, b);
             }
-
-            writeQuad(entry, buffer, 
-                0, 0, d,  0, h, d,  w, h, d,  w, 0, d, 
-                u1, v1, u2, v2, light, 0, 0, -1, sprite, r, g, b);
-
-            writeQuad(entry, buffer, 
-                w, 0, 0,  w, h, 0,  0, h, 0,  0, 0, 0, 
-                u1, v1, u2, v2, light, 0, 0, 1, sprite, r, g, b);
-
-            writeQuad(entry, buffer, 
-                0, h, d,  0, h, 0,  w, h, 0,  w, h, d, 
-                u1, v1, u2, v2, light, 0, -1, 0, sprite, r, g, b);
-
-            writeQuad(entry, buffer, 
-                0, 0, 0,  0, 0, d,  w, 0, d,  w, 0, 0, 
-                u1, v1, u2, v2, light, 0, 1, 0, sprite, r, g, b);
-
-            writeQuad(entry, buffer, 
-                w, 0, d,  w, h, d,  w, h, 0,  w, 0, 0, 
-                u1, v1, u2, v2, light, -1, 0, 0, sprite, r, g, b);
-
-            writeQuad(entry, buffer, 
-                0, 0, 0,  0, h, 0,  0, h, d,  0, 0, d, 
-                u1, v1, u2, v2, light, 1, 0, 0, sprite, r, g, b);
-            
-        }
+        });
     }
 
     private void writeQuad(PoseStack.Pose pose, VertexConsumer buffer, 
@@ -209,7 +209,7 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     private void vertex(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z, float u, float v, int light, float nx, float ny, float nz, int r, int g, int b) {
-        buffer.addVertex(pose.pose(), x, y, z)
+        buffer.addVertex(pose, x, y, z)
             .setColor(r, g, b, 255)
             .setUv(u, v)
             .setOverlay(OverlayTexture.NO_OVERLAY)

@@ -46,7 +46,8 @@ public class Option<T> {
     }
 
     public void setToNextValue() {
-        if(reload) Minecraft.getInstance().levelRenderer.allChanged();
+        Minecraft client = Minecraft.getInstance();
+        if(reload) Minecraft.getInstance().levelRenderer.invalidateCompiledGeometry(client.level, client.options, client.gameRenderer.mainCamera(), client.getBlockColors());
         this.value = cycle(this.value);
     }
 

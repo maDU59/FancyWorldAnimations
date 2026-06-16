@@ -4,15 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.feature.RenderTypeFeatureRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimationRenderingContext {
     private final PoseStack poseStack;
-    private final MultiBufferSource bufferSource;
     private final SubmitNodeCollector submitNodeCollector;
     private final double nowTick;
     private final Camera camera;
@@ -21,9 +20,8 @@ public class AnimationRenderingContext {
     private final Frustum frustum;
     private final CameraRenderState cameraRenderState;
 
-    public AnimationRenderingContext(PoseStack poseStack, Camera camera, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, Frustum frustum, CameraRenderState cameraRenderState, double nowTick, boolean isShadow) {
+    public AnimationRenderingContext(PoseStack poseStack, Camera camera, SubmitNodeCollector submitNodeCollector, Frustum frustum, CameraRenderState cameraRenderState, double nowTick, boolean isShadow) {
         this.poseStack = poseStack;
-        this.bufferSource = bufferSource;
         this.submitNodeCollector = submitNodeCollector;
         this.nowTick = nowTick;
         this.camera = camera;
@@ -33,26 +31,21 @@ public class AnimationRenderingContext {
         this.cameraRenderState = cameraRenderState;
     }
 
-    public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, Frustum frustum, double nowTick, boolean isShadow) {
+    public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, SubmitNodeCollector submitNodeCollector, Frustum frustum, double nowTick, boolean isShadow) {
         this.poseStack = poseStack;
-        this.bufferSource = bufferSource;
         this.submitNodeCollector = submitNodeCollector;
         this.nowTick = nowTick;
-        this.camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        this.camera = Minecraft.getInstance().gameRenderer.mainCamera();
         this.cameraPos = cameraPos;
         this.isShadow = isShadow;
         this.frustum = frustum;
         CameraRenderState cameraRenderState = new CameraRenderState();
-        Minecraft.getInstance().gameRenderer.getMainCamera().extractRenderState(cameraRenderState, 0);
+        Minecraft.getInstance().gameRenderer.mainCamera().extractRenderState(cameraRenderState, 0);
         this.cameraRenderState = cameraRenderState;
     }
 
     public PoseStack getPoseStack() {
         return poseStack;
-    }
-
-    public MultiBufferSource getBufferSource() {
-        return bufferSource;
     }
 
     public SubmitNodeCollector getSubmitNodeCollector() {

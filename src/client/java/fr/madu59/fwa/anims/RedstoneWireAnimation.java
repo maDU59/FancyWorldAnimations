@@ -84,6 +84,6 @@ public class RedstoneWireAnimation extends Animation{
 
         float[] color = getColor(context.getNowTick(), newR, newG, newB, oldR, oldG, oldB);
 
-        RenderHelper.renderModel(context.getBufferSource(), poseStack.last(), parts, 1.0f, color[0], color[1], color[2], light);
+        RenderHelper.renderModel(poseStack, parts, 1.0f, color[0], color[1], color[2], light);
     }
 }

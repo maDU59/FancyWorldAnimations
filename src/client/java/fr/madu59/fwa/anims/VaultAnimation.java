@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class VaultAnimation extends Animation{
 
@@ -88,7 +89,7 @@ public class VaultAnimation extends Animation{
 
     @Override
     public void updateBoundingBox(){
-        this.boundingBox = new AABB(position.getCenter().add(-1.5, -1.5, -1.5), position.getCenter().add(1.5, 1.5, 1.5));
+        this.boundingBox = new AABB(Vec3.atCenterOf(position).add(-1.5, -1.5, -1.5), Vec3.atCenterOf(position).add(1.5, 1.5, 1.5));
     }
 
     @Override

@@ -26,7 +26,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
             dispatcher.register(
                 literal("fwaConfig")
                     .executes(context -> {
-                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new FancyWorldAnimationsConfigScreen(null)));
+                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.setScreen(new FancyWorldAnimationsConfigScreen(null)));
                         return 1;
                     })
             );
@@ -148,7 +148,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.slider(SettingsManager.DRIPLEAF_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.DRIPLEAF_STATE.getValue()).build();
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {
-            this.minecraft.setScreen(this.parent);
+            this.minecraft.gui.setScreen(this.parent);
             SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
         }).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build();
 
@@ -158,7 +158,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
         SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
     }
 

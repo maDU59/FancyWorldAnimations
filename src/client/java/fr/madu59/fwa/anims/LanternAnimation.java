@@ -15,7 +15,6 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
@@ -25,6 +24,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class LanternAnimation extends Animation{
 
@@ -62,7 +62,7 @@ public class LanternAnimation extends Animation{
 
     @Override
     public void updateBoundingBox(){
-        this.boundingBox = new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+        this.boundingBox = new AABB(Vec3.atCenterOf(position).add(-0.5, -0.5, -0.5), Vec3.atCenterOf(position.above(chainCount)).add(0.5, 0.5, 0.5));
     }
 
     @Override
@@ -83,7 +83,6 @@ public class LanternAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         if (needUpdate) update();
-        MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
         extractRenderState(context);
@@ -119,7 +118,7 @@ public class LanternAnimation extends Animation{
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             BlockStateModel chainModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             chainModel.collectParts(random, chainParts);
-            RenderHelper.renderModel(bufferSource, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(poseStack, chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);
@@ -140,7 +139,7 @@ public class LanternAnimation extends Animation{
         BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         parts.clear();
         model.collectParts(random, parts);
-        RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
         poseStack.popPose();
         poseStack.popPose();
     }

@@ -97,7 +97,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			timer = System.nanoTime() - startingTime;
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
 				double tickDelta = getPartialTick();
-				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().getMainCamera(), context.bufferSource(), context.submitNodeCollector(), context.gameRenderer().getMainCamera().getCullFrustum(), context.levelState().cameraRenderState, tickDelta, false));
+				render(new AnimationRenderingContext(context.poseStack(), context.gameRenderer().mainCamera(), context.submitNodeCollector(), context.gameRenderer().mainCamera().getCullFrustum(), context.levelState().cameraRenderState, tickDelta, false));
 			}
 		});
 	}
@@ -145,8 +145,8 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		startTick = syncDoors(startTick, blockPos, newState, type);
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
-		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 500000*500000) return;
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
+		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(Vec3.atCenterOf(blockPos)) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(Vec3.atCenterOf(blockPos)) > 500000*500000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
@@ -174,7 +174,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		RenderHelper.prepareFrame(context);
 
-		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+		Vec3 camPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
 		if(context.isShadow()) dist *= SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE.getValue();
 
@@ -182,7 +182,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
+			if(camPos.distanceToSqr(Vec3.atCenterOf(animation.getPos())) > dist) continue;
 			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}

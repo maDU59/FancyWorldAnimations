@@ -14,7 +14,6 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper;
 import fr.madu59.fwa.utils.ModelSplitHelper.FenceGate;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -89,9 +88,7 @@ public class FenceGateAnimation extends Animation{
 
         int light = getLight();
 
-        MultiBufferSource bufferSource = context.getBufferSource();
-
-        renderQuads(poseStack, bufferSource, fenceGate.postQuadList(), light);
+        renderQuads(poseStack, fenceGate.postQuadList(), light);
 
         boolean onAxisZ = (facing.getAxis() == Axis.Z);
         float leftPivotX = onAxisZ ? (1.0f / 16.0f) : 0.5f;
@@ -106,7 +103,7 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
-        renderQuads(poseStack, bufferSource, fenceGate.leftQuadList(), light);
+        renderQuads(poseStack, fenceGate.leftQuadList(), light);
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
@@ -115,12 +112,12 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(rightPivotX, 0.0f, rightPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
         poseStack.translate(-rightPivotX, 0.0f, -rightPivotZ);
-        renderQuads(poseStack, bufferSource, fenceGate.rightQuadList(), light);
+        renderQuads(poseStack, fenceGate.rightQuadList(), light);
     }
 
-    private void renderQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, int light) {
+    private void renderQuads(PoseStack poseStack, List<BakedQuad> quads, int light) {
         for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
         }
     }
 

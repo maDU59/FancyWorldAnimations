@@ -15,7 +15,6 @@ import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
@@ -24,6 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class ChainAnimation extends Animation{
 
@@ -68,7 +68,7 @@ public class ChainAnimation extends Animation{
 
     @Override
     public void updateBoundingBox(){
-        this.boundingBox = new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+        this.boundingBox = new AABB(Vec3.atCenterOf(position).add(-0.5, -0.5, -0.5), Vec3.atCenterOf(position.above(chainCount)).add(0.5, 0.5, 0.5));
     }
 
     public void update(){
@@ -99,7 +99,6 @@ public class ChainAnimation extends Animation{
         float swingScale = 0.7F;
         if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float prevFactor = 0.0F;
-        MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
         extractRenderState(context);
         float degToRad = 0.017453292519943295f;
@@ -131,7 +130,7 @@ public class ChainAnimation extends Animation{
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             model.collectParts(random, parts);
-            RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);

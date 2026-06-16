@@ -12,6 +12,8 @@ import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
+import net.minecraft.client.renderer.feature.FeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -95,8 +97,6 @@ public class LecternAnimation extends Animation {
         Double nowTick = context.getNowTick();
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-
-        VertexConsumer buffer = context.getBufferSource().getBuffer(RenderTypes.entityCutout(textureId));
         
         int light = getLight();
         BookModel.State bookState = new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));
@@ -107,6 +107,6 @@ public class LecternAnimation extends Animation {
         poseStack.mulPose(Axis.ZP.rotationDegrees(67.5F));
         poseStack.translate(0.0F, -0.125F, 0.0F);
 
-        bookModel.renderToBuffer(poseStack, buffer, light, OverlayTexture.NO_OVERLAY);
+        context.getSubmitNodeCollector().submitModel(bookModel, bookState, poseStack, textureId, light, OverlayTexture.NO_OVERLAY, 0, null);
     }
 }

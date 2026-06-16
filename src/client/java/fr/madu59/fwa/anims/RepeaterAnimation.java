@@ -11,7 +11,6 @@ import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -70,9 +69,9 @@ public class RepeaterAnimation extends Animation{
 
         BlockStateModelPart part = parts.get(0);
 
-        renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), false, light);
+        renderFilteredQuads(poseStack, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(dir), false, light);
+            renderFilteredQuads(poseStack, part.getQuads(dir), false, light);
         }
 
         float dx = getPosition(context.getNowTick(), newState.getValue(BlockStateProperties.DELAY), oldState.getValue(BlockStateProperties.DELAY));
@@ -80,17 +79,17 @@ public class RepeaterAnimation extends Animation{
         if (facing.getAxis() == Axis.X) poseStack.translate(dx,0,0);
         else poseStack.translate(0,0,dx);
 
-        renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(null), true, light);
+        renderFilteredQuads(poseStack, part.getQuads(null), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, context.getBufferSource(), part.getQuads(dir), true, light);
+            renderFilteredQuads(poseStack, part.getQuads(dir), true, light);
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, boolean wantTorch, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantTorch, int light) {
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && (quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f || quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f) && (quad.position0().z() > 5f/16f && quad.position0().z() < 11f/16f || quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f)) == wantTorch) {
-                RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
             }
         }
     }

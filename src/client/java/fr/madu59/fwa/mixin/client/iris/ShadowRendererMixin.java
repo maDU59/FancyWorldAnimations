@@ -13,7 +13,6 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.irisshaders.iris.mixin.LevelRendererAccessor;
 import net.irisshaders.iris.shadows.ShadowRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -27,7 +26,7 @@ public abstract class ShadowRendererMixin {
     private SubmitNodeStorage submitNodeStorage;
     
     @Inject(at = @At("HEAD"), method = "renderEntities")
-    public void fwa$renderEntities(LevelRendererAccessor levelRenderer, EntityRenderDispatcher dispatcher, MultiBufferSource.BufferSource bufferSource, PoseStack modelView, float tickDelta, Frustum frustum, double cameraX, double cameraY, double cameraZ, CallbackInfoReturnable<Integer> ci){
-        FancyWorldAnimationsClient.render(new AnimationRenderingContext(modelView, new Vec3(cameraX, cameraY, cameraZ), bufferSource, submitNodeStorage, frustum, FancyWorldAnimationsClient.getPartialTick(), true));
+    public void fwa$renderEntities(LevelRendererAccessor levelRenderer, EntityRenderDispatcher dispatcher, PoseStack modelView, float tickDelta, Frustum frustum, double cameraX, double cameraY, double cameraZ, CallbackInfoReturnable<Integer> ci){
+        FancyWorldAnimationsClient.render(new AnimationRenderingContext(modelView, new Vec3(cameraX, cameraY, cameraZ), submitNodeStorage, frustum, FancyWorldAnimationsClient.getPartialTick(), true));
     }
 }
