@@ -1,2 +1,2 @@
 # What's new:
-- Ported to 26.2
+- Fixed blocks showing up as very big
