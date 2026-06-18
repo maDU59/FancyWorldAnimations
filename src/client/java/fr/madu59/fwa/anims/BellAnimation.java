@@ -52,7 +52,7 @@ public class BellAnimation extends Animation{
         if(client.level.getBlockEntity(position) instanceof BellBlockEntity bbe){
             this.bellBlockEntity = bbe;
         }
-        else if (client.level.getBlockEntity(position) != null){
+        else if (client.level.getBlockEntity(position) != null || PlatformHelper.isModLoaded("betterblockentities")){
             FancyWorldAnimationsClient.removeAnimationAt(position);
         }
 
@@ -76,7 +76,7 @@ public class BellAnimation extends Animation{
     }
 
     private boolean shouldUseFallbackRender() {
-        return PlatformHelper.isModLoaded("betterblockentities");
+        return PlatformHelper.isModLoaded("obe");
     }
 
     public boolean hasInfiniteAnimation(){
