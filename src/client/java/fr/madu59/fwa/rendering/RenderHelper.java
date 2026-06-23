@@ -105,7 +105,7 @@ public class RenderHelper {
     }
 
     private static float scaleCoordinate(float value) {
-        return 0.5F + (value - 0.5F) * 0002f;
+        return 0.5F + (value - 0.5F) * 0.0002f;
     }
 
     private static Vector3fc scalePosition(Vector3fc position) {
