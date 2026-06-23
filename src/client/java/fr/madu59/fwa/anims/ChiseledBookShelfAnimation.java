@@ -207,7 +207,7 @@ public class ChiseledBookShelfAnimation extends Animation{
     }
 
     private void vertex(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z, float u, float v, int light, float nx, float ny, float nz, int r, int g, int b) {
-        buffer.addVertex(pose.pose(), x, y, z)
+        buffer.addVertex(pose, x, y, z)
             .setColor(r, g, b, 255)
             .setUv(u, v)
             .setOverlay(OverlayTexture.NO_OVERLAY)

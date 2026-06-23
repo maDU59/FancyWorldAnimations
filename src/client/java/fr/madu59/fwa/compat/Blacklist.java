@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import fr.madu59.fwa.api.animations.AnimationDisabler;
+import fr.madu59.fwa.api.animations.BlackListOverrides;
 import fr.madu59.fwa.platform.PlatformHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,7 +36,7 @@ public class Blacklist {
         Minecraft.getInstance().getResourceManager().getResource(resourcePath).ifPresent(resource -> {
             try (InputStreamReader reader = new InputStreamReader(resource.open())) {
                 BlacklistData data = GSON.fromJson(reader, BlacklistData.class);
-                applyData(data);
+                applyData(data, Provider.USER);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -47,20 +48,20 @@ public class Blacklist {
             if (Files.exists(CONFIG_PATH)) {
                 String content = Files.readString(CONFIG_PATH);
                 BlacklistData data = GSON.fromJson(content, BlacklistData.class);
-                applyData(data);
+                applyData(data, Provider.MOD);
             }
         } catch (Exception e) {
             System.err.println("[FWA] Failed to load blacklist: " + e.getMessage());
         }
     }
 
-    private static void applyData(BlacklistData data){
+    private static void applyData(BlacklistData data, Provider provider){
         for(String mod : data.mods){
-            MODS_BLACKLIST.add(mod);
+            if(provider == Provider.USER || !BlackListOverrides.containsMod(mod)) MODS_BLACKLIST.add(mod);
         }
         for(String block : data.blocks){
             Identifier id = Identifier.tryParse(block);
-            if(id!=null) BLOCKS_BLACKLIST.add(id);
+            if(id != null && (provider == Provider.USER || !BlackListOverrides.containsBlock(id))) BLOCKS_BLACKLIST.add(id);
         }
     }
 
@@ -68,6 +69,11 @@ public class Blacklist {
         Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         String mod = id.getNamespace();
         return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod) || AnimationDisabler.getDisabledBlocks().contains(id) || AnimationDisabler.getDisabledMods().contains(mod);
+    }
+
+    public static enum Provider{
+        USER,
+        MOD
     }
 }
 

@@ -12,7 +12,8 @@ import fr.madu59.fwa.rendering.RenderHelper;
 
 @Mixin(
    targets = {"net/caffeinemc/sodium/client/render/chunk/compile/pipeline/BlockRenderer", "net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer", "me/jellysquid/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer"},
-   remap = false
+   remap = false,
+   priority = 1001
 )
 public class BlockRendererMixin {
 

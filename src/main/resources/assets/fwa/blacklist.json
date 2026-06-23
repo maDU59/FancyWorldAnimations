@@ -3,7 +3,8 @@
         "framedblocks",
         "copycats",
         "create_connected",
-        "potioncauldron"
+        "potioncauldron",
+        "domum_ornamentum"
     ],
     "blocks":[
         "create:train_door",
