@@ -4,23 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -31,6 +28,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CardinalLighting;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderHelper {
 
@@ -44,6 +42,12 @@ public class RenderHelper {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
+
+    private static final Map<BlockState, BlockStateModel> INVISIBLE_MODEL_CACHE = new ConcurrentHashMap<>();
+    private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
+    .translation(0.5f, 0.5f, 0.5f)
+    .scale(0.0002f)
+    .translate(-0.5f, -0.5f, -0.5f);
 
     public static void prepareFrame(AnimationRenderingContext context){
         if(!context.isShadow()){
@@ -117,30 +121,33 @@ public class RenderHelper {
         return shade;
     }
 
-    public static BlockStateModel getInvisibleModel(BlockStateModel originalModel){
-        return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
+    public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){
+        return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : INVISIBLE_MODEL_CACHE.computeIfAbsent(state, k -> new InvisibleModel(originalModel)));
     }
 
-    private static float scaleCoordinate(float value) {
-        return 0.5F + (value - 0.5F) * 0.0002f;
-    }
-
-    private static Vector3fc scalePosition(Vector3fc position) {
-        return new Vector3f(scaleCoordinate(position.x()), scaleCoordinate(position.y()), scaleCoordinate(position.z()));
+    private static Vector3fc scaleVertex(Vector3fc position) {
+        return SHRINK_MATRIX.transformPosition(new Vector3f(position));
     }
 
     private static BakedQuad scaleQuad(BakedQuad quad) {
-        return new BakedQuad(scalePosition(quad.position0()), scalePosition(quad.position1()), scalePosition(quad.position2()), scalePosition(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo());
+        return new BakedQuad(scaleVertex(quad.position0()), scaleVertex(quad.position1()), scaleVertex(quad.position2()), scaleVertex(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo());
     }
 
-    private record InvisibleModel(BlockStateModel model) implements BlockStateModel{
+    private static class InvisibleModel implements BlockStateModel{
+
+        private final BlockStateModel model;
+
+        public InvisibleModel(BlockStateModel model) {
+            this.model = model;
+        }
 
         @Override
         public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
             int start = parts.size();
             this.model.collectParts(random, parts);
+            int end = parts.size();
 
-            for(int i = start; i < parts.size(); ++i) {
+            for(int i = start; i < end; i++) {
                 BlockStateModelPart part = parts.get(i);
                 if (!(part instanceof InvisibleBlockStateModelPart)) {
                     parts.set(i, new InvisibleBlockStateModelPart(part));
@@ -201,5 +208,5 @@ public class RenderHelper {
                 return scaledQuads;
             }
         }
-   }
+    }
 }

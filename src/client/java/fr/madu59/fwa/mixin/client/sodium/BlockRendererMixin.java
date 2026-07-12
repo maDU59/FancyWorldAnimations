@@ -24,7 +24,7 @@ public class BlockRendererMixin {
         ordinal = 0
     )
     private BlockStateModel fwa$render(BlockStateModel originalModel, BlockStateModel model, BlockState state, BlockPos pos, BlockPos origin) {
-        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel) : originalModel;
+        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel, state) : originalModel;
     }
 
 }
