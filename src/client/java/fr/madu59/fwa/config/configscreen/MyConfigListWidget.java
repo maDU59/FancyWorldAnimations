@@ -90,7 +90,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         public boolean isEnabled(){
-            return this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean();
+            return this.isEnabledSupplier == null || this.isEnabledSupplier.getAsBoolean();
         }
     }
 
@@ -105,7 +105,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if(this.isEnabled()) return;
+            if(!this.isEnabled()) return;
             Font font = Minecraft.getInstance().font;
             int textX = getContentX() + getContentWidth() / 2;
             int textY = getContentY() + (getContentHeight() - font.lineHeight) / 2;
@@ -140,7 +140,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if(this.isEnabled()) return;
+            if(!this.isEnabled()) return;
             this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
             this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
             this.button.extractRenderState(context, mouseX, mouseY, tickDelta);
@@ -149,7 +149,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
             Font font = Minecraft.getInstance().font;
             MutableComponent text = Component.literal(indent + this.name);
-            if(this.isEnabled() || !this.option.isEnabled()) text.withColor(TextColor.GRAY);
+            if(!this.isEnabled() || !this.option.isEnabled()) text.withColor(TextColor.GRAY);
             context.text(font, text, 10, this.getContentY() + (this.getContentHeight() - font.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
@@ -197,7 +197,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if(this.isEnabled()) return;
+            if(!this.isEnabled()) return;
             this.slider.setY(this.getContentY() + (this.getContentHeight() - this.slider.getHeight()) / 2);
             this.slider.setX(this.getContentWidth() - this.slider.getWidth() - 10);
             this.slider.extractRenderState(context, mouseX, mouseY, tickDelta);
@@ -206,7 +206,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
             Font font = Minecraft.getInstance().font;
             MutableComponent text = Component.literal(indent + this.name);
-            if(this.isEnabled() || !this.option.isEnabled()) text.withColor(TextColor.GRAY);
+            if(!this.isEnabled() || !this.option.isEnabled()) text.withColor(TextColor.GRAY);
             context.text(font, text, 10, this.getContentY() + (this.getContentHeight() - font.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
