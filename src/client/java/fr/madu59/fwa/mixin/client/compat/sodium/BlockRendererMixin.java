@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client.sodium;
+package fr.madu59.fwa.mixin.client.compat.sodium;
 
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.core.BlockPos;

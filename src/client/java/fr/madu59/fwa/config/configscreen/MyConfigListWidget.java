@@ -20,6 +20,8 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.sounds.SoundEvents;
 
 public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
@@ -86,9 +88,13 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return 0;
             return super.getContentHeight();
         }
+
+        public boolean isEnabled(){
+            return this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean();
+        }
     }
 
-    public static class CategoryEntry extends MyConfigListWidget.Entry {
+    public static class CategoryEntry extends Entry {
         private final String name;
 
         public CategoryEntry(MyConfigListWidget parent, String name, BooleanSupplier isEnabledSupplier) {
@@ -99,11 +105,11 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return;
-            Font textextractRenderStateer = Minecraft.getInstance().font;
+            if(this.isEnabled()) return;
+            Font font = Minecraft.getInstance().font;
             int textX = getContentX() + getContentWidth() / 2;
-            int textY = getContentY() + (getContentHeight() - textextractRenderStateer.lineHeight) / 2;
-            context.centeredText(textextractRenderStateer, Component.translatable(this.name).withStyle(ChatFormatting.UNDERLINE), textX, textY, 0xFFFFFFFF);
+            int textY = getContentY() + (getContentHeight() - font.lineHeight) / 2;
+            context.centeredText(font, Component.translatable(this.name).withStyle(ChatFormatting.UNDERLINE), textX, textY, 0xFFFFFFFF);
         }  
 
         @Override
@@ -117,7 +123,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
     }
 
-    public static class ButtonEntry extends MyConfigListWidget.Entry{
+    public static class ButtonEntry extends Entry{
         private final Button button;
         private final String name;
         private final String indent;
@@ -134,15 +140,17 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return;
+            if(this.isEnabled()) return;
             this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
             this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
             this.button.extractRenderState(context, mouseX, mouseY, tickDelta);
 
             if(this.name == null) return;
 
-            Font textextractRenderStateer = Minecraft.getInstance().font;
-            context.text(textextractRenderStateer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textextractRenderStateer.lineHeight) / 2, 0xFFFFFFFF, true);
+            Font font = Minecraft.getInstance().font;
+            MutableComponent text = Component.literal(indent + this.name);
+            if(this.isEnabled() || !this.option.isEnabled()) text.withColor(TextColor.GRAY);
+            context.text(font, text, 10, this.getContentY() + (this.getContentHeight() - font.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override
@@ -172,6 +180,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         private final AbstractSliderButton slider;
         private final String name;
         private final String indent;
+        private final Option<?> option;
 
         public SliderEntry(MyConfigListWidget parent, AbstractSliderButton slider, Option<?> option, String indent) {
             this(parent, slider, option, indent, () -> true);
@@ -183,19 +192,22 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             this.slider = slider;
             this.name = option.getName();
             this.indent = indent;
+            this.option = option;
         }
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return;
+            if(this.isEnabled()) return;
             this.slider.setY(this.getContentY() + (this.getContentHeight() - this.slider.getHeight()) / 2);
             this.slider.setX(this.getContentWidth() - this.slider.getWidth() - 10);
             this.slider.extractRenderState(context, mouseX, mouseY, tickDelta);
 
             if(this.name == null) return;
 
-            Font textextractRenderStateer = Minecraft.getInstance().font;
-            context.text(textextractRenderStateer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textextractRenderStateer.lineHeight) / 2, 0xFFFFFFFF, true);
+            Font font = Minecraft.getInstance().font;
+            MutableComponent text = Component.literal(indent + this.name);
+            if(this.isEnabled() || !this.option.isEnabled()) text.withColor(TextColor.GRAY);
+            context.text(font, text, 10, this.getContentY() + (this.getContentHeight() - font.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override

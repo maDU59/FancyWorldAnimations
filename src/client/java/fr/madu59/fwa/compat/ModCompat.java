@@ -3,6 +3,7 @@ package fr.madu59.fwa.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
@@ -14,7 +15,6 @@ import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -26,6 +26,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -54,6 +55,10 @@ public class ModCompat {
     private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
     private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
+    private final static boolean IS_BBE_LOADED = PlatformHelper.isModLoaded("betterblockentities");
+    private final static boolean IS_OBE_LOADED = PlatformHelper.isModLoaded("obe");
+    
+    private static boolean IS_FA_OBJECTS_LOADED = false;
 
     private final static Map<Identifier, Identifier> VAULT_KEYS = new HashMap<>();
 
@@ -116,6 +121,28 @@ public class ModCompat {
 
     public static boolean isFlashbackLoaded(){
         return IS_FLASHBACK_LOADED;
+    }
+
+    public static boolean isFAObjectsLoaded(){
+        return IS_FA_OBJECTS_LOADED;
+    }
+
+    public static boolean isBetterBlockEntitiesLoaded(){
+        return IS_BBE_LOADED;
+    }
+
+    public static boolean isOptimizedBlockEntitiesLoaded(){
+        return IS_OBE_LOADED;
+    }
+
+    public static void reload(){
+        ResourceManager currentManager = Minecraft.getInstance().getResourceManager();
+        if (currentManager == null) return;
+
+        IS_FA_OBJECTS_LOADED = currentManager.listPacks().anyMatch(pack -> pack.packId()
+            .toLowerCase(Locale.ROOT)
+            .contains("fa+objects")
+        );
     }
 
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)

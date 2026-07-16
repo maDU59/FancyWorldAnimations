@@ -1,2 +1,3 @@
 # What's new:
-- Fixed blocks showing up as very big
+- Automatically disable chest and shulker boxes animations when FA: Objects is loaded
+- Automatically disable bell animation when BBE or OBE is loaded

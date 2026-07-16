@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client.entityculling;
+package fr.madu59.fwa.mixin.client.compat.entityculling;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

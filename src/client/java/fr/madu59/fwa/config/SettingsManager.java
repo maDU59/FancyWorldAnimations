@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import fr.madu59.fwa.FancyWorldAnimations;
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.utils.Curves;
@@ -193,7 +194,7 @@ public class SettingsManager {
     );
 
     public static Option<Boolean> JUKEBOX_INFINITE = loadOptionWithDefaults(
-        "lectern_infinite",
+        "jukebox_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
         true,
@@ -205,7 +206,7 @@ public class SettingsManager {
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
         true
-    );
+    ).isEnabled(() -> !ModCompat.isBetterBlockEntitiesLoaded() && !ModCompat.isOptimizedBlockEntitiesLoaded()).disabledValue(false);
 
     public static Option<Double> BELL_SPEED = loadOptionWithDefaults(
         "bell_speed",
@@ -430,7 +431,7 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.SPRINGY
-    );
+    ).isEnabled(() -> !ModCompat.isFAObjectsLoaded()).disabledValue(Curves.Door.LINEAR);
 
     public static Option<Boolean> LANTERN_STATE = loadOptionWithDefaults(
         "lantern_state",
@@ -477,7 +478,7 @@ public class SettingsManager {
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
         true
-    );
+    ).isEnabled(() -> !ModCompat.isFAObjectsLoaded()).disabledValue(false);
 
     public static Option<Double> SHULKERBOX_SPEED = loadOptionWithDefaults(
         "shulkerbox_speed",
@@ -501,7 +502,7 @@ public class SettingsManager {
     private static Map<String, String> toMap(List<Option<?>> options) {
         Map<String, String> map = new LinkedHashMap<>();
         for (Option<?> option : options) {
-            if (option.getValue() != option.getDefaultValue()) map.put(option.getId(), option.getValue().toString());
+            if (option.getTrueValue() != option.getDefaultValue()) map.put(option.getId(), option.getTrueValue().toString());
         }
         return map;
     }

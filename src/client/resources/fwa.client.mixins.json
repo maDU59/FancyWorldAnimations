@@ -12,10 +12,11 @@
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
 		"ShulkerBoxModelMixin",
-		"sodium.BlockRendererMixin",
-		"iris.ShadowRendererMixin",
-		"scholar.ChiseledBookShelfBlockEntityMixin",
-		"entityculling.CullTaskMixin"
+		"compat.sodium.BlockRendererMixin",
+		"compat.iris.ShadowRendererMixin",
+		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
+		"compat.entityculling.CullTaskMixin",
+		"core.ResourceManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

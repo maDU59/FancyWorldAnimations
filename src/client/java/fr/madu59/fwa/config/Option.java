@@ -1,5 +1,7 @@
 package fr.madu59.fwa.config;
 
+import java.util.function.BooleanSupplier;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 
@@ -10,6 +12,8 @@ public class Option<T> {
     private T value;
     private T defaultValue;
     private boolean reload;
+    private BooleanSupplier enabledSupplier;
+    private T disabledValue;
 
     public Option(String id, String name, String description, T value, T defaultValue, boolean reload) {
         this.id = id;
@@ -25,7 +29,19 @@ public class Option<T> {
         this.value = this.defaultValue;
     }
 
+    @SuppressWarnings("unchecked")
     public T getValue() {
+        T value = this.value;
+        if(enabledSupplier != null && !enabledSupplier.getAsBoolean()){
+            if(disabledValue != null) return disabledValue;
+            if(value instanceof Boolean){
+                value = (T) Boolean.FALSE;
+            }
+        }
+        return value;
+    }
+
+    public T getTrueValue() {
         return this.value;
     }
 
@@ -61,6 +77,21 @@ public class Option<T> {
 
     public void setDescription(String description){
         this.description = description;
+    }
+
+    public Option<T> isEnabled(BooleanSupplier enabledSupplier){
+        this.enabledSupplier = enabledSupplier;
+        return this;
+    }
+
+    public boolean isEnabled(){
+        if(this.enabledSupplier == null) return true;
+        else return enabledSupplier.getAsBoolean();
+    }
+
+    public Option<T> disabledValue(T disabledValue){
+        this.disabledValue = disabledValue;
+        return this;
     }
 
     @SuppressWarnings("unchecked")
