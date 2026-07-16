@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client;
+package fr.madu59.fwa.mixin.client.blockentity;
 
 import net.minecraft.world.level.block.entity.ChestLidController;
 
