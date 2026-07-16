@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -43,7 +42,6 @@ public class RenderHelper {
     };
     private static final Direction[] DIRECTIONS = Direction.values();
 
-    private static final Map<BlockState, BlockStateModel> INVISIBLE_MODEL_CACHE = new ConcurrentHashMap<>();
     private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
     .translation(0.5f, 0.5f, 0.5f)
     .scale(0.0002f)
@@ -122,7 +120,7 @@ public class RenderHelper {
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){
-        return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : INVISIBLE_MODEL_CACHE.computeIfAbsent(state, k -> new InvisibleModel(originalModel)));
+        return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
     }
 
     private static Vector3fc scaleVertex(Vector3fc position) {
