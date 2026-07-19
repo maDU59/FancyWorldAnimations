@@ -6,16 +6,19 @@
 	"client": [
 		"ClientLevelMixin",
 		"BlockEntityRenderDispatcherMixin",
-		"ChestLidControllerMixin",
 		"SetSectionDirtyInvoker",
 		"GetContentHeightInvoker",
 		"LevelChunkMixin",
 		"RenderSectionRegionMixin",
-		"ShulkerBoxModelMixin",
-		"sodium.BlockRendererMixin",
-		"iris.ShadowRendererMixin",
-		"scholar.ChiseledBookShelfBlockEntityMixin",
-		"entityculling.CullTaskMixin"
+		"blockentity.ChestLidControllerMixin",
+		"blockentity.ShulkerBoxModelMixin",
+		"blockentity.ext.BlockEntityRenderStateExtMixin",
+		"blockentity.renderer.BellRendererMixin",
+		"compat.sodium.BlockRendererMixin",
+		"compat.iris.ShadowRendererMixin",
+		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
+		"compat.entityculling.CullTaskMixin",
+		"core.ResourceManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

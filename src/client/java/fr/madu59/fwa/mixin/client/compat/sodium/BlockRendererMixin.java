@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client.sodium;
+package fr.madu59.fwa.mixin.client.compat.sodium;
 
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.core.BlockPos;
@@ -24,7 +24,7 @@ public class BlockRendererMixin {
         ordinal = 0
     )
     private BlockStateModel fwa$render(BlockStateModel originalModel, BlockStateModel model, BlockState state, BlockPos pos, BlockPos origin) {
-        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel) : originalModel;
+        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel, state) : originalModel;
     }
 
 }

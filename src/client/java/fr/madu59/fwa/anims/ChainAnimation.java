@@ -101,7 +101,7 @@ public class ChainAnimation extends Animation{
         float prevFactor = 0.0F;
         MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
-        extractRenderState(context);
+        animate(context);
         float degToRad = 0.017453292519943295f;
         float tiltX = this.tiltX * swingScale * degToRad;
         float tiltZ = this.tiltZ * swingScale * degToRad;
@@ -139,7 +139,7 @@ public class ChainAnimation extends Animation{
         poseStack.popPose();
     }
 
-    public void extractRenderState(AnimationRenderingContext context) {
+    public void animate(AnimationRenderingContext context) {
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)context.getNowTick()) * 0.1f + posOffset;
 

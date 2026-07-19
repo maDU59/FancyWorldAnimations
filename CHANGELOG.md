@@ -1,2 +1,4 @@
 # What's new:
-- Fixed blocks showing up as very big
+- Improved bell animation visuals
+- Improved bell animation compatibility with mods
+- Bug fixes
