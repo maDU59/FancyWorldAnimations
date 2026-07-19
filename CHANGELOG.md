@@ -1,3 +1,4 @@
 # What's new:
-- Automatically disable chest and shulker boxes animations when FA: Objects is loaded
-- Automatically disable bell animation when BBE or OBE is loaded
+- Improved bell animation visuals
+- Improved bell animation compatibility with mods
+- Bug fixes

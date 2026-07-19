@@ -30,7 +30,7 @@ import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 
-@Mixin(BellRenderer.class)
+@Mixin(value = BellRenderer.class, priority = 1001)
 public class BellRendererMixin {
 
     @Shadow
