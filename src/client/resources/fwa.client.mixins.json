@@ -12,6 +12,8 @@
 		"RenderSectionRegionMixin",
 		"blockentity.ChestLidControllerMixin",
 		"blockentity.ShulkerBoxModelMixin",
+		"blockentity.ext.BlockEntityRenderStateExtMixin",
+		"blockentity.renderer.BellRendererMixin",
 		"compat.sodium.BlockRendererMixin",
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
