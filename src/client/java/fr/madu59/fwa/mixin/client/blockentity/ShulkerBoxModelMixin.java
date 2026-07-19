@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client;
+package fr.madu59.fwa.mixin.client.blockentity;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

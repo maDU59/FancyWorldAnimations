@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -22,6 +23,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderHelper {
 
@@ -34,6 +36,11 @@ public class RenderHelper {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
+
+    private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
+    .translation(0.5f, 0.5f, 0.5f)
+    .scale(0.0002f)
+    .translate(-0.5f, -0.5f, -0.5f);
 
     public static void prepareFrame(AnimationRenderingContext context){
         if(!context.isShadow()){
@@ -93,30 +100,33 @@ public class RenderHelper {
         return shade;
     }
 
-    public static BlockStateModel getInvisibleModel(BlockStateModel originalModel){
+    public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){
         return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
     }
 
-    private static float scaleCoordinate(float value) {
-        return 0.5F + (value - 0.5F) * 0.0002f;
-    }
-
-    private static Vector3fc scalePosition(Vector3fc position) {
-        return new Vector3f(scaleCoordinate(position.x()), scaleCoordinate(position.y()), scaleCoordinate(position.z()));
+    private static Vector3fc scaleVertex(Vector3fc position) {
+        return SHRINK_MATRIX.transformPosition(new Vector3f(position));
     }
 
     private static BakedQuad scaleQuad(BakedQuad quad) {
-        return new BakedQuad(scalePosition(quad.position0()), scalePosition(quad.position1()), scalePosition(quad.position2()), scalePosition(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission());
+        return new BakedQuad(scaleVertex(quad.position0()), scaleVertex(quad.position1()), scaleVertex(quad.position2()), scaleVertex(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission());
     }
 
-    private record InvisibleModel(BlockStateModel model) implements BlockStateModel{
-        
+    private static class InvisibleModel implements BlockStateModel{
+
+        private final BlockStateModel model;
+
+        public InvisibleModel(BlockStateModel model) {
+            this.model = model;
+        }
+
         @Override
         public void collectParts(RandomSource random, List<BlockModelPart> parts) {
             int start = parts.size();
             this.model.collectParts(random, parts);
+            int end = parts.size();
 
-            for(int i = start; i < parts.size(); ++i) {
+            for(int i = start; i < end; i++) {
                 BlockModelPart part = parts.get(i);
                 if (!(part instanceof InvisibleBlockStateModelPart)) {
                     parts.set(i, new InvisibleBlockStateModelPart(part));
@@ -165,5 +175,5 @@ public class RenderHelper {
                 return scaledQuads;
             }
         }
-   }
+    }
 }
