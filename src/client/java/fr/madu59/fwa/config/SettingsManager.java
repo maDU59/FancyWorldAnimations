@@ -206,7 +206,7 @@ public class SettingsManager {
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
         true
-    ).isEnabled(() -> !ModCompat.isBetterBlockEntitiesLoaded() && !ModCompat.isOptimizedBlockEntitiesLoaded()).disabledValue(false);
+    );
 
     public static Option<Double> BELL_SPEED = loadOptionWithDefaults(
         "bell_speed",

@@ -55,8 +55,6 @@ public class ModCompat {
     private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
     private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
-    private final static boolean IS_BBE_LOADED = PlatformHelper.isModLoaded("betterblockentities");
-    private final static boolean IS_OBE_LOADED = PlatformHelper.isModLoaded("obe");
     
     private static boolean IS_FA_OBJECTS_LOADED = false;
 
@@ -125,14 +123,6 @@ public class ModCompat {
 
     public static boolean isFAObjectsLoaded(){
         return IS_FA_OBJECTS_LOADED;
-    }
-
-    public static boolean isBetterBlockEntitiesLoaded(){
-        return IS_BBE_LOADED;
-    }
-
-    public static boolean isOptimizedBlockEntitiesLoaded(){
-        return IS_OBE_LOADED;
     }
 
     public static void reload(){
