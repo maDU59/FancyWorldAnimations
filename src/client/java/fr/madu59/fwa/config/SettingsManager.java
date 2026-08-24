@@ -73,6 +73,13 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> DOOR_REDSTONE = loadOptionWithDefaults(
+        "door_redstone",
+        "fwa.config.option.redstone.name",
+        "fwa.config.option.redstone.description",
+        true
+    );
+
     public static Option<Boolean> TRAPDOOR_STATE = loadOptionWithDefaults(
         "trapdoor_state",
         "fwa.config.option.state.name",
@@ -94,6 +101,13 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> TRAPDOOR_REDSTONE = loadOptionWithDefaults(
+        "trapdoor_redstone",
+        "fwa.config.option.redstone.name",
+        "fwa.config.option.redstone.description",
+        true
+    );
+
     public static Option<Boolean> FENCEGATE_STATE = loadOptionWithDefaults(
         "fencegate_state",
         "fwa.config.option.state.name",
@@ -113,6 +127,13 @@ public class SettingsManager {
         "fwa.config.option.speed.name",
         "fwa.config.option.speed.description",
         1.0
+    );
+
+    public static Option<Boolean> FENCEGATE_REDSTONE = loadOptionWithDefaults(
+        "fencegate_redstone",
+        "fwa.config.option.redstone.name",
+        "fwa.config.option.redstone.description",
+        true
     );
 
     public static Option<Boolean> LEVER_STATE = loadOptionWithDefaults(

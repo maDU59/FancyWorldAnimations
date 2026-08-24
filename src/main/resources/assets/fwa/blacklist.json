@@ -4,7 +4,9 @@
         "copycats",
         "create_connected",
         "potioncauldron",
-        "domum_ornamentum"
+        "domum_ornamentum",
+        "malisisdoorsreborn",
+        "outpostzero"
     ],
     "blocks":[
         "create:train_door",

@@ -1,7 +1,6 @@
 package fr.madu59.fwa.anims;
 
 import fr.madu59.fwa.config.SettingsManager;
-import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
