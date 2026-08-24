@@ -1,6 +1,7 @@
 package fr.madu59.fwa.anims;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.compat.ModCompat;
