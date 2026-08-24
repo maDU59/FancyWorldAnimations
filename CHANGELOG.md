@@ -1,4 +1,3 @@
 # What's new:
-- Improved bell animation visuals
-- Improved bell animation compatibility with mods
-- Bug fixes
+- Added a setting to disable redstone-powered animations (#77)
+- Improved compatiblity with malisis doors reborn

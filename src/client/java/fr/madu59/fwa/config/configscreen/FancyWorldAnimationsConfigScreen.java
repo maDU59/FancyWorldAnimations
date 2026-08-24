@@ -48,17 +48,20 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.button(SettingsManager.DOOR_STATE).build();
         list.button(SettingsManager.DOOR_EASING).isEnabled(() -> SettingsManager.DOOR_STATE.getValue()).build();
         list.slider(SettingsManager.DOOR_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.DOOR_STATE.getValue()).build();
+        list.button(SettingsManager.DOOR_REDSTONE).isEnabled(() -> SettingsManager.DOOR_STATE.getValue()).build();
         
         list.category("fwa.config.category.trapdoor").build();
         list.button(SettingsManager.TRAPDOOR_STATE).build();
         list.button(SettingsManager.TRAPDOOR_EASING).isEnabled(() -> SettingsManager.TRAPDOOR_STATE.getValue()).build();
         list.slider(SettingsManager.TRAPDOOR_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.TRAPDOOR_STATE.getValue()).build();
-        
+        list.button(SettingsManager.TRAPDOOR_REDSTONE).isEnabled(() -> SettingsManager.TRAPDOOR_STATE.getValue()).build();
+
         list.category("fwa.config.category.fencegate").build();
         list.button(SettingsManager.FENCEGATE_STATE).build();
         list.button(SettingsManager.FENCEGATE_EASING).isEnabled(() -> SettingsManager.FENCEGATE_STATE.getValue()).build();
         list.slider(SettingsManager.FENCEGATE_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.FENCEGATE_STATE.getValue()).build();
-        
+        list.button(SettingsManager.FENCEGATE_REDSTONE).isEnabled(() -> SettingsManager.FENCEGATE_STATE.getValue()).build();
+
         list.category("fwa.config.category.lectern").build();
         list.button(SettingsManager.LECTERN_STATE).build();
         list.button(SettingsManager.LECTERN_EASING).isEnabled(() -> SettingsManager.LECTERN_STATE.getValue()).build();
