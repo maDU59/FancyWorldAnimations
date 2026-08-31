@@ -1,4 +1,3 @@
 # What's new:
-- Hopefully fixed a crash with MoreCulling depending on the loading order
-- Fixed bell animations not playing
-- Fixed some sliders not working correctly
+- Added a setting to disable redstone-powered animations (#77)
+- Improved compatiblity with malisis doors reborn

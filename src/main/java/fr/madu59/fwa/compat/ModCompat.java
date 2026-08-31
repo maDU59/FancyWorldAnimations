@@ -3,6 +3,7 @@ package fr.madu59.fwa.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
@@ -26,6 +27,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -54,6 +56,8 @@ public class ModCompat {
     private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
     private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
+    
+    private static boolean IS_FA_OBJECTS_LOADED = false;
 
     private final static Map<Identifier, Identifier> VAULT_KEYS = new HashMap<>();
 
@@ -118,6 +122,20 @@ public class ModCompat {
         return IS_FLASHBACK_LOADED;
     }
 
+    public static boolean isFAObjectsLoaded(){
+        return IS_FA_OBJECTS_LOADED;
+    }
+
+    public static void reload(){
+        ResourceManager currentManager = Minecraft.getInstance().getResourceManager();
+        if (currentManager == null) return;
+
+        IS_FA_OBJECTS_LOADED = currentManager.listPacks().anyMatch(pack -> pack.packId()
+            .toLowerCase(Locale.ROOT)
+            .contains("fa+objects")
+        );
+    }
+
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
 
     private static void disableIncompatibleOptions(){
@@ -155,7 +173,7 @@ public class ModCompat {
 
     // MAP ATLASES COMPATIBILITY
 
-    public class MapAtlasesCompat{
+    public static class MapAtlasesCompat{
 
         // DEFAULT TEXTURE FOR BOOKS
         private static final Identifier DEFAULT_BOOK_TEXTURE =
@@ -232,7 +250,7 @@ public class ModCompat {
 
     // END REMASTERED COMPATIBILITY
 
-    public class EndRemasteredCompat{
+    public static class EndRemasteredCompat{
         private static Method renderMethod;
         private static Method extractMethod;
         private static Class<?> ancientPortalStateClass;
@@ -286,7 +304,7 @@ public class ModCompat {
 
     // SCHOLAR COMPATIBILITY
 
-    public class ScholarCompat{
+    public static class ScholarCompat{
         public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
         public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
         private static Method getDefaultTintColorForSlotMethod;
@@ -339,7 +357,7 @@ public class ModCompat {
 
     // FLASHBACK COMPATIBILITY
 
-    public class FlashbackCompat{
+    public static class FlashbackCompat{
         private static Method getVisualMillis;
         private static Method isExporting;
 
@@ -381,7 +399,7 @@ public class ModCompat {
 
     // MORE CULLING COMPATIBILITY
 
-    public class MoreCullingCompat{
+    public static class MoreCullingCompat{
         
         public static void disableBlockStateCulling(){
             try{

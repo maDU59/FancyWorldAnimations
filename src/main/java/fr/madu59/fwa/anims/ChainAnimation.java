@@ -67,8 +67,8 @@ public class ChainAnimation extends Animation{
     }
 
     @Override
-    public AABB getBoundingBox(){
-        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    public void updateBoundingBox(){
+        this.boundingBox = new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
     }
 
     public void update(){
@@ -78,6 +78,7 @@ public class ChainAnimation extends Animation{
             if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
         }
         chainCount = SwingingBlockHelper.getChainCount(position);
+        updateBoundingBox();
         needUpdate = false;
     }
 
@@ -100,7 +101,7 @@ public class ChainAnimation extends Animation{
         float prevFactor = 0.0F;
         MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
-        extractRenderState(context);
+        animate(context);
         float degToRad = 0.017453292519943295f;
         float tiltX = this.tiltX * swingScale * degToRad;
         float tiltZ = this.tiltZ * swingScale * degToRad;
@@ -138,7 +139,7 @@ public class ChainAnimation extends Animation{
         poseStack.popPose();
     }
 
-    public void extractRenderState(AnimationRenderingContext context) {
+    public void animate(AnimationRenderingContext context) {
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)context.getNowTick()) * 0.1f + posOffset;
 

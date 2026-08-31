@@ -195,7 +195,7 @@ public class FancyWorldAnimationsClient{
 		for (Animation animation : animations.animations.values()) {
 			animation.tick(context.getNowTick());
 			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
-			if(animation.isRendering() && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
+			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
 				renderAnimation(animation, context);
 			}
 		}
@@ -204,6 +204,9 @@ public class FancyWorldAnimationsClient{
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
 	{
+		if(type == Type.DOOR && !SettingsManager.DOOR_REDSTONE.getValue() && isDifferentRedstonePower(oldState, newState)) return false;
+		if(type == Type.TRAPDOOR && !SettingsManager.TRAPDOOR_REDSTONE.getValue() && isDifferentRedstonePower(oldState, newState)) return false;
+		if(type == Type.FENCE_GATE && !SettingsManager.FENCEGATE_REDSTONE.getValue() && isDifferentRedstonePower(oldState, newState)) return false;
 		if(type == Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_INFINITE.getValue()) return true;
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
 		if(type == Type.JUKEBOX) return newState.getValue(BlockStateProperties.HAS_RECORD);
@@ -431,6 +434,10 @@ public class FancyWorldAnimationsClient{
 			}
 		}
 		return startTick;
+	}
+
+	public static boolean isDifferentRedstonePower(BlockState oldState, BlockState newState){
+		return oldState.getValueOrElse(BlockStateProperties.POWERED, false) != newState.getValueOrElse(BlockStateProperties.POWERED, false);
 	}
 
 	public static enum Type

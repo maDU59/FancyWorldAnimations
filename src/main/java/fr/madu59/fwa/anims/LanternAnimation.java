@@ -61,8 +61,8 @@ public class LanternAnimation extends Animation{
     }
 
     @Override
-    public AABB getBoundingBox(){
-        return new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
+    public void updateBoundingBox(){
+        this.boundingBox = new AABB(position.getCenter().add(-0.5, -0.5, -0.5), position.above(chainCount).getCenter().add(0.5, 0.5, 0.5));
     }
 
     @Override
@@ -76,6 +76,7 @@ public class LanternAnimation extends Animation{
     public void update(){
         if(!SettingsManager.CHAIN_STATE.getValue() && !SettingsManager.LANTERN_OVERRIDE.getValue()) chainCount = 1;
         else chainCount = SwingingBlockHelper.getChainCount(position);
+        updateBoundingBox();
         needUpdate = false;
     }
 
@@ -85,7 +86,7 @@ public class LanternAnimation extends Animation{
         MultiBufferSource bufferSource = context.getBufferSource();
         PoseStack poseStack = context.getPoseStack();
         ClientLevel level = Minecraft.getInstance().level;
-        extractRenderState(context);
+        animate(context);
         float swingScale = 0.7f;
         if(SettingsManager.CHAIN_SWING_LIMIT.getValue()) swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
         float degToRad = 0.017453292519943295f;
@@ -133,7 +134,6 @@ public class LanternAnimation extends Animation{
         }
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);
-        poseStack.translate(0.0F, 0.03F, 0.0F);
         int light = getLight();
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
@@ -144,7 +144,7 @@ public class LanternAnimation extends Animation{
         poseStack.popPose();
     }
 
-    public void extractRenderState(AnimationRenderingContext context) {
+    public void animate(AnimationRenderingContext context) {
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)context.getNowTick()) * 0.1f + posOffset;
 

@@ -1,4 +1,5 @@
-package fr.madu59.fwa.mixin;
+package fr.madu59.fwa.mixin.blockentity;
+
 import net.minecraft.world.level.block.entity.ChestLidController;
 
 import org.spongepowered.asm.mixin.Mixin;

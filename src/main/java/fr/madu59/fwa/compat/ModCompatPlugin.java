@@ -4,7 +4,9 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+
 import fr.madu59.fwa.platform.PlatformHelper;
+
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +21,9 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
         }
         if (mixinClassName.contains(".scholar.")) {
             return PlatformHelper.isModLoaded("scholar");
+        }
+        if (mixinClassName.contains(".entityculling.")) {
+            return PlatformHelper.isModLoaded("entityculling");
         }
         return true;
     }
