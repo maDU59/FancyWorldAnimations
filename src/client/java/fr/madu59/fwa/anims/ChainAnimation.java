@@ -142,7 +142,7 @@ public class ChainAnimation extends Animation{
     }
 
     public void animate(AnimationRenderingContext context) {
-        if(SwingDrivers.getSwing(position, context.getNowTick(), swing)){
+        if(SwingDrivers.getSwing(position, defaultState, context.getNowTick(), swing)){
             this.tiltX = swing.tiltX;
             this.tiltZ = swing.tiltZ;
             this.spin = swing.spin;

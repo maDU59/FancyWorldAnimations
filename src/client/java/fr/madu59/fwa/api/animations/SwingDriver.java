@@ -1,6 +1,7 @@
 package fr.madu59.fwa.api.animations;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 /*
  * SwingDriver interface supplies the swing of lanterns and chains, replacing the idle
@@ -10,5 +11,5 @@ import net.minecraft.core.BlockPos;
 @FunctionalInterface
 public interface SwingDriver {
 
-    boolean getSwing(BlockPos position, double nowTick, HangingSwing swing);
+    boolean getSwing(BlockPos position, BlockState state, double nowTick, HangingSwing swing);
 }
