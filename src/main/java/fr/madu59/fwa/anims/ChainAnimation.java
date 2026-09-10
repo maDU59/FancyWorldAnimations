@@ -8,6 +8,8 @@ import org.joml.Quaternionf;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
+import fr.madu59.fwa.api.animations.HangingSwing;
+import fr.madu59.fwa.api.animations.SwingDrivers;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
@@ -30,6 +32,7 @@ public class ChainAnimation extends Animation{
     private float tiltX = 0f;
     private float tiltZ = 0f;
     private float spin = 0f;
+    private final HangingSwing swing = new HangingSwing();
     private int chainCount = 0;
     private final List<BlockStateModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
@@ -140,11 +143,10 @@ public class ChainAnimation extends Animation{
     }
 
     public void animate(AnimationRenderingContext context) {
-        float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
-        float uniqueTime = ((float)context.getNowTick()) * 0.1f + posOffset;
-
-        this.tiltX = (float) Math.sin(uniqueTime) * 8f;
-        this.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-        this.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
+        if(SwingDrivers.getSwing(position, defaultState, context.getNowTick(), swing)){
+            this.tiltX = swing.tiltX;
+            this.tiltZ = swing.tiltZ;
+            this.spin = swing.spin;
+        }
     }
 }

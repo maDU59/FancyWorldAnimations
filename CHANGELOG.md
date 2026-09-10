@@ -1,3 +1,4 @@
 # What's new:
-- Added a setting to disable redstone-powered animations (#77)
-- Improved compatiblity with malisis doors reborn
+- Added weather effects for swinging animations (chain and lanterns)
+- Added a way for other mods to provide a swinging animation (e.g. for wind mods)
+- Fixed a crash with Json Things (#89)
