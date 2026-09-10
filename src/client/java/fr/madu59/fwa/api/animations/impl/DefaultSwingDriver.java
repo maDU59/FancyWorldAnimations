@@ -15,8 +15,9 @@ public class DefaultSwingDriver implements SwingDriver{
         ClientLevel level = Minecraft.getInstance().level;
         if(level != null){
             float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
-            effects += level.getRainLevel(partialTick) * 0.0005;
-            effects += level.getThunderLevel(partialTick) * 0.0008;
+            float frameTime = Minecraft.getInstance().getDeltaTracker().getRealtimeDeltaTicks();
+            effects += level.getRainLevel(partialTick) * 0.0020 * frameTime;
+            effects += level.getThunderLevel(partialTick) * 0.0024 * frameTime;
         }
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)nowTick + effects) * speed + posOffset;
