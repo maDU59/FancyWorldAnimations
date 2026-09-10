@@ -127,6 +127,7 @@ public class ModCompat {
 
     public static void reload(){
         Minecraft client = Minecraft.getInstance();
+        if(client == null) return;
         ResourceManager currentManager = client.getResourceManager();
         if (currentManager == null) return;
 
