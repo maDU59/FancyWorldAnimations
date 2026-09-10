@@ -127,7 +127,9 @@ public class ModCompat {
     }
 
     public static void reload(){
-        ResourceManager currentManager = Minecraft.getInstance().getResourceManager();
+        Minecraft client = Minecraft.getInstance();
+        if(client == null) return;
+        ResourceManager currentManager = client.getResourceManager();
         if (currentManager == null) return;
 
         IS_FA_OBJECTS_LOADED = currentManager.listPacks().anyMatch(pack -> pack.packId()
