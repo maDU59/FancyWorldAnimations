@@ -5,3 +5,6 @@
 
 # Patch 1:
 - Fixed weather effects being framerate dependent
+
+# Patch 2:
+- Fixed weather effects being dependent on the number of rendering pass per frame
