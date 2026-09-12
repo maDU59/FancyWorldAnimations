@@ -98,7 +98,7 @@ public class CampfireAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
-                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

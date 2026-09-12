@@ -15,6 +15,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -59,42 +60,46 @@ public class RenderHelper {
         collector = context.getSubmitNodeCollector();
     }
 
-    public static void renderModel(PoseStack poseStack, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
+    public static void renderModel(PoseStack poseStack, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < parts.size(); i++){
             for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                renderQuads(poseStack, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light);
+                renderQuads(poseStack, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light, blockData);
             }
         }
     }
 
-    public static void renderQuads(PoseStack poseStack, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
+    public static void renderQuads(PoseStack poseStack, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < bakedQuads.size(); i++){
-            renderQuad(poseStack, bakedQuads.get(i), a, r, g, b, light, shouldShade);
+            renderQuad(poseStack, bakedQuads.get(i), a, r, g, b, light, shouldShade, blockData);
         }
     }
 
-    public static void renderQuad(PoseStack poseStack, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
-        renderQuad(poseStack, bakedQuad, a, r, g, b, light, shouldShade);
+    public static void renderQuad(PoseStack poseStack, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        renderQuad(poseStack, bakedQuad, a, r, g, b, light, shouldShade, blockData);
     }
 
-    public static void renderQuad(PoseStack poseStack, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
+    public static void renderQuad(PoseStack poseStack, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded, AnimationBlockData blockData){
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
         float shade = isShaded? getShade(dir.x(), dir.y(), dir.z(), poseStack) : 1.0f;
         QuadInstance quadInstance = new QuadInstance();
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
         RenderType renderType = a < 1.0f? RenderTypes.translucentMovingBlock() : bakedQuad.materialInfo().sprite().transparency().hasTranslucent()? RenderTypes.translucentMovingBlock() : RenderTypes.cutoutMovingBlock();
-        putBakedQuad(collector, poseStack, bakedQuad, quadInstance, renderType);
+        putBakedQuad(collector, poseStack, bakedQuad, quadInstance, renderType, blockData);
     }
 
-    public static void putBakedQuad(SubmitNodeCollector collector, PoseStack poseStack, BakedQuad bakedQuad, QuadInstance quadInstance, RenderType renderType){
+    public static void putBakedQuad(SubmitNodeCollector collector, PoseStack poseStack, BakedQuad bakedQuad, QuadInstance quadInstance, RenderType renderType, AnimationBlockData blockData){
         collector.submitCustomGeometry(
             poseStack,
             renderType,
             (Pose currentPose, VertexConsumer consumer) -> {
+                ModCompat.startQuad(consumer, blockData);
+
                 consumer.putBakedQuad(
                     currentPose, bakedQuad, quadInstance
                 );
+
+                ModCompat.endQuad(consumer);
             }
         );
     }

@@ -120,7 +120,7 @@ public class LayeredCauldronAnimation extends Animation{
                     }
                 }
 
-                RenderHelper.renderQuad(poseStack, quad, 1.0f, r, g, b, light);
+                RenderHelper.renderQuad(poseStack, quad, 1.0f, r, g, b, light, getAnimationBlockData());
             }
         }
     }

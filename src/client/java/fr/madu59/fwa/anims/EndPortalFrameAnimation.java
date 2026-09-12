@@ -82,7 +82,7 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            RenderHelper.renderModel(poseStack, parts, 1f, 1f, 1f, 1f, light);
+            RenderHelper.renderModel(poseStack, parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
             if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
@@ -112,7 +112,7 @@ public class EndPortalFrameAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                RenderHelper.renderQuad(poseStack, quad, a, r, g, b, light);
+                RenderHelper.renderQuad(poseStack, quad, a, r, g, b, light, getAnimationBlockData());
             }
         }
     }

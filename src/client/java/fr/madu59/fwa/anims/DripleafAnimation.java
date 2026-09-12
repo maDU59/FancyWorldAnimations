@@ -103,7 +103,7 @@ public class DripleafAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (!path.contains("_stem") == wantLeaf) {
-                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,7 @@ public class Animation {
     protected boolean needUpdate = true;
 
     protected boolean isOcclusionCulled = false;
+    protected AnimationBlockData defaultAnimationBlockData;
 
     public Animation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         this.position = position;
@@ -37,6 +39,7 @@ public class Animation {
         this.newIsOpen = newIsOpen;
         this.oldState = oldState;
         this.newState = newState;
+        this.defaultAnimationBlockData = new AnimationBlockData(defaultState, position, getLight());
         updateBoundingBox();
     }
 
@@ -168,5 +171,9 @@ public class Animation {
 
     public void setIsOcclusionCulled(boolean isOcclusionCulled){
         this.isOcclusionCulled = isOcclusionCulled;
+    }
+
+    public AnimationBlockData getAnimationBlockData(){
+        return this.defaultAnimationBlockData;
     }
 }

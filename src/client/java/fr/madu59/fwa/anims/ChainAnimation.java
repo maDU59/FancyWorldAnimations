@@ -11,6 +11,7 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.api.animations.HangingSwing;
 import fr.madu59.fwa.api.animations.SwingDrivers;
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
@@ -133,7 +134,7 @@ public class ChainAnimation extends Animation{
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             model.collectParts(random, parts);
-            RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light, new AnimationBlockData(chainState, mutable, light));
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);
