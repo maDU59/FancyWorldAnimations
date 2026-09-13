@@ -19,9 +19,6 @@ import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import net.caffeinemc.mods.sodium.client.render.chunk.compile.buffers.ChunkVertexConsumer;
-import net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings;
-import net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -434,13 +431,13 @@ public class ModCompat {
     public static class IrisCompat{
 
         public static void startQuad(VertexConsumer consumer, AnimationBlockData blockData){
-            if (consumer instanceof BlockSensitiveBufferBuilder blockSensitiveConsumer) {
-                blockSensitiveConsumer.beginBlock(WorldRenderingSettings.INSTANCE.getBlockStateIds().getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
+            if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
+                blockSensitiveConsumer.beginBlock(net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.WorldRenderingSettings.INSTANCE.getBlockStateIds().getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
             }
         }
 
         public static void endQuad(VertexConsumer consumer){
-            if (consumer instanceof BlockSensitiveBufferBuilder blockSensitiveConsumer) {
+            if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
                 blockSensitiveConsumer.endBlock();
             }
         }
