@@ -8,14 +8,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
 
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
 
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
+import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import net.caffeinemc.mods.sodium.client.render.chunk.compile.buffers.ChunkVertexConsumer;
+import net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings;
+import net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -136,6 +142,14 @@ public class ModCompat {
             .toLowerCase(Locale.ROOT)
             .contains("fa+objects")
         );
+    }
+
+    public static void startQuad(VertexConsumer consumer, AnimationBlockData data){
+        if(isIrisLoaded()) IrisCompat.startQuad(consumer, data);
+    }
+
+    public static void endQuad(VertexConsumer consumer){
+        if(isIrisLoaded()) IrisCompat.endQuad(consumer);
     }
 
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
@@ -411,6 +425,23 @@ public class ModCompat {
                 FancyWorldAnimations.LOGGER.info("Successfully disabled MoreCulling's blockStateCulling!");
             }catch(Exception e){
                 FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling, visual issues may appear!");
+            }
+        }
+    }
+
+    // IRIS COMPATIBILITY
+
+    public static class IrisCompat{
+
+        public static void startQuad(VertexConsumer consumer, AnimationBlockData blockData){
+            if (consumer instanceof BlockSensitiveBufferBuilder blockSensitiveConsumer) {
+                blockSensitiveConsumer.beginBlock(WorldRenderingSettings.INSTANCE.getBlockStateIds().getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
+            }
+        }
+
+        public static void endQuad(VertexConsumer consumer){
+            if (consumer instanceof BlockSensitiveBufferBuilder blockSensitiveConsumer) {
+                blockSensitiveConsumer.endBlock();
             }
         }
     }

@@ -10,13 +10,16 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 
 import com.mojang.blaze3d.vertex.QuadInstance;
 
+import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -56,25 +59,25 @@ public class RenderHelper {
         shouldShade = !context.isShadow();
     }
 
-    public static void renderModel(MultiBufferSource bufferSource, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light){
+    public static void renderModel(MultiBufferSource bufferSource, Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < parts.size(); i++){
             for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                renderQuads(bufferSource, pose, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light);
+                renderQuads(bufferSource, pose, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light, blockData);
             }
         }
     }
 
-    public static void renderQuads(MultiBufferSource bufferSource, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light){
+    public static void renderQuads(MultiBufferSource bufferSource, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < bakedQuads.size(); i++){
-            renderQuad(bufferSource, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade);
+            renderQuad(bufferSource, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade, blockData);
         }
     }
 
-    public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light){
-        renderQuad(bufferSource, pose, bakedQuad, a, r, g, b, light, shouldShade);
+    public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        renderQuad(bufferSource, pose, bakedQuad, a, r, g, b, light, shouldShade, blockData);
     }
 
-    public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded){
+    public static void renderQuad(MultiBufferSource bufferSource, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded, AnimationBlockData blockData){
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
         float shade = isShaded? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
 
@@ -82,7 +85,10 @@ public class RenderHelper {
         quadInstance.setLightCoords(light);
         quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
         VertexConsumer buffer = a < 1.0f? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bakedQuad.materialInfo().sprite().transparency().hasTranslucent()? bufferSource.getBuffer(RenderTypes.translucentMovingBlock()) : bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
+        
+        ModCompat.startQuad(buffer, blockData);
         buffer.putBakedQuad(pose, bakedQuad, quadInstance);
+        ModCompat.endQuad(buffer);
     }
 
     public static void endBatch(MultiBufferSource bufferSource){

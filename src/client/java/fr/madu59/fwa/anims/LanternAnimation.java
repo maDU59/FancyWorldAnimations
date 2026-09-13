@@ -11,6 +11,7 @@ import fr.madu59.fwa.api.animations.HangingSwing;
 import fr.madu59.fwa.api.animations.SwingDrivers;
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
+import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
 import fr.madu59.fwa.utils.Curves;
@@ -122,7 +123,7 @@ public class LanternAnimation extends Animation{
             RandomSource random = RandomSource.create(chainState.getSeed(mutable));
             BlockStateModel chainModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(chainState);
             chainModel.collectParts(random, chainParts);
-            RenderHelper.renderModel(bufferSource, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderModel(bufferSource, poseStack.last(), chainParts, 1.0f, 1.0f, 1.0f, 1.0f, light, new AnimationBlockData(chainState, mutable, light));
             poseStack.popPose();
             poseStack.translate(0.0F, -1.0F, 0.0F);
             mutable.move(0,-1,0);
@@ -142,7 +143,7 @@ public class LanternAnimation extends Animation{
         BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         parts.clear();
         model.collectParts(random, parts);
-        RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(bufferSource, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
         poseStack.popPose();
         poseStack.popPose();
     }
