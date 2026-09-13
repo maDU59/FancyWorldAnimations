@@ -432,7 +432,7 @@ public class ModCompat {
 
         public static void startQuad(VertexConsumer consumer, AnimationBlockData blockData){
             if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
-                blockSensitiveConsumer.beginBlock(net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.WorldRenderingSettings.INSTANCE.getBlockStateIds().getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
+                blockSensitiveConsumer.beginBlock(net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.INSTANCE.getBlockStateIds().getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
             }
         }
 
