@@ -19,6 +19,7 @@ import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -432,7 +433,9 @@ public class ModCompat {
 
         public static void startQuad(VertexConsumer consumer, AnimationBlockData blockData){
             if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
-                blockSensitiveConsumer.beginBlock(net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.INSTANCE.getBlockStateIds().getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
+                Object2IntMap<BlockState> blockStateIdsMap = net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.INSTANCE.getBlockStateIds();
+                if(blockStateIdsMap == null) return;
+                blockSensitiveConsumer.beginBlock(blockStateIdsMap.getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
             }
         }
 
