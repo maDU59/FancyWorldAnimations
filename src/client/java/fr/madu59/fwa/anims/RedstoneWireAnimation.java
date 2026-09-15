@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -36,11 +36,11 @@ public class RedstoneWireAnimation extends Animation{
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
 
-        int newColor = RedStoneWireBlock.getColorForPower(newState.getValue(BlockStateProperties.POWER));
+        int newColor = RedstoneWireBlock.getColorForPower(newState.getValue(BlockStateProperties.POWER));
         newR = (float) (newColor >> 16 & 255) / 255.0F;
         newG = (float) (newColor >> 8 & 255) / 255.0F;
         newB = (float) (newColor & 255) / 255.0F;
-        int oldColor = RedStoneWireBlock.getColorForPower(oldState.getValue(BlockStateProperties.POWER));
+        int oldColor = RedstoneWireBlock.getColorForPower(oldState.getValue(BlockStateProperties.POWER));
         oldR = (float) (oldColor >> 16 & 255) / 255.0F;
         oldG = (float) (oldColor >> 8 & 255) / 255.0F;
         oldB = (float) (oldColor & 255) / 255.0F;

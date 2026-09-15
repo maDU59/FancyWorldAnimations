@@ -99,10 +99,10 @@ public class LecternAnimation extends Animation {
 
         bookModel.setupAnim(bookState);
         poseStack.translate(0.5F, 1.0625F, 0.5F);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-facing.getClockWise().toYRot()));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(67.5F));
+        poseStack.rotate(Axis.YP.rotationDegrees(-facing.getClockWise().toYRot()));
+        poseStack.rotate(Axis.ZP.rotationDegrees(67.5F));
         poseStack.translate(0.0F, -0.125F, 0.0F);
 
-        context.getSubmitNodeCollector().submitModel(bookModel, bookState, poseStack, textureId, light, OverlayTexture.NO_OVERLAY, 0, null);
+        context.getSubmitNodeCollector().submitModel(bookModel, bookState, poseStack, textureId, light, OverlayTexture.NO_OVERLAY, 0);
     }
 }

@@ -121,12 +121,12 @@ public class VaultAnimation extends Animation{
 
         poseStack.translate(0.5f, 0.5f, 0.5f);
         float angle = facing.toYRot();
-        poseStack.mulPose(Axis.YP.rotationDegrees(-angle));
+        poseStack.rotate(Axis.YP.rotationDegrees(-angle));
         poseStack.scale(scale, scale, 1);
         poseStack.translate(0f, 0f, 0.6f + getDistance(context.getNowTick()));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90f + getRotation(context.getNowTick())));
-        poseStack.mulPose(Axis.XP.rotationDegrees(90f));
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
+        poseStack.rotate(Axis.ZP.rotationDegrees(90f + getRotation(context.getNowTick())));
+        poseStack.rotate(Axis.XP.rotationDegrees(90f));
+        poseStack.rotate(Axis.YP.rotationDegrees(180f));
 
         Minecraft.getInstance().getItemModelResolver().updateForTopItem(keyState, keyItemStack, ItemDisplayContext.ON_SHELF, Minecraft.getInstance().player.level(), null, position.hashCode());
 

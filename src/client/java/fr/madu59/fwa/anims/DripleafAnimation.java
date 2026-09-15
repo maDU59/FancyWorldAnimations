@@ -81,15 +81,15 @@ public class DripleafAnimation extends Animation{
 
             poseStack.translate(0.5, 0.5, 0.5);
             float yRot = -facing.toYRot(); 
-            poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+            poseStack.rotate(Axis.YP.rotationDegrees(yRot));
             poseStack.translate(-0.5, -0.5, -0.5);
 
             poseStack.translate(0.5, 0.9375, 0);
-            poseStack.mulPose(Axis.XP.rotationDegrees(tiltAngle));
+            poseStack.rotate(Axis.XP.rotationDegrees(tiltAngle));
             poseStack.translate(-0.5, -0.9375, 0);
 
             poseStack.translate(0.5, 0.5, 0.5);
-            poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+            poseStack.rotate(Axis.YP.rotationDegrees(-yRot));
             poseStack.translate(-0.5, -0.5, -0.5);
 
             renderFilteredQuads(poseStack, part.getQuads(null), true, light);

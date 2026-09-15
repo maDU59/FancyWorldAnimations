@@ -147,7 +147,7 @@ public class LeverAnimation extends Animation{
 
         poseStack.translate(pivotX, pivotY, pivotZ);
 
-        poseStack.mulPose(axis.rotationDegrees((float)angle));
+        poseStack.rotate(axis.rotationDegrees((float)angle));
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 

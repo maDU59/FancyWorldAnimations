@@ -98,7 +98,7 @@ public class JukeBoxAnimation extends Animation{
         float dy = getDeltaY(context.getNowTick());
         dy = newIsOpen? 1f - dy : dy;
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(90f));
+        poseStack.rotate(Axis.YP.rotationDegrees(90f));
         poseStack.scale(scale, scale, 1);
         poseStack.translate(-23f / 32f, 19f/16f + dy, 8f/16f);
 

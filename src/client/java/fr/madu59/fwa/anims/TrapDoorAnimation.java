@@ -130,9 +130,9 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(shiftX, shiftY, shiftZ);
         poseStack.translate(pivotX, pivotY, pivotZ);
         if (hingeSide == Direction.NORTH || hingeSide == Direction.SOUTH) {
-            poseStack.mulPose(Axis.XP.rotationDegrees((float)angle));
+            poseStack.rotate(Axis.XP.rotationDegrees((float)angle));
         } else {
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float)angle));
+            poseStack.rotate(Axis.ZP.rotationDegrees((float)angle));
         }
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
         poseStack.translate(-shiftX, -shiftY, -shiftZ);

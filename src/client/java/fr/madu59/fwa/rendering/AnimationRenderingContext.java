@@ -39,7 +39,7 @@ public class AnimationRenderingContext {
         this.isShadow = isShadow;
         this.frustum = frustum;
         CameraRenderState cameraRenderState = new CameraRenderState();
-        Minecraft.getInstance().gameRenderer.mainCamera().extractRenderState(cameraRenderState, 0);
+        Minecraft.getInstance().gameRenderer.mainCamera().extractRenderState(cameraRenderState, Minecraft.getInstance().getDeltaTracker());
         this.cameraRenderState = cameraRenderState;
     }
 

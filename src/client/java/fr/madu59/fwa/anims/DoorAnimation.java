@@ -127,7 +127,7 @@ public class DoorAnimation extends Animation{
 
         poseStack.translate(shiftX, 0.0f, shiftZ);
         poseStack.translate(pivotX, 0.0f, pivotZ);
-        poseStack.mulPose(Axis.YP.rotationDegrees((float)angle));
+        poseStack.rotate(Axis.YP.rotationDegrees((float)angle));
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = getLight();

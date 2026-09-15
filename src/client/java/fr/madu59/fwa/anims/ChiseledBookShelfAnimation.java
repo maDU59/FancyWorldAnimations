@@ -129,7 +129,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         }
 
         poseStack.translate(z, y, x);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
+        poseStack.rotate(Axis.YP.rotationDegrees(-facing.toYRot()));
         poseStack.translate(-w / 2f, -(6f/16f) / 2f, -d / 2f);
 
         context.getSubmitNodeCollector().submitCustomGeometry(poseStack, RenderTypes.cutoutMovingBlock(), (PoseStack.Pose pose, VertexConsumer buffer) -> {

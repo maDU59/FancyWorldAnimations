@@ -101,16 +101,16 @@ public class FenceGateAnimation extends Animation{
         float rightAngle = onAxisZ ? angle : -angle;
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
+        poseStack.rotate(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
         renderQuads(poseStack, fenceGate.leftQuadList(), light);
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
+        poseStack.rotate(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
 
         poseStack.translate(rightPivotX, 0.0f, rightPivotZ);
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
+        poseStack.rotate(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
         poseStack.translate(-rightPivotX, 0.0f, -rightPivotZ);
         renderQuads(poseStack, fenceGate.rightQuadList(), light);
     }

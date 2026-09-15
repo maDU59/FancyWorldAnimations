@@ -112,7 +112,7 @@ public class LanternAnimation extends Animation{
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
                     .rotateY(spin * deltaFactor);
-                poseStack.mulPose(combined);
+                poseStack.rotate(combined);
             }
             poseStack.pushPose();
             poseStack.translate(-0.5F, -1.0F, -0.5F);
@@ -133,7 +133,7 @@ public class LanternAnimation extends Animation{
                     .rotateZ(tiltZ * deltaFactor)
                     .rotateX(tiltX * deltaFactor)
                     .rotateY(spin * deltaFactor);
-                poseStack.mulPose(combined);
+                poseStack.rotate(combined);
         }
         poseStack.pushPose();
         poseStack.translate(-0.5F, -1.0F, -0.5F);

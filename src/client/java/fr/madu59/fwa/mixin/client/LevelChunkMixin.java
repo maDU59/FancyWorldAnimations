@@ -48,7 +48,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     }
 
     @Inject(method = "replaceWithPacketData", at = @At("RETURN"))
-    private void fwa$onReplaceWithPacketData(FriendlyByteBuf friendlyByteBuf, Map<Heightmap.Types, long[]> map, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfo ci) {
+    private void fwa$onReplaceWithPacketData(final int chunkX, final int chunkZ, final ClientboundLevelChunkPacketData chunkData, CallbackInfo ci) {
         if(Minecraft.getInstance().level == null) return;
         LevelChunkSection[] sections = this.getSections();
         BlockPos chunkPos = this.getPos().getWorldPosition();
