@@ -87,7 +87,7 @@ public class ComposterAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if ((path.endsWith("_compost") || path.contains("_ready")) == wantCompost) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

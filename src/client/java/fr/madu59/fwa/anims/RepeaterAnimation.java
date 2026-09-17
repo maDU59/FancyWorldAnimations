@@ -91,7 +91,7 @@ public class RepeaterAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if ((path.contains("redstone_torch") && (quad.position0().x() > 5f/16f && quad.position0().x() < 11f/16f || quad.position2().x() > 5f/16f && quad.position2().x() < 11f/16f) && (quad.position0().z() > 5f/16f && quad.position0().z() < 11f/16f || quad.position2().z() > 5f/16f && quad.position2().z() < 11f/16f)) == wantTorch) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

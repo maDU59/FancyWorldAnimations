@@ -86,7 +86,7 @@ public class EndPortalFrameAnimation extends Animation{
 
             VertexConsumer buffer = getBuffer(context);
 
-            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1f, 1f, 1f, 1f, light);
+            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
             if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
@@ -118,7 +118,7 @@ public class EndPortalFrameAnimation extends Animation{
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, a, r, g, b, light);
+                RenderHelper.renderQuad(buffer, poseStack.last(), quad, a, r, g, b, light, getAnimationBlockData());
             }
         }
     }

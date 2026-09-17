@@ -121,7 +121,7 @@ public class FenceGateAnimation extends Animation{
 
     private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
         for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
         }
     }
 

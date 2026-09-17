@@ -133,6 +133,6 @@ public class DoorAnimation extends Animation{
 
         int light = getLight();
         VertexConsumer buffer = getBuffer(context);
-        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light);
+        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
     }
 }
