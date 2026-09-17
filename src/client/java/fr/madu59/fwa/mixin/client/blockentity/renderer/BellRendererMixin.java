@@ -37,6 +37,7 @@ public class BellRendererMixin {
 
     @Inject(method = "submit", at = @At("HEAD"), cancellable = true)
     public void fwa$submit(final BellRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera, CallbackInfo ci) {
+        if(((BlockEntityRenderStateExt)state).getPosition() == null) return;
         Animation animation = FancyWorldAnimationsClient.animations.getAt(((BlockEntityRenderStateExt)state).getPosition());
         BellModel.State modelState = new BellModel.State(state.ticks, state.shakeDirection);
 
