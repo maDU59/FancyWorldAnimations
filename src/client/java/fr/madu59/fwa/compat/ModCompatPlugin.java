@@ -24,6 +24,9 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
         if (mixinClassName.contains(".entityculling.")) {
             return PlatformHelper.isModLoaded("entityculling");
         }
+        if (mixinClassName.contains(".vulkanmod.")) {
+            return PlatformHelper.isModLoaded("vulkanmod");
+        }
         return true;
     }
 
