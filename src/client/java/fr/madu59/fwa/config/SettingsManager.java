@@ -452,7 +452,7 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.SPRINGY
-    ).isEnabled(() -> !ModCompat.isFAObjectsLoaded()).disabledValue(Curves.Door.LINEAR);
+    ).isEnabled(() -> !ModCompat.isFAObjectsLoaded()).disabledValue(Curves.Door.DEFAULT);
 
     public static Option<Boolean> LANTERN_STATE = loadOptionWithDefaults(
         "lantern_state",
