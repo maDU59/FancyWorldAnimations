@@ -508,6 +508,27 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Float> SWINGING_SPEED = loadOptionWithDefaults(
+        "swinging_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0f
+    );
+
+    public static Option<Float> SWINGING_INTENSITY = loadOptionWithDefaults(
+        "swinging_intensity",
+        "fwa.config.option.intensity.name",
+        "fwa.config.option.intensity.description",
+        1.0f
+    );
+
+    public static Option<Boolean> SWINGING_WEATHER_STATE = loadOptionWithDefaults(
+        "swinging_weather_state",
+        "fwa.config.option.weather.name",
+        "fwa.config.option.weather.description",
+        true
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {

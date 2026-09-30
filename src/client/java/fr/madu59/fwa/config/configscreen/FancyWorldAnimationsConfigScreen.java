@@ -128,6 +128,11 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.category("fwa.config.category.vault").build();
         list.button(SettingsManager.VAULT_STATE).build();
         list.button(SettingsManager.VAULT_EASING).isEnabled(() -> SettingsManager.VAULT_STATE.getValue()).build();
+
+        list.category("fwa.config.category.dripleaf").build();
+        list.button(SettingsManager.DRIPLEAF_STATE).build();
+        list.button(SettingsManager.DRIPLEAF_EASING).isEnabled(() -> SettingsManager.DRIPLEAF_STATE.getValue()).build();
+        list.slider(SettingsManager.DRIPLEAF_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.DRIPLEAF_STATE.getValue()).build();
         
         list.category("fwa.config.category.chest").build();
         list.button(SettingsManager.CHEST_EASING).build(); 
@@ -136,6 +141,12 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.button(SettingsManager.SHULKERBOX_STATE).build();
         list.slider(SettingsManager.SHULKERBOX_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.SHULKERBOX_STATE.getValue()).build();
         
+        list.category("fwa.config.category.swinging").build();
+
+        list.button(SettingsManager.SWINGING_WEATHER_STATE).build();
+        list.slider(SettingsManager.SWINGING_SPEED).range(0.5f, 2.0f).step(0.1f).build();
+        list.slider(SettingsManager.SWINGING_INTENSITY).range(0.5f, 2.0f).step(0.1f).build();
+
         list.category("fwa.config.category.lantern").build();
         list.button(SettingsManager.LANTERN_STATE).build();
         
@@ -144,11 +155,6 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.button(SettingsManager.CHAIN_GROUNDED).isEnabled(() -> SettingsManager.CHAIN_STATE.getValue()).build();
         list.button(SettingsManager.LANTERN_OVERRIDE).isEnabled(() -> SettingsManager.CHAIN_STATE.getValue() || SettingsManager.LANTERN_STATE.getValue()).build();
         list.button(SettingsManager.CHAIN_SWING_LIMIT).isEnabled(() -> SettingsManager.CHAIN_STATE.getValue() || SettingsManager.LANTERN_STATE.getValue()).build();
-        
-        list.category("fwa.config.category.dripleaf").build();
-        list.button(SettingsManager.DRIPLEAF_STATE).build();
-        list.button(SettingsManager.DRIPLEAF_EASING).isEnabled(() -> SettingsManager.DRIPLEAF_STATE.getValue()).build();
-        list.slider(SettingsManager.DRIPLEAF_SPEED).range(0.5, 2.0).step(0.1).isEnabled(() -> SettingsManager.DRIPLEAF_STATE.getValue()).build();
 
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {
             this.minecraft.gui.setScreen(this.parent);
