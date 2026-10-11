@@ -14,11 +14,12 @@ import fr.madu59.fwa.utils.Curves;
 @Mixin(ChestLidController.class)
 public abstract class ChestLidControllerMixin {
 
+
 	@Shadow
 	private boolean shouldBeOpen;
 
 	@ModifyReturnValue(at = @At("RETURN"), method = "getOpenness")
 	private float fwa$getOpenness(float original) {
-		return SettingsManager.MOD_TOGGLE.getValue()?(float) Curves.ease(original, SettingsManager.CHEST_EASING.getValue(), shouldBeOpen):original;
+		return SettingsManager.MOD_TOGGLE.getValue()?1.0f - (float) Math.cbrt(1.0f - (float) Curves.ease(original, SettingsManager.CHEST_EASING.getValue(), shouldBeOpen)):original;
 	}
 }

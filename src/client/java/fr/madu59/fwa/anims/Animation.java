@@ -20,6 +20,7 @@ public class Animation {
     protected final BlockState defaultState;
     protected final BlockState oldState;
     protected final BlockState newState;
+    protected int reverseCount = 0;
     protected boolean toRemove = false;
     protected double toRemoveTick = 0;
     protected boolean removalApproved = false;
@@ -175,5 +176,13 @@ public class Animation {
 
     public AnimationBlockData getAnimationBlockData(){
         return this.defaultAnimationBlockData;
+    }
+
+    public void setReverseCount(int reverseCount){
+        this.reverseCount = reverseCount;
+    }
+
+    public int getReverseCount(){
+        return this.reverseCount;
     }
 }
