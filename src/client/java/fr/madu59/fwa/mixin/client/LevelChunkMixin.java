@@ -1,10 +1,13 @@
 package fr.madu59.fwa.mixin.client;
 
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +20,7 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
