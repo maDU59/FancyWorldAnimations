@@ -3,3 +3,4 @@
 - Improved chest animations, DEFAULT is now how Vanilla chests look
 - Added support for VulkanMod
 - Swinging animations now have settings for their speed and intensity
+- Fixed a crash when pressing a button
