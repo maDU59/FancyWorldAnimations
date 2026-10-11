@@ -32,6 +32,7 @@ import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -131,20 +132,24 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean oldIsOpen = isOpen(oldState, type);
 		boolean newIsOpen = isOpen(newState, type);
 
+		int reverseCount = 0;
+
 		double startTick = getPartialTick();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = getPartialTick() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = getPartialTick() - animation.getAnimDuration() * (Curves.unease(1 - Curves.ease(animation.getProgress(getPartialTick()), animation.getCurve()), animation.getCurve()));
+				reverseCount = animation.getReverseCount() + 1;
 				animations.removeAt(blockPos);
 			}
 		}
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
-		startTick = syncDoors(startTick, blockPos, newState, type);
+		startTick = syncDoors(startTick, blockPos, newState, type, reverseCount);
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
+		animation.setReverseCount(reverseCount);
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
 		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(Vec3.atCenterOf(blockPos)) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(Vec3.atCenterOf(blockPos)) > 500000*500000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
@@ -403,14 +408,14 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 	}
 
-	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type){
+	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type, int reverseCount){
 		if(type == Type.DOOR){
 			if(newState.getValueOrElse(DoorBlock.HALF, DoubleBlockHalf.LOWER) == DoubleBlockHalf.LOWER){
 				BlockPos abovePos = blockPos.above();
 				BlockState aboveState = Minecraft.getInstance().level.getBlockState(abovePos);
 				if(aboveState.getBlock() instanceof DoorBlock){
 					Animation anim = animations.animations.get(abovePos);
-					if(anim != null) startTick = anim.getStartTick();
+					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
 			else{
@@ -418,7 +423,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 				BlockState belowState = Minecraft.getInstance().level.getBlockState(belowPos);
 				if(belowState.getBlock() instanceof DoorBlock){
 					Animation anim = animations.animations.get(belowPos);
-					if(anim != null) startTick = anim.getStartTick();
+					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
 		}

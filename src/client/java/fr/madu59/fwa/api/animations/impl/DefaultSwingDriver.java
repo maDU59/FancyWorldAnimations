@@ -2,6 +2,7 @@ package fr.madu59.fwa.api.animations.impl;
 
 import fr.madu59.fwa.api.animations.HangingSwing;
 import fr.madu59.fwa.api.animations.SwingDriver;
+import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.BlockPos;
@@ -12,7 +13,7 @@ public class DefaultSwingDriver implements SwingDriver{
     double lastNowTick = 0;
 
     public boolean getSwing(BlockPos position, BlockState state, double nowTick, HangingSwing swing){
-        float speed = 0.1f;
+        float speed = 0.1f * SettingsManager.SWINGING_SPEED.getValue();
         if(nowTick != lastNowTick) {
             this.updateWeatherEffect();
             lastNowTick = nowTick;
@@ -20,16 +21,18 @@ public class DefaultSwingDriver implements SwingDriver{
         float posOffset = (position.getX() * 0.6f) + (position.getZ() * 0.6f);
         float uniqueTime = ((float)nowTick + effects) * speed + posOffset;
 
-        swing.tiltX = (float) Math.sin(uniqueTime) * 8f;
-        swing.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f;
-        swing.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f;
+        float intensity = SettingsManager.SWINGING_INTENSITY.getValue();
+
+        swing.tiltX = (float) Math.sin(uniqueTime) * 8f * intensity;
+        swing.tiltZ = (float) Math.cos(uniqueTime * 0.8f) * 6f * intensity;
+        swing.spin = (float) Math.sin(uniqueTime * 1.5f) * 4f * intensity;
 
         return true;
     }
 
     private void updateWeatherEffect(){
         Level level = Minecraft.getInstance().level;
-        if(level != null){
+        if(level != null && SettingsManager.SWINGING_WEATHER_STATE.getValue()){
             float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
             float frameTime = Minecraft.getInstance().getDeltaTracker().getRealtimeDeltaTicks();
             effects += level.getRainLevel(partialTick) * frameTime;

@@ -22,6 +22,7 @@
     "fwa.config.category.dripleaf":"DRIPLEAVES",
     "fwa.config.category.redstone":"REDSTONE WIRES",
     "fwa.config.category.shulkerbox":"SHULKER BOXES",
+    "fwa.config.category.swinging":"SWINGING ANIMATIONS",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.animation_render_distance.name":"Triggered animations render distance",
@@ -37,6 +38,8 @@
     "fwa.config.option.override.name":"Override chains' state if there's a lantern at the end",
     "fwa.config.option.swing_limit.name":"Limit the swing of the chains to a certain angle",
     "fwa.config.option.redstone.name":"Animate when powered through redstone",
+    "fwa.config.option.weather.name":"Weather affects the swinging animations",
+    "fwa.config.option.intensity.name":"Animation intensity multiplier",
 
     "fwa.config.value.true":"Enabled",
     "fwa.config.value.false":"Disabled",
