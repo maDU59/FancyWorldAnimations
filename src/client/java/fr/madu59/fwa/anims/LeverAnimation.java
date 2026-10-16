@@ -101,7 +101,9 @@ public class LeverAnimation extends Animation{
 
         int light = getLight();
 
-        RenderHelper.renderQuads(poseStack, lever.baseQuadList(), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+        for(int i = 0; i < lever.baseQuadList().size(); i++){
+            RenderHelper.renderQuad(poseStack, lever.baseQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+        }
 
         double angle = getAngle(context.getNowTick(), facing);
 
@@ -151,7 +153,9 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
-        RenderHelper.renderQuads(poseStack, lever.handleQuadList(), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+        for(int i = 0; i < lever.handleQuadList().size(); i++){
+            RenderHelper.renderQuad(poseStack, lever.handleQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+        }
     }
 
     public Lever splitLeverQuads(List<BakedQuad> quads, Direction facing, AttachFace face){
