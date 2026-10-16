@@ -41,6 +41,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -185,15 +186,25 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		dist = dist * dist;
 
+		boolean isShadow = context.isShadow();
+		Frustum frustum = context.getFrustum();
+		double nowTick = context.getNowTick();
+
 		for (Animation animation : animations.animations.values()) {
-			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(Vec3.atCenterOf(animation.getPos())) > dist) continue;
-			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
-				renderAnimation(animation, context);
-			}
+
+			animation.tick(nowTick);
+            if (!animation.isRendering()) continue;
+            double dx = camPos.x - (animation.getPos().getX() + 0.5);
+            double dy = camPos.y - (animation.getPos().getY() + 0.5);
+            double dz = camPos.z - (animation.getPos().getZ() + 0.5);
+            if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
+            if (animation.isOcclusionCulled() && !isShadow) continue;
+            if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
+
+			renderAnimation(animation, context);
 		}
 		dimension = level.dimension();
-		if(!context.isShadow()) animations.clean(context.getNowTick());
+		if(!context.isShadow()) animations.clean(nowTick);
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
