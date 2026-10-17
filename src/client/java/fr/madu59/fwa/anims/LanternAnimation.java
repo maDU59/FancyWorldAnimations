@@ -43,6 +43,7 @@ public class LanternAnimation extends Animation{
     private PoseStack.Pose[] poses;
     private boolean updateLights = true;
     private boolean updatePoses = true;
+    private long lastFrame = -1;
     
     public LanternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -94,31 +95,26 @@ public class LanternAnimation extends Animation{
         needUpdate = false;
     }
 
-    public void updateCache(){
-        updateLights = true;
-        updatePoses = true;
-    }
-
-    @Override 
-    public void tickVisible(double nowTick) {
-        super.tickVisible(nowTick);
+    public void updateCache(long frameCount){
+        if(frameCount == lastFrame) return;
+        lastFrame = frameCount;
         double distance = distanceToPlayer();
         if(distance > 128 * 128){
-            if(getFrameCount() % 8 == 0) updateLights = true;
+            if(frameCount % 8 == 0) updateLights = true;
         }
         else if(distance > 64 * 64){
-            if(getFrameCount() % 4 == 0) updateLights = true;
+            if(frameCount % 4 == 0) updateLights = true;
         }
         else if(distance > 16 * 16){
-            if(getFrameCount() % 2 == 0) updateLights = true;
+            if(frameCount % 2 == 0) updateLights = true;
         }
         else updateLights = true;
         
         if(distance > 64 * 64){
-            if(getFrameCount() % 4 == 0) updatePoses = true;
+            if(frameCount % 4 == 0) updatePoses = true;
         }
         else if(distance > 32 * 32){
-            if(getFrameCount() % 2 == 0) updatePoses = true;
+            if(frameCount % 2 == 0) updatePoses = true;
         }
         else updatePoses = true;
     }
@@ -126,6 +122,8 @@ public class LanternAnimation extends Animation{
     @Override
     public void render(AnimationRenderingContext context) {
         if (needUpdate) update();
+
+        updateCache(context.getFrameCount());
 
         if(updatePoses == true){
             PoseStack poseStack = new PoseStack();

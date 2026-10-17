@@ -26,7 +26,6 @@ public class Animation {
     protected boolean removalApproved = false;
     protected AABB boundingBox;
     protected int cachedLight = -1;
-    protected int frameCount = 0;
 
     protected Boolean isLast;
     protected boolean needUpdate = true;
@@ -150,10 +149,6 @@ public class Animation {
 
     }
 
-    public void tickVisible(double nowTick) {
-        frameCount++;
-    }
-
     public void updateCache(){
         cachedLight = -1;
     }
@@ -196,10 +191,6 @@ public class Animation {
 
     public int getReverseCount(){
         return this.reverseCount;
-    }
-
-    public int getFrameCount(){
-        return this.frameCount;
     }
 
     public double distanceToPlayer(){

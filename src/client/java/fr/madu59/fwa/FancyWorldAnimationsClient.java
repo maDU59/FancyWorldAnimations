@@ -201,7 +201,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
             if (animation.isOcclusionCulled() && !isShadow) continue;
             if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
 
-			if(!context.isShadow()) animation.tickVisible(nowTick);
+			if(!context.isShadow()) animation.updateCache();
 			renderAnimation(animation, context);
 		}
 
