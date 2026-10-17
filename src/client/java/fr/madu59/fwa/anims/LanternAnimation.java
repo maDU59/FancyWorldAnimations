@@ -103,13 +103,13 @@ public class LanternAnimation extends Animation{
     public void tickVisible(double nowTick) {
         super.tickVisible(nowTick);
         double distance = distanceToPlayer();
-        if(distance > 256){
+        if(distance > 128 * 128){
             if(getFrameCount() % 8 == 0) updateLights = true;
         }
-        else if(distance > 128){
+        else if(distance > 64 * 64){
             if(getFrameCount() % 4 == 0) updateLights = true;
         }
-        else if(distance > 64){
+        else if(distance > 16 * 16){
             if(getFrameCount() % 2 == 0) updateLights = true;
         }
         else updateLights = true;
