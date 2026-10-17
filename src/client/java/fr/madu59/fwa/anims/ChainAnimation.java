@@ -111,18 +111,24 @@ public class ChainAnimation extends Animation{
     public void tickVisible(double nowTick) {
         super.tickVisible(nowTick);
         double distance = distanceToPlayer();
-        if(distance > 256){
+        if(distance > 128 * 128){
             if(getFrameCount() % 8 == 0) updateLights = true;
         }
-        else if(distance > 128){
+        else if(distance > 64 * 64){
             if(getFrameCount() % 4 == 0) updateLights = true;
         }
-        else if(distance > 64){
+        else if(distance > 32 * 32){
             if(getFrameCount() % 2 == 0) updateLights = true;
         }
         else updateLights = true;
         
-        updatePoses = true;
+        if(distance > 64 * 64){
+            if(getFrameCount() % 4 == 0) updatePoses = true;
+        }
+        else if(distance > 32 * 32){
+            if(getFrameCount() % 2 == 0) updatePoses = true;
+        }
+        else updatePoses = true;
     }
 
     @Override

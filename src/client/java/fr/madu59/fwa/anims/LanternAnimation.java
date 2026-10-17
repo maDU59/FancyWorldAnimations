@@ -114,7 +114,13 @@ public class LanternAnimation extends Animation{
         }
         else updateLights = true;
         
-        updatePoses = true;
+        if(distance > 64 * 64){
+            if(getFrameCount() % 4 == 0) updatePoses = true;
+        }
+        else if(distance > 32 * 32){
+            if(getFrameCount() % 2 == 0) updatePoses = true;
+        }
+        else updatePoses = true;
     }
 
     @Override
