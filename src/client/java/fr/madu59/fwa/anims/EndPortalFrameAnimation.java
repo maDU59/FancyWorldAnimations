@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -82,7 +82,7 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            RenderHelper.renderModel(poseStack, parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+            AnimationRenderer.renderModel(poseStack, parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
             if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
@@ -109,10 +109,11 @@ public class EndPortalFrameAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                RenderHelper.renderQuad(poseStack, quad, a, r, g, b, light, getAnimationBlockData());
+                AnimationRenderer.renderQuad(pose, quad, a, r, g, b, light, getAnimationBlockData());
             }
         }
     }

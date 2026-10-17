@@ -10,7 +10,7 @@ import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.compat.ModCompat.ScholarCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -197,7 +197,7 @@ public class ChiseledBookShelfAnimation extends Animation{
         vMin = sprite.getV(vMin);
         vMax = sprite.getV(vMax);
 
-        float shade = RenderHelper.getShade(nx, ny, nz, pose);
+        float shade = AnimationRenderer.getShade(nx, ny, nz, pose);
         r = (int)(r * shade);
         g = (int)(g * shade);
         b = (int)(b * shade);

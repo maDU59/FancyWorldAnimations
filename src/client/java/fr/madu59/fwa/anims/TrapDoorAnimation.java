@@ -8,7 +8,7 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -138,6 +138,6 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = getLight();
-        RenderHelper.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+        AnimationRenderer.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
     }
 }

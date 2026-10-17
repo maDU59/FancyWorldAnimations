@@ -31,7 +31,7 @@ import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
@@ -178,7 +178,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(animations.isEmpty()) return;
 
-		RenderHelper.prepareFrame(context);
+		AnimationRenderer.prepareFrame(context);
 
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
@@ -192,7 +192,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		for (Animation animation : animations.animations.values()) {
 
-			animation.tick(nowTick);
+			if(!context.isShadow()) animation.tick(nowTick);
             if (!animation.isRendering()) continue;
             double dx = camPos.x - (animation.getPos().getX() + 0.5);
             double dy = camPos.y - (animation.getPos().getY() + 0.5);
@@ -201,8 +201,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
             if (animation.isOcclusionCulled() && !isShadow) continue;
             if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
 
+			if(!context.isShadow()) animation.tickVisible(nowTick);
 			renderAnimation(animation, context);
 		}
+
+		AnimationRenderer.renderBuffers();
+
 		dimension = level.dimension();
 		if(!context.isShadow()) animations.clean(nowTick);
 	}

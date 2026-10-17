@@ -12,7 +12,7 @@ import com.mojang.math.Axis;
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper;
 import fr.madu59.fwa.utils.ModelSplitHelper.Lever;
@@ -101,8 +101,9 @@ public class LeverAnimation extends Animation{
 
         int light = getLight();
 
+        PoseStack.Pose pose = poseStack.last().copy();
         for(int i = 0; i < lever.baseQuadList().size(); i++){
-            RenderHelper.renderQuad(poseStack, lever.baseQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+            AnimationRenderer.renderQuad(pose, lever.baseQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
         }
 
         double angle = getAngle(context.getNowTick(), facing);
@@ -153,8 +154,9 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
+        pose = poseStack.last().copy();
         for(int i = 0; i < lever.handleQuadList().size(); i++){
-            RenderHelper.renderQuad(poseStack, lever.handleQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+            AnimationRenderer.renderQuad(pose, lever.handleQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
         }
     }
 

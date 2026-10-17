@@ -9,7 +9,7 @@ import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -101,6 +101,7 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantLiquid, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             String last = path.split("/")[path.split("/").length-1];
@@ -120,7 +121,7 @@ public class LayeredCauldronAnimation extends Animation{
                     }
                 }
 
-                RenderHelper.renderQuad(poseStack, quad, 1.0f, r, g, b, light, getAnimationBlockData());
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, r, g, b, light, getAnimationBlockData());
             }
         }
     }

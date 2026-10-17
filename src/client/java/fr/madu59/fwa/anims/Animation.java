@@ -25,6 +25,8 @@ public class Animation {
     protected double toRemoveTick = 0;
     protected boolean removalApproved = false;
     protected AABB boundingBox;
+    protected int cachedLight = -1;
+    protected int frameCount = 0;
 
     protected Boolean isLast;
     protected boolean needUpdate = true;
@@ -145,13 +147,23 @@ public class Animation {
     }
 
     public void tick(double nowTick) {
+
+    }
+
+    public void tickVisible(double nowTick) {
+        frameCount++;
+    }
+
+    public void updateCache(){
+        cachedLight = -1;
     }
 
     public void render(AnimationRenderingContext context) {
     }
 
     public int getLight(){
-        return getLight(position, newState);
+        if(cachedLight == -1) cachedLight = getLight(position, newState);
+        return cachedLight;
     }
 
     public int getLight(BlockPos pos, BlockState state){
@@ -184,5 +196,13 @@ public class Animation {
 
     public int getReverseCount(){
         return this.reverseCount;
+    }
+
+    public int getFrameCount(){
+        return this.frameCount;
+    }
+
+    public double distanceToPlayer(){
+        return boundingBox.distanceToSqr(Minecraft.getInstance().player.getClientPosition());
     }
 }
