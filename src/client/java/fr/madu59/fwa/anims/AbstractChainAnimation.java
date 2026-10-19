@@ -28,6 +28,8 @@ import net.minecraft.world.phys.Vec3;
 
 public abstract class AbstractChainAnimation extends Animation {
 
+    private int hashCode = 0;
+
     protected Boolean isLast;
     protected boolean needUpdate = true;
 
@@ -52,6 +54,7 @@ public abstract class AbstractChainAnimation extends Animation {
 
     public AbstractChainAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+        hashCode = position.hashCode();
     }
 
     public boolean isLast(){
@@ -112,23 +115,26 @@ public abstract class AbstractChainAnimation extends Animation {
     public void updateCache(long frameCount){
         if(frameCount == lastFrame) return;
         lastFrame = frameCount;
+
+        long random = frameCount + position.hashCode();
+
         double distance = distanceToPlayer();
         if(distance > 128 * 128){
-            if(frameCount % 8 == 0) updateLights = true;
+            if(random % 8 == 0) updateLights = true;
         }
         else if(distance > 64 * 64){
-            if(frameCount % 4 == 0) updateLights = true;
+            if(random % 4 == 0) updateLights = true;
         }
         else if(distance > 16 * 16){
-            if(frameCount % 2 == 0) updateLights = true;
+            if(random % 2 == 0) updateLights = true;
         }
         else updateLights = true;
         
         if(distance > 64 * 64){
-            if(frameCount % 4 == 0) updatePoses = true;
+            if(random % 4 == 0) updatePoses = true;
         }
         else if(distance > 32 * 32){
-            if(frameCount % 2 == 0) updatePoses = true;
+            if(random % 2 == 0) updatePoses = true;
         }
         else updatePoses = true;
     }
