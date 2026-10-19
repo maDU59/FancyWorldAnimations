@@ -15,18 +15,22 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class BellAnimation extends Animation{
 
     private final Minecraft client = Minecraft.getInstance();
-    public final BellModel bellModel;
+    public BellModel bellModel;
     private final float hash;
     private final Direction facing;
     private final BellAttachType attachment;
     
     public BellAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
         this.hash = position.hashCode();
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         attachment = defaultState.getValue(BlockStateProperties.BELL_ATTACHMENT);
+    }
+
+    @Override
+    public void updateModel(){
+        this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
     }
 
     @Override

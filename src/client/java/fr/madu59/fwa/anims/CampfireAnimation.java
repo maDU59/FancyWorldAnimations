@@ -22,15 +22,20 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class CampfireAnimation extends Animation{
 
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public CampfireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+        updateModel();
+    }
 
+    @Override
+    public void updateModel(){
         BlockState state;
         if (oldIsOpen) state = oldState;
         else state = newState;
+
         RandomSource random = RandomSource.create(state.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
         model.collectParts(random, parts);

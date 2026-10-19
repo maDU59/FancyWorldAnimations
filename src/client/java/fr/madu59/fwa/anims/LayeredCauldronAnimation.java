@@ -30,7 +30,7 @@ public class LayeredCauldronAnimation extends Animation{
     private final BlockState oldBlockState;
     private final BlockState newBlockState;
     private final boolean isInverted;
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public LayeredCauldronAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
@@ -46,7 +46,10 @@ public class LayeredCauldronAnimation extends Animation{
             oldBlockState = oldState;
             isInverted = false;
         }
+    }
 
+    @Override
+    public void updateModel(){
         RandomSource random = RandomSource.create(newBlockState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newBlockState);
         model.collectParts(random, parts);

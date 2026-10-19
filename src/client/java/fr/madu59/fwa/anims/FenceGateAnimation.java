@@ -27,18 +27,24 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class FenceGateAnimation extends Animation{
 
     private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
-    private final FenceGate fenceGate;
+    private BlockStateModel model;
+    private FenceGate fenceGate;
     private final Direction facing;
 
 
     public FenceGateAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+        updateModel();
+
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+    }
+
+    @Override
+    public void updateModel(){
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
 
-        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         BlockStateModelPart part = parts.get(0);
 
         List<BakedQuad> quads = new ArrayList<>();

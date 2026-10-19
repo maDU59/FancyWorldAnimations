@@ -23,12 +23,16 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RepeaterAnimation extends Animation{
     
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public RepeaterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+        updateModel();
+    }
 
+    @Override
+    public void updateModel(){
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);

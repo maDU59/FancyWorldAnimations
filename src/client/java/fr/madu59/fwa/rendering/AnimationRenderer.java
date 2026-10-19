@@ -64,10 +64,6 @@ public class AnimationRenderer {
         buffers.clear();
     }
 
-    public static void renderModel(PoseStack poseStack, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        renderModel(poseStack.last().copy(), parts, a, r, g, b, light, blockData);
-    }
-
     public static void renderModel(PoseStack.Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < parts.size(); i++){
             BlockStateModelPart part = parts.get(i);
@@ -79,6 +75,12 @@ public class AnimationRenderer {
                     renderQuad(pose, quads.get(k), a, r, g, b, light, blockData);
                 }
             }
+        }
+    }
+
+    public static void renderQuads(PoseStack.Pose pose, BakedQuad[] quads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        for (int i = 0; i < quads.length; i++){
+            renderQuad(pose, quads[i], a, r, g, b, light, blockData);
         }
     }
 
@@ -133,6 +135,17 @@ public class AnimationRenderer {
             );
         }
         buffers.clear();
+    }
+
+    public static BakedQuad[] flattenModel(List<BlockStateModelPart> parts){
+        List<BakedQuad> quads = new ArrayList<>();
+        for (int i = 0; i < parts.size(); i++){
+            BlockStateModelPart part = parts.get(i);
+            for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
+                quads.addAll(part.getQuads(DIRECTIONS_WITH_NULL[j]));
+            }
+        }
+        return quads.toArray(new BakedQuad[0]);
     }
 
     public static float getShade(float nx, float ny, float nz, PoseStack.Pose pose){

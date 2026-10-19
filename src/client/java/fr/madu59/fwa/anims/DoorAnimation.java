@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
 
 public class DoorAnimation extends Animation{
 
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     private final float dX;
     private final float dZ;
@@ -34,9 +34,7 @@ public class DoorAnimation extends Animation{
 
     public DoorAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
+        updateModel();
 
         BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -76,6 +74,13 @@ public class DoorAnimation extends Animation{
         }
         this.dX = dX;
         this.dZ = dZ;
+    }
+
+    @Override
+    public void updateModel(){
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -131,6 +136,6 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = getLight();
-        AnimationRenderer.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+        AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
     }
 }

@@ -25,7 +25,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TrapDoorAnimation extends Animation{
 
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
     private final float pivotX;
     private final float pivotY;
@@ -36,9 +36,7 @@ public class TrapDoorAnimation extends Animation{
     
     public TrapDoorAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
+        updateModel();
 
         BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -65,6 +63,13 @@ public class TrapDoorAnimation extends Animation{
         float thickness = (float) (boundingBox.maxY - boundingBox.minY);
         float halfThickness = thickness > 0.0f ? thickness * 0.5f : (3.0f / 32.0f);
         dY = (half == Half.TOP) ? -halfThickness : halfThickness;
+    }
+
+    @Override
+    public void updateModel(){
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, parts);
     }
 
     @Override
@@ -138,6 +143,6 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = getLight();
-        AnimationRenderer.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+        AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
     }
 }

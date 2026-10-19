@@ -29,20 +29,24 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LeverAnimation extends Animation{
     
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final Lever lever;
+    private Lever lever;
     private final Direction facing;
     private final AttachFace face;
 
     public LeverAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         face = defaultState.getValue(BlockStateProperties.ATTACH_FACE);
+    }
+
+    @Override
+    public void updateModel(){
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, parts);
 
         BlockStateModelPart part = parts.get(0);
 

@@ -2,6 +2,7 @@ package fr.madu59.fwa;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.madu59.fwa.anims.AbstractChainAnimation;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
@@ -406,20 +407,20 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
 				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(false);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(false);
 			}
 		}
 		else{
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
 				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(true);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isActiveSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
 			Animation anim = animations.animations.get(lastPos);
-			if (anim != null) anim.needUpdate();
+			if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.needUpdate();
 		}
 	}
 

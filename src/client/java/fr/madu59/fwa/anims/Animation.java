@@ -27,9 +27,6 @@ public class Animation {
     protected AABB boundingBox;
     protected int cachedLight = -1;
 
-    protected Boolean isLast;
-    protected boolean needUpdate = true;
-
     protected boolean isOcclusionCulled = false;
     protected AnimationBlockData defaultAnimationBlockData;
 
@@ -43,6 +40,11 @@ public class Animation {
         this.newState = newState;
         this.defaultAnimationBlockData = new AnimationBlockData(defaultState, position, getLight());
         updateBoundingBox();
+        updateModel();
+    }
+
+    public void updateModel(){
+
     }
 
     public boolean isUnique() {
@@ -109,14 +111,6 @@ public class Animation {
 
     public boolean needEndBatch(){
         return false;
-    }
-
-    public void setLast(boolean isLast){
-        this.isLast = isLast;
-    }
-
-    public void needUpdate(){
-        needUpdate = true;
     }
 
     public double getProgress(double nowTick) {
@@ -195,5 +189,9 @@ public class Animation {
 
     public double distanceToPlayer(){
         return boundingBox.distanceToSqr(Minecraft.getInstance().player.getClientPosition());
+    }
+
+    public void clearModelCache() {
+        updateModel();
     }
 }

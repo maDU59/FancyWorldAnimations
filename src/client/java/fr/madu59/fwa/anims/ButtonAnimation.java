@@ -24,10 +24,15 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class ButtonAnimation extends Animation{
 
     private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
+    private BlockStateModel model;
     
     public ButtonAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+        updateModel();
+    }
+
+    @Override
+    public void updateModel(){
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
@@ -82,6 +87,6 @@ public class ButtonAnimation extends Animation{
         poseStack.translate(x, y, z);
 
         int light = getLight();
-        AnimationRenderer.renderModel(poseStack, parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+        AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
     }
 }

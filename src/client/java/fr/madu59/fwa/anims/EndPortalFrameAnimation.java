@@ -24,15 +24,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class EndPortalFrameAnimation extends Animation{
 
     private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
+    private BlockStateModel model;
     private List<BlockStateModelPart> eyeParts = new ArrayList<>();
-    private final BlockStateModel eyeModel;
+    private BlockStateModel eyeModel;
     
     public EndPortalFrameAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+        updateModel();
+    }
+
+    @Override
+    public void updateModel(){
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
+
         BlockState eyeState = defaultState.setValue(BlockStateProperties.EYE, true);
         RandomSource eyeRandom = RandomSource.create(eyeState.getSeed(position));
         eyeModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(eyeState);
@@ -82,7 +88,7 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            AnimationRenderer.renderModel(poseStack, parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+            AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
             if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
