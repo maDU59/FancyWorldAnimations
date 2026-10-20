@@ -1,6 +1,4 @@
 # What's new:
-- Improved animation cancelling (e.g. closing a door while it's already opening will now transition smoothly to the closing animation)
-- Improved chest animations, DEFAULT is now how Vanilla chests look
-- Added support for VulkanMod
-- Swinging animations now have settings for their speed and intensity
-- Fixed a crash when pressing a button
+- Optimized chains and lanterns animations
+- Improved the blacklist system to read from resource packs too
+- Added es_ar translation (@MiqueMC)

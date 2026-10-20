@@ -1,6 +1,5 @@
 package fr.madu59.fwa.compat;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,12 +9,15 @@ import java.util.Set;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.api.animations.AnimationDisabler;
 import fr.madu59.fwa.api.animations.BlackListOverrides;
 import fr.madu59.fwa.platform.PlatformHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class Blacklist {
@@ -23,6 +25,7 @@ public class Blacklist {
     private static final Set<String> MODS_BLACKLIST = new HashSet<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = PlatformHelper.getConfigDir().resolve("fwa-blacklist.json");
+    private static final Identifier RESOURCE_IDENTIFIER = Identifier.fromNamespaceAndPath("fwa", "blacklist.json");
 
     public static void load() {
         BLOCKS_BLACKLIST.clear();
@@ -32,15 +35,16 @@ public class Blacklist {
     }
 
     private static void loadFromResource() {
-        Identifier resourcePath = Identifier.fromNamespaceAndPath("fwa", "blacklist.json");
-        Minecraft.getInstance().getResourceManager().getResource(resourcePath).ifPresent(resource -> {
+        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+
+        for(Resource resource : resourceManager.getResourceStack(RESOURCE_IDENTIFIER)) {
             try (InputStreamReader reader = new InputStreamReader(resource.open())) {
                 BlacklistData data = GSON.fromJson(reader, BlacklistData.class);
-                applyData(data, Provider.USER);
-            } catch (IOException e) {
-                e.printStackTrace();
+                applyData(data, Provider.MOD);
+            } catch (Exception e) {
+                FancyWorldAnimations.LOGGER.error("Failed to load blacklist from resource: {}", e);
             }
-        });
+        }
     }
 
     private static void loadFromConfig() {
@@ -48,10 +52,10 @@ public class Blacklist {
             if (Files.exists(CONFIG_PATH)) {
                 String content = Files.readString(CONFIG_PATH);
                 BlacklistData data = GSON.fromJson(content, BlacklistData.class);
-                applyData(data, Provider.MOD);
+                applyData(data, Provider.USER);
             }
         } catch (Exception e) {
-            System.err.println("[FWA] Failed to load blacklist: " + e.getMessage());
+            FancyWorldAnimations.LOGGER.error("Failed to load blacklist from config: {}", e);
         }
     }
 
