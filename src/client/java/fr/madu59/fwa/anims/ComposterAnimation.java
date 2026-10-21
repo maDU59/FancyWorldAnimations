@@ -23,19 +23,20 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class ComposterAnimation extends Animation{
 
     private BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts;
 
     
     public ComposterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        updateModel();
     }
 
     @Override
     public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override

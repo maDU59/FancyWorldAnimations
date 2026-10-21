@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RedstoneWireAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts;
     private BlockStateModel model;
     private final float newR;
     private final float newG;
@@ -32,7 +32,6 @@ public class RedstoneWireAnimation extends Animation{
     
     public RedstoneWireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        updateModel();
 
         int newColor = RedstoneWireBlock.getColorForPower(newState.getValue(BlockStateProperties.POWER));
         newR = (float) (newColor >> 16 & 255) / 255.0F;
@@ -46,9 +45,11 @@ public class RedstoneWireAnimation extends Animation{
 
     @Override
     public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override

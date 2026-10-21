@@ -23,19 +23,20 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ButtonAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts;
     private BlockStateModel model;
     
     public ButtonAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        updateModel();
     }
 
     @Override
     public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override

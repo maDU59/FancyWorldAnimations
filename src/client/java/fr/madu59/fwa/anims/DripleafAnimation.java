@@ -23,16 +23,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class DripleafAnimation extends Animation{
 
-    private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private BlockStateModel model;
+    private List<BlockStateModelPart> parts;
 
     
     public DripleafAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
         model.collectParts(random, parts);
+        parts = newParts;
     }
 
     @Override

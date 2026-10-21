@@ -23,26 +23,29 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class EndPortalFrameAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts;
     private BlockStateModel model;
-    private List<BlockStateModelPart> eyeParts = new ArrayList<>();
+    private List<BlockStateModelPart> eyeParts;
     private BlockStateModel eyeModel;
     
     public EndPortalFrameAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        updateModel();
     }
 
     @Override
     public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
 
+        List<BlockStateModelPart> newEyeParts = new ArrayList<>();
         BlockState eyeState = defaultState.setValue(BlockStateProperties.EYE, true);
         RandomSource eyeRandom = RandomSource.create(eyeState.getSeed(position));
         eyeModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(eyeState);
-        eyeModel.collectParts(eyeRandom, eyeParts);
+        eyeModel.collectParts(eyeRandom, newEyeParts);
+        eyeParts = newEyeParts;
     }
 
     @Override
