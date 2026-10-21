@@ -40,7 +40,6 @@ public class Animation {
         this.newState = newState;
         this.defaultAnimationBlockData = new AnimationBlockData(defaultState, position, getLight());
         updateBoundingBox();
-        updateModel();
     }
 
     public void updateModel(){

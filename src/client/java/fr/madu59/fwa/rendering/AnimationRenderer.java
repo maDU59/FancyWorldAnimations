@@ -43,7 +43,6 @@ public class AnimationRenderer {
     private static final Direction[] DIRECTIONS_WITH_NULL = {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
-    private static final Direction[] DIRECTIONS = Direction.values();
     private static final Map<RenderType, List<AnimationQuad>> buffers = new HashMap<>();
 
     private static final Matrix4f SHRINK_MATRIX = new Matrix4f()

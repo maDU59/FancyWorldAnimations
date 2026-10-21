@@ -46,6 +46,7 @@ public class LayeredCauldronAnimation extends Animation{
             oldBlockState = oldState;
             isInverted = false;
         }
+        updateModel();
     }
 
     @Override

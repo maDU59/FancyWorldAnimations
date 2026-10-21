@@ -26,6 +26,7 @@ public class BellAnimation extends Animation{
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         attachment = defaultState.getValue(BlockStateProperties.BELL_ATTACHMENT);
+        updateModel();
     }
 
     @Override

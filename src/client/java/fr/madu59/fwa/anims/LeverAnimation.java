@@ -40,6 +40,7 @@ public class LeverAnimation extends Animation{
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         face = defaultState.getValue(BlockStateProperties.ATTACH_FACE);
+        updateModel();
     }
 
     @Override

@@ -33,9 +33,7 @@ public class ChainAnimation extends AbstractChainAnimation {
         chainCount = SwingingBlockHelper.getChainCount(position);
     }
 
-    @Override
     public void tick(double nowTick) {
-        super.tick(nowTick);
         if(isLast == null){
             update();
             return;
