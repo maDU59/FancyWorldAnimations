@@ -88,11 +88,9 @@ public class ChiseledBookShelfAnimation extends Animation{
         List<Integer> colors;
         AtlasManager atlasManager = Minecraft.getInstance().getAtlasManager();
         if(ModCompat.isScholarLoaded()){
-            assert ScholarCompat.BOOKS_TEXTURE != null;
             sprites = List.of(atlasManager.getAtlasOrThrow(atlasId).getSprite(textureId), atlasManager.getAtlasOrThrow(atlasId).getSprite(ScholarCompat.BOOKS_TEXTURE));
             List<BlockTintSource> tintSources = Minecraft.getInstance().getBlockColors().getTintSources(defaultState);
             if(isAdding){
-                assert Minecraft.getInstance().level != null;
                 colors = List.of(-1, tintSources.get(slot).colorInWorld(defaultState, Minecraft.getInstance().level, position));
             }
             else{

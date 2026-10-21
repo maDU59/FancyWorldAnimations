@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -154,13 +155,11 @@ public class Animation {
     }
 
     public int getLight(BlockPos pos, BlockState state){
-        assert Minecraft.getInstance().level != null;
-        return LightCoordsUtil.getLightCoords(LightCoordsUtil.BrightnessGetter.DEFAULT, Minecraft.getInstance().level, state, pos);
+        return LightCoordsUtil.getLightCoords(LightCoordsUtil.BrightnessGetter.DEFAULT, (BlockAndLightGetter) Minecraft.getInstance().level, state, pos);
     }
 
     public int getLight(BlockPos pos){
-        assert Minecraft.getInstance().level != null;
-        return LightCoordsUtil.getLightCoords(Minecraft.getInstance().level, pos);
+        return LightCoordsUtil.getLightCoords((BlockAndLightGetter) Minecraft.getInstance().level, pos);
     }
 
     public int getRelativeLight(Direction dir){
@@ -188,7 +187,6 @@ public class Animation {
     }
 
     public double distanceToPlayer(){
-        assert Minecraft.getInstance().player != null;
         return boundingBox.distanceToSqr(Minecraft.getInstance().player.getClientPosition());
     }
 

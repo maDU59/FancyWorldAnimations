@@ -25,7 +25,7 @@ import net.minecraft.world.phys.AABB;
 public class DoorAnimation extends Animation{
 
     private BlockStateModel model;
-    private final List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private final float dX;
     private final float dZ;
     private final float pivotX;
@@ -44,7 +44,6 @@ public class DoorAnimation extends Animation{
                 ? facing.getClockWise(Direction.Axis.Y)
                 : facing.getCounterClockWise(Direction.Axis.Y);
 
-        assert Minecraft.getInstance().level != null;
         AABB boundingBox = closedState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds();
 
         float pivotX = (float) ((boundingBox.minX + boundingBox.maxX) * 0.5);

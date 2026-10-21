@@ -75,7 +75,7 @@ public class Blacklist {
         return BLOCKS_BLACKLIST.contains(id) || MODS_BLACKLIST.contains(mod) || AnimationDisabler.getDisabledBlocks().contains(id) || AnimationDisabler.getDisabledMods().contains(mod);
     }
 
-    public enum Provider{
+    public static enum Provider{
         USER,
         MOD
     }

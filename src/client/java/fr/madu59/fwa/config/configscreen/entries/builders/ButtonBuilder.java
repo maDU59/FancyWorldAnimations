@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 public class ButtonBuilder extends AbstractEntryBuilder{
 
     private Button button;
-    private final Option<?> option;
+    private Option<?> option;
     private String indent = "";
 
     public ButtonBuilder(MyConfigListWidget list, Option<?> option) {
@@ -37,7 +37,7 @@ public class ButtonBuilder extends AbstractEntryBuilder{
     }
 
     public void build() {
-        button = Button.builder(Component.translatable(FancyWorldAnimations.MOD_ID + ".config.value." + option.getValue().toString().toLowerCase()), btn -> option.setToNextValue()).bounds(0, 0, 100, 20).build();
+        button = Button.builder(Component.translatable(FancyWorldAnimations.MOD_ID + ".config.value." + option.getValue().toString().toLowerCase()), btn -> {option.setToNextValue();}).bounds(0, 0, 100, 20).build();
         parent.addBuiltEntry(new ButtonEntry(parent, button, option, indent, isEnabledSupplier));
     }
 }

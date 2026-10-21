@@ -6,12 +6,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 
 public class Option<T> {
-    private final String id;
+    private String id;
     private String name;
     private String description;
     private T value;
-    private final T defaultValue;
-    private final boolean reload;
+    private T defaultValue;
+    private boolean reload;
     private BooleanSupplier enabledSupplier;
     private T disabledValue;
 
@@ -63,10 +63,7 @@ public class Option<T> {
 
     public void setToNextValue() {
         Minecraft client = Minecraft.getInstance();
-        if(reload) {
-            assert client.level != null;
-            Minecraft.getInstance().levelRenderer.invalidateCompiledGeometry(client.level, client.options, client.gameRenderer.mainCamera(), client.getBlockColors());
-        }
+        if(reload) Minecraft.getInstance().levelRenderer.invalidateCompiledGeometry(client.level, client.options, client.gameRenderer.mainCamera(), client.getBlockColors());
         this.value = cycle(this.value);
     }
 

@@ -35,7 +35,6 @@ public class VaultAnimation extends Animation{
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         ItemStack defaultKeyStack = new ItemStack(Items.TRIAL_KEY);
         ItemStack itemStack = defaultKeyStack;
-        assert Minecraft.getInstance().level != null;
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof VaultBlockEntity vaultBlockEntity){
             itemStack = vaultBlockEntity.getConfig().keyItem();
         }
@@ -129,7 +128,6 @@ public class VaultAnimation extends Animation{
         poseStack.rotate(Axis.XP.rotationDegrees(90f));
         poseStack.rotate(Axis.YP.rotationDegrees(180f));
 
-        assert Minecraft.getInstance().player != null;
         Minecraft.getInstance().getItemModelResolver().updateForTopItem(keyState, keyItemStack, ItemDisplayContext.ON_SHELF, Minecraft.getInstance().player.level(), null, position.hashCode());
 
         keyState.submit(poseStack, context.getSubmitNodeCollector(), light, OverlayTexture.NO_OVERLAY, 0);

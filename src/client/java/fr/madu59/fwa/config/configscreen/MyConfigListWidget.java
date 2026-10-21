@@ -57,7 +57,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     }
 
     public <N extends Number> SliderBuilder<N> slider(Option<N> option){
-        return new SliderBuilder<>(this, option);
+        return new SliderBuilder<N>(this, option);
     }
 
     public abstract static class Entry extends ContainerObjectSelectionList.Entry<MyConfigListWidget.Entry> {

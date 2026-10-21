@@ -28,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
 
 public abstract class AbstractChainAnimation extends Animation {
 
-    private final int positionHash;
+    private int positionHash = 0;
 
     protected Boolean isLast;
     protected boolean needUpdate = true;
@@ -159,7 +159,7 @@ public abstract class AbstractChainAnimation extends Animation {
 
         updateCache(context.getFrameCount());
 
-        if(updatePoses){
+        if(updatePoses == true){
             PoseStack poseStack = new PoseStack();
             float swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
             float prevFactor = 0.0F;
@@ -198,7 +198,6 @@ public abstract class AbstractChainAnimation extends Animation {
         ClientLevel level = Minecraft.getInstance().level;
         MutableBlockPos mutable = position.mutable().move(0,chainCount-1,0);
         for (int index = chainCount - 1; index >= 0; --index) {
-            assert level != null;
             BlockState state = level.getBlockState(mutable);
 
             if(updateLights) lightValues[index] = getLight(mutable, state);

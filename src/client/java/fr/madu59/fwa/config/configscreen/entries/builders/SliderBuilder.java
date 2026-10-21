@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 public class SliderBuilder<N extends Number> extends AbstractEntryBuilder{
 
     private AbstractSliderButton button;
-    private final Option<N> option;
+    private Option<N> option;
     private String indent = "";
     private N min;
     private N max;
@@ -106,7 +106,7 @@ public class SliderBuilder<N extends Number> extends AbstractEntryBuilder{
                     int imin = min.intValue();
                     int istep = step.intValue();
                     int newValue = imin + Math.round((imax - imin) * (float)this.value / istep) * istep;
-                    option.setValue((N)(Object) newValue);
+                    option.setValue((N)(Object) Math.round(newValue));
 
                 } else if (option.getValue() instanceof Double) {
                     

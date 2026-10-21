@@ -20,7 +20,6 @@ public class LanternAnimation extends AbstractChainAnimation {
 
     @Override
     public boolean hideOriginalBlockEntity() {
-        assert ModCompat.WW_DISPLAY_LANTERNS != null;
         return !ModCompat.WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(defaultState.getBlock()));
     }
 

@@ -41,7 +41,7 @@ public class BellRendererMixin {
         Animation animation = FancyWorldAnimationsClient.animations.getAt(((BlockEntityRenderStateExt)state).getPosition());
         BellModel.State modelState = new BellModel.State(state.ticks, state.shakeDirection);
 
-        if (modelState.shakeDirection() == null && animation instanceof BellAnimation bellAnimation) {
+        if (modelState.shakeDirection() == null && animation != null && animation instanceof BellAnimation bellAnimation) {
             bellAnimation.bellModel.setupAnim(modelState);
             ModelPart bellBody = bellAnimation.bellModel.getChildPart("bell_body");
 
@@ -52,10 +52,8 @@ public class BellRendererMixin {
             else rot = bellAnimation.animateIdle(time);
             bellAnimation.rotateBell(bellBody, rot);
 
-            assert atlasId != null;
             TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(BELL_TEXTURE.texture());
 
-            assert bellBody != null;
             submitNodeCollector.submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), state.lightCoords, OverlayTexture.NO_OVERLAY, sprite);
             ci.cancel();
         }

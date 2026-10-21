@@ -22,13 +22,15 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
     }
 
     public static void registerCommand() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(
-            literal("fwaConfig")
-                .executes(context -> {
-                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.setScreen(new FancyWorldAnimationsConfigScreen(null)));
-                    return 1;
-                })
-        ));
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
+                literal("fwaConfig")
+                    .executes(context -> {
+                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.setScreen(new FancyWorldAnimationsConfigScreen(null)));
+                        return 1;
+                    })
+            );
+        });
     }
 
     @Override
@@ -40,7 +42,7 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.button(SettingsManager.MOD_TOGGLE).build();
         list.slider(SettingsManager.ANIMATION_RENDER_DISTANCE).range(32, 1024).step(16).build();
         list.slider(SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE).range(32, 1024).step(16).build();
-        list.slider(SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE).range(0.4f, 1.0f).step(0.1f).isEnabled(ModCompat::isIrisLoaded).build();
+        list.slider(SettingsManager.SHADOW_ANIMATION_RENDER_DISTANCE).range(0.4f, 1.0f).step(0.1f).isEnabled(() -> ModCompat.isIrisLoaded()).build();
         
         list.category("fwa.config.category.door").build();
         list.button(SettingsManager.DOOR_STATE).build();

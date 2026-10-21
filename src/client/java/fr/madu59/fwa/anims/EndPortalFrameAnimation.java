@@ -23,9 +23,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class EndPortalFrameAnimation extends Animation{
 
-    private final List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
-    private final List<BlockStateModelPart> eyeParts = new ArrayList<>();
+    private List<BlockStateModelPart> eyeParts = new ArrayList<>();
     private BlockStateModel eyeModel;
     
     public EndPortalFrameAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
@@ -84,7 +84,7 @@ public class EndPortalFrameAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
         int light = getLight();
-        BlockStateModelPart part = eyeParts.getFirst();
+        BlockStateModelPart part = eyeParts.get(0);
 
         if(newIsOpen){
 

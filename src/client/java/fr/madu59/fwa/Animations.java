@@ -34,7 +34,6 @@ public class Animations{
         while (it.hasNext()) {
             Animation animation = it.next();
             BlockPos pos = animation.getPos();
-            assert level != null;
             if(level.isLoaded(pos)){
                 if (animation.isForRemoval()){
                     if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {

@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class CampfireAnimation extends Animation{
 
     private BlockStateModel model;
-    private final List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public CampfireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -71,7 +71,7 @@ public class CampfireAnimation extends Animation{
     public void render(AnimationRenderingContext context) {
         PoseStack poseStack = context.getPoseStack();
 
-        BlockStateModelPart part = parts.getFirst();
+        BlockStateModelPart part = parts.get(0);
         
         int light = getLight();
 

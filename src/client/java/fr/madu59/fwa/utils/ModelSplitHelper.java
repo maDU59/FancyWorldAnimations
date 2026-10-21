@@ -45,7 +45,7 @@ public class ModelSplitHelper {
 
     public record FenceGate(List<BakedQuad> postQuadList, List<BakedQuad> leftQuadList, List<BakedQuad> rightQuadList){}
 
-    public enum splitMethod{
+    public static enum splitMethod{
         MODEL,
         TEXTURE
     }

@@ -31,7 +31,7 @@ public class LayeredCauldronAnimation extends Animation{
     private final BlockState newBlockState;
     private final boolean isInverted;
     private BlockStateModel model;
-    private final List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     
     public LayeredCauldronAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -88,7 +88,7 @@ public class LayeredCauldronAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
 
         int light = getLight();
-        BlockStateModelPart part = parts.getFirst();
+        BlockStateModelPart part = parts.get(0);
 
         renderFilteredQuads(poseStack, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){
@@ -116,7 +116,6 @@ public class LayeredCauldronAnimation extends Animation{
                     List<BlockTintSource> tintSources = Minecraft.getInstance().getBlockColors().getTintSources(newBlockState);
                     int index = quad.materialInfo().tintIndex();
                     if (index >= 0 && index < tintSources.size()) {
-                        assert Minecraft.getInstance().level != null;
                         int color = tintSources.get(index).colorInWorld(newBlockState, Minecraft.getInstance().level, position);
                         if (color != -1){
                             r = (float) (color >> 16 & 255) / 255.0F;

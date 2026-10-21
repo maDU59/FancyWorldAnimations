@@ -41,9 +41,7 @@ public class SwingingBlockHelper {
         int count = 1;
         MutableBlockPos pos = blockPos.mutable().move(0, 1, 0);
         ClientLevel level = Minecraft.getInstance().level;
-        while(true){
-            assert level != null;
-            if (!isVerticalChain(level.getBlockState(pos))) break;
+        while(isVerticalChain(level.getBlockState(pos))){
             count += 1;
             pos.move(0, 1, 0);
         }
@@ -53,21 +51,17 @@ public class SwingingBlockHelper {
     public static boolean isLastGrounded(BlockPos blockPos){
         ClientLevel level = Minecraft.getInstance().level;
         BlockPos lastPos = SwingingBlockHelper.getLast(blockPos);
-        assert level != null;
         return !level.getBlockState(lastPos.below()).isAir() && SwingingBlockHelper.isVerticalChain(level.getBlockState(lastPos));
     }
 
     public static boolean isLast(BlockPos blockPos){
         Animation anim = FancyWorldAnimationsClient.animations.animations.get(blockPos.below());
-        assert Minecraft.getInstance().level != null;
         return !isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(blockPos.below())) && !(anim instanceof LanternAnimation || anim instanceof ChainAnimation);
     }
 
     public static BlockPos getLast(BlockPos blockPos){
         MutableBlockPos pos = blockPos.mutable();
-        while (true){
-            assert Minecraft.getInstance().level != null;
-            if (!isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(pos))) break;
+        while (isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(pos))){
             pos.move(0,-1,0);
         }
         return pos.move(0,1,0);

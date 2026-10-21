@@ -26,7 +26,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class TrapDoorAnimation extends Animation{
 
     private BlockStateModel model;
-    private final List<BlockStateModelPart> parts = new ArrayList<>();
+    private List<BlockStateModelPart> parts = new ArrayList<>();
     private final float pivotX;
     private final float pivotY;
     private final float pivotZ;
@@ -43,7 +43,6 @@ public class TrapDoorAnimation extends Animation{
         half = defaultState.getValue(BlockStateProperties.HALF);
         hingeSide = facing.getOpposite();
 
-        assert Minecraft.getInstance().level != null;
         VoxelShape collShape = closedState.getCollisionShape(Minecraft.getInstance().level, BlockPos.ZERO);
         AABB boundingBox = collShape.isEmpty() ? closedState.getShape(Minecraft.getInstance().level, BlockPos.ZERO).bounds() : collShape.bounds();
 
@@ -114,7 +113,7 @@ public class TrapDoorAnimation extends Animation{
         float sin = (float) Math.sin(rad);
 
         float shiftX = 0.0f;
-        float shiftY;
+        float shiftY = 0.0f;
         float shiftZ = 0.0f;
         if (hingeSide == Direction.NORTH || hingeSide == Direction.SOUTH) {
             float rotY = dY * cos;
