@@ -28,6 +28,8 @@ import net.minecraft.world.phys.Vec3;
 
 public abstract class AbstractChainAnimation extends Animation {
 
+    protected static final float DEG_TO_RAD = 0.017453292519943295f;
+
     private int positionHash = 0;
 
     protected Boolean isLast;
@@ -164,10 +166,9 @@ public abstract class AbstractChainAnimation extends Animation {
             float swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
             float prevFactor = 0.0F;
             animate(context);
-            float degToRad = 0.017453292519943295f;
-            float tiltX = this.tiltX * swingScale * degToRad;
-            float tiltZ = this.tiltZ * swingScale * degToRad;
-            float spin = this.spin * Math.max(0.55F, swingScale) * degToRad;
+            float tiltX = this.tiltX * swingScale * DEG_TO_RAD;
+            float tiltZ = this.tiltZ * swingScale * DEG_TO_RAD;
+            float spin = this.spin * Math.max(0.55F, swingScale) * DEG_TO_RAD;
 
             poseStack.pushPose();
             poseStack.translate(0.5F, chainCount, 0.5F);
