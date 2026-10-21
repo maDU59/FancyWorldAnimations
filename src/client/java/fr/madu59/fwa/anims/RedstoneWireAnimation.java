@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RedstoneWireAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
     private final float newR;
     private final float newG;

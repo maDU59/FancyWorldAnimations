@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SwingDrivers {
-    private static SwingDriver DEFAULT_DRIVER = new DefaultSwingDriver();
+    private static final SwingDriver DEFAULT_DRIVER = new DefaultSwingDriver();
     private static SwingDriver driver = DEFAULT_DRIVER;
 
     public static void register(SwingDriver swingDriver){

@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.compat.ModCompat;
-import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper.splitMethod;
@@ -21,7 +20,7 @@ public class SettingsManager {
     public static List<Option<?>> ALL_OPTIONS = new ArrayList<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = PlatformHelper.getConfigDir().resolve("fwa.json");
-    private static Map<String, String> loadedSettings = loadSettings();
+    private static final Map<String, String> loadedSettings = loadSettings();
 
     public static Option<Boolean> MOD_TOGGLE = loadOptionWithDefaults(
         "mod_toggle",
@@ -529,7 +528,7 @@ public class SettingsManager {
                 GSON.toJson(map, writer);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            FancyWorldAnimations.LOGGER.error("[FWA] Failed to save config", e);
         }
     }
 
@@ -544,8 +543,7 @@ public class SettingsManager {
     private static Map<String, String> loadSettings() {
         try (Reader reader = Files.newBufferedReader(CONFIG_PATH)) {
             Type type = new TypeToken<Map<String, String>>() {}.getType();
-            Map<String, String> map = GSON.fromJson(reader, type);
-            return map;
+            return GSON.fromJson(reader, type);
         } catch (Exception e) {
             FancyWorldAnimations.LOGGER.info("[FWA] Config file not found or invalid, using default");
             return null;
@@ -580,7 +578,7 @@ public class SettingsManager {
     private static <T> Option<T> loadOptionWithDefaults(String id, String name, String description, T defaultValue, boolean reload) {
         T optionValue= getOptionValue(id, defaultValue);
         if (optionValue == null) optionValue = defaultValue;
-        Option<T> option = new Option<T>(
+        return new Option<>(
                 id,
                 name,
                 description,
@@ -588,6 +586,5 @@ public class SettingsManager {
                 defaultValue,
                 reload
         );
-        return option;
     }
 }

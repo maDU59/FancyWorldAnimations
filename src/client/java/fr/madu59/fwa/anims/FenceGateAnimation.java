@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FenceGateAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
     private BlockStateModel model;
     private FenceGate fenceGate;
     private final Direction facing;
@@ -45,7 +45,7 @@ public class FenceGateAnimation extends Animation{
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
 
-        BlockStateModelPart part = parts.get(0);
+        BlockStateModelPart part = parts.getFirst();
 
         List<BakedQuad> quads = new ArrayList<>();
         for (Direction dir : Direction.values()) {

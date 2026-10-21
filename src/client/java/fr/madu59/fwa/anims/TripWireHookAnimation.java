@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class TripWireHookAnimation extends Animation{
 
     private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
     
     public TripWireHookAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);

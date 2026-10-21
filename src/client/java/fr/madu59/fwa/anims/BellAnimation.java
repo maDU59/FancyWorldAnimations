@@ -64,7 +64,7 @@ public class BellAnimation extends Animation{
     }
 
     public float animateIdle(float time){
-        float uniqueOffset = (float)(hash % 100);
+        float uniqueOffset = hash % 100;
         time += uniqueOffset;
         float slowWave = (float) Math.sin(time * 0.1f) * 0.05f;
 

@@ -8,46 +8,35 @@ public class Curves {
 
     public static double ease(double t, Enum<?> type) {
         if (type instanceof Classic c) {
-            switch (c) {
-                case EASE_IN_OUT_CUBIC:
-                    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-                default:
-                    return t;
+            if (c == Classic.EASE_IN_OUT_CUBIC) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
             }
+            return t;
         }
         else if (type instanceof Door c) {
-            switch (c) {
-                case SPRINGY:
-                    return wrap(1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2));
+            return switch (c) {
+                case SPRINGY -> wrap(1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2));
                 // case ELASTIC:
                 //     if (t == 0) return 0;
                 //     if (t == 1) return 1;
                 //     return wrap(Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1);
-                case DEFAULT:
-                    return wrap(1 - Math.pow(1 - t, 5));
-                default:
-                    return t;
-            }
+                case DEFAULT -> wrap(1 - Math.pow(1 - t, 5));
+                default -> t;
+            };
         }
         else return t;
     }
 
     public static double unease(double t, Enum<?> type) {
         if (type instanceof Classic c) {
-            switch (c) {
-                default:
-                    return t;
-            }
+            return t;
         }
         else if (type instanceof Door c) {
-            switch (c) {
-                case SPRINGY:
-                    return solveSpringyUnease(t);
-                case DEFAULT:
-                    return 1.0 - Math.pow(1.0 - t, 0.2);
-                default:
-                    return t;
-            }
+            return switch (c) {
+                case SPRINGY -> solveSpringyUnease(t);
+                case DEFAULT -> 1.0 - Math.pow(1.0 - t, 0.2);
+                default -> t;
+            };
         }
         else return t;
     }
@@ -80,29 +69,29 @@ public class Curves {
 
             x -= error / derivative;
         }
-        return Math.max(0.0, Math.min(1.0, x));
+        return Math.clamp(x, 0.0, 1.0);
     }
 
     public static double getSpeedCoeff(Speed speed){
-        switch(speed){
-            case FAST: return 1.5;
-            case SLOW: return 0.65;
-            default: return 1;
-        }
+        return switch (speed) {
+            case FAST -> 1.5;
+            case SLOW -> 0.65;
+            default -> 1;
+        };
     }
 
-    public static enum Classic {
+    public enum Classic {
         LINEAR,
         EASE_IN_OUT_CUBIC
     }
 
-    public static enum Door {
+    public enum Door {
         DEFAULT,
         SPRINGY,
         LINEAR,
     }
 
-    public static enum Speed{
+    public enum Speed{
         SLOW,
         DEFAULT,
         FAST,

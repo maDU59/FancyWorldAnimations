@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class RepeaterAnimation extends Animation{
     
     private BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
     
     public RepeaterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -71,7 +71,7 @@ public class RepeaterAnimation extends Animation{
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         int light = getLight();
 
-        BlockStateModelPart part = parts.get(0);
+        BlockStateModelPart part = parts.getFirst();
 
         renderFilteredQuads(poseStack, part.getQuads(null), false, light);
         for(Direction dir : Direction.values()){

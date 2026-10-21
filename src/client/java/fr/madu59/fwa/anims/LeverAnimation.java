@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class LeverAnimation extends Animation{
     
     private BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
     private Lever lever;
     private final Direction facing;
     private final AttachFace face;
@@ -49,7 +49,7 @@ public class LeverAnimation extends Animation{
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
         model.collectParts(random, parts);
 
-        BlockStateModelPart part = parts.get(0);
+        BlockStateModelPart part = parts.getFirst();
 
         List<BakedQuad> quads = new ArrayList<>();
         for (Direction dir : Direction.values()) {
@@ -128,25 +128,18 @@ public class LeverAnimation extends Animation{
         }
         else if (face == AttachFace.CEILING){
             pivotY = 1f - pivotY;
-            switch (facing) {
-                case EAST, WEST:
-                    axis = Axis.ZN;
-                    break;
-                default:
-                    axis = Axis.XN;
-                    break;
-            }
+            axis = switch (facing) {
+                case EAST, WEST -> Axis.ZN;
+                default -> Axis.XN;
+            };
         }
         else if (face == AttachFace.WALL){
             switch (facing) {
                 case EAST, WEST:
                     axis = Axis.ZP;
                     pivotX = (facing == Direction.WEST) ? 1f - pivotY : pivotY;
-                    pivotZ = 0.5f;
                     break;
                 default:
-                    axis = Axis.XP;
-                    pivotX = 0.5f;
                     pivotZ = (facing == Direction.NORTH) ? 1f - pivotY : pivotY;
                     break;
             }

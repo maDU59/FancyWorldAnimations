@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public class DripleafAnimation extends Animation{
 
     private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private final List<BlockStateModelPart> parts = new ArrayList<>();
 
     
     public DripleafAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
@@ -56,12 +56,11 @@ public class DripleafAnimation extends Animation{
     }
 
     private double getRotation(BlockState state){
-        switch(state.getValue(BlockStateProperties.TILT)){
-            case UNSTABLE: return 0;
-            case PARTIAL: return 22.5;
-            case FULL: return 45;
-            default: return 0;
-        }
+        return switch (state.getValue(BlockStateProperties.TILT)) {
+            case PARTIAL -> 22.5;
+            case FULL -> 45;
+            default -> 0;
+        };
     }
 
     @Override

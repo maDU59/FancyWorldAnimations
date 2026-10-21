@@ -30,6 +30,7 @@ public class JukeBoxAnimation extends Animation{
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
         ItemStack itemStack = new ItemStack(Items.MUSIC_DISC_13);
+        assert Minecraft.getInstance().level != null;
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
             itemStack = jukeboxBlockEntity.getTheItem();
         }

@@ -130,9 +130,7 @@ public class ModCompat {
 
     public static void reload(){
         Minecraft client = Minecraft.getInstance();
-        if(client == null) return;
         ResourceManager currentManager = client.getResourceManager();
-        if (currentManager == null) return;
 
         IS_FA_OBJECTS_LOADED = currentManager.listPacks().anyMatch(pack -> pack.packId()
             .toLowerCase(Locale.ROOT)
@@ -160,7 +158,7 @@ public class ModCompat {
 
     public static ItemStack getVaultKeyItem(Block block){
         ItemStack itemStack = new ItemStack(BuiltInRegistries.ITEM.getOptional(VAULT_KEYS.get(BuiltInRegistries.BLOCK.getKey(block))).orElse(Items.TRIAL_KEY));
-        if (itemStack != null && !itemStack.isEmpty()) return itemStack;
+        if (!itemStack.isEmpty()) return itemStack;
         else return new ItemStack(Items.TRIAL_KEY);
     }
 
@@ -179,8 +177,8 @@ public class ModCompat {
     // IDLING MODDED BLOCKS COMPATIBILITY
 
     public static boolean isAnimatedModdedBlock(BlockState state){
-        if(WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()))) return true;
-        return false;
+        assert WW_DISPLAY_LANTERNS != null;
+        return WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
     }
 
     // MAP ATLASES COMPATIBILITY
@@ -289,6 +287,7 @@ public class ModCompat {
         }
 
         public static boolean isEndRemasteredPortal(BlockState state){
+            assert ENDREM_ANCIENT_PORTAL_FRAME != null;
             return ENDREM_ANCIENT_PORTAL_FRAME.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
         }
 
@@ -302,14 +301,13 @@ public class ModCompat {
 
             try{
                 BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
-                Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
+                Object rendererInstance = dispatcher.getRenderer(be);
 
                 Object portalState = ancientPortalStateClass.getConstructor().newInstance();
                 extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
                 renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
                 // RenderHelper.endBatch(context.getBufferSource());
-            }catch(Exception e){
-                return;
+            }catch(Exception _){
             }
         }
     }
@@ -398,11 +396,8 @@ public class ModCompat {
                     if(millis instanceof Number number){
                         return number.doubleValue() / 50.0;
                     }
-                    return defaultValue;
                 }
-                else{
-                    return defaultValue;
-                }
+                return defaultValue;
             }catch(Exception e){
                 return defaultValue;
             }

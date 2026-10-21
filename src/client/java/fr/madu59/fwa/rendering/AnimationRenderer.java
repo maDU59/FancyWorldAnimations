@@ -52,6 +52,7 @@ public class AnimationRenderer {
 
     public static void prepareFrame(AnimationRenderingContext context){
         if(!context.isShadow()){
+            assert Minecraft.getInstance().level != null;
             CardinalLighting cardinalLighting = Minecraft.getInstance().level.cardinalLighting();
             bottomShade = cardinalLighting.byFace(Direction.DOWN);
             topShade = cardinalLighting.byFace(Direction.UP);
@@ -64,22 +65,21 @@ public class AnimationRenderer {
     }
 
     public static void renderModel(PoseStack.Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        for (int i = 0; i < parts.size(); i++){
-            BlockStateModelPart part = parts.get(i);
-            for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                List<BakedQuad> quads = part.getQuads(DIRECTIONS_WITH_NULL[j]);
+        for (BlockStateModelPart part : parts) {
+            for (Direction direction : DIRECTIONS_WITH_NULL) {
+                List<BakedQuad> quads = part.getQuads(direction);
                 int n = quads.size();
                 if (n == 0) continue;
-                for (int k = 0; k < n; k++){
-                    renderQuad(pose, quads.get(k), a, r, g, b, light, blockData);
+                for (BakedQuad quad : quads) {
+                    renderQuad(pose, quad, a, r, g, b, light, blockData);
                 }
             }
         }
     }
 
     public static void renderQuads(PoseStack.Pose pose, BakedQuad[] quads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        for (int i = 0; i < quads.length; i++){
-            renderQuad(pose, quads[i], a, r, g, b, light, blockData);
+        for (BakedQuad quad : quads) {
+            renderQuad(pose, quad, a, r, g, b, light, blockData);
         }
     }
 
@@ -94,7 +94,6 @@ public class AnimationRenderer {
         } else {
             renderType = switch (bakedQuad.materialInfo().layer()) {
                 case ChunkSectionLayer.TRANSLUCENT -> RenderTypes.translucentMovingBlock();
-                case ChunkSectionLayer.CUTOUT -> RenderTypes.cutoutMovingBlock();
                 case ChunkSectionLayer.SOLID -> RenderTypes.solidMovingBlock();
                 default -> RenderTypes.cutoutMovingBlock();
             };
@@ -138,10 +137,9 @@ public class AnimationRenderer {
 
     public static BakedQuad[] flattenModel(List<BlockStateModelPart> parts){
         List<BakedQuad> quads = new ArrayList<>();
-        for (int i = 0; i < parts.size(); i++){
-            BlockStateModelPart part = parts.get(i);
-            for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                quads.addAll(part.getQuads(DIRECTIONS_WITH_NULL[j]));
+        for (BlockStateModelPart part : parts) {
+            for (Direction direction : DIRECTIONS_WITH_NULL) {
+                quads.addAll(part.getQuads(direction));
             }
         }
         return quads.toArray(new BakedQuad[0]);
@@ -159,7 +157,7 @@ public class AnimationRenderer {
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){
-        return (originalModel != null && originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
+        return (originalModel instanceof InvisibleModel ? originalModel : new InvisibleModel(originalModel));
     }
 
     private static Vector3fc scaleVertex(Vector3fc position) {
@@ -170,13 +168,7 @@ public class AnimationRenderer {
         return new BakedQuad(scaleVertex(quad.position0()), scaleVertex(quad.position1()), scaleVertex(quad.position2()), scaleVertex(quad.position3()), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo());
     }
 
-    private static class InvisibleModel implements BlockStateModel{
-
-        private final BlockStateModel model;
-
-        public InvisibleModel(BlockStateModel model) {
-            this.model = model;
-        }
+    private record InvisibleModel(BlockStateModel model) implements BlockStateModel {
 
         @Override
         public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
@@ -206,7 +198,7 @@ public class AnimationRenderer {
 
     private static final class InvisibleBlockStateModelPart implements BlockStateModelPart {
         private final BlockStateModelPart part;
-        private final Map<Direction, List<BakedQuad>> directions = new HashMap<Direction, List<BakedQuad>>();
+        private final Map<Direction, List<BakedQuad>> directions = new HashMap<>();
 
         private InvisibleBlockStateModelPart(BlockStateModelPart originalPart) {
             this.part = originalPart;
@@ -236,7 +228,7 @@ public class AnimationRenderer {
             if (quads.isEmpty()) {
                 return quads;
             } else {
-                List<BakedQuad> scaledQuads = new ArrayList<BakedQuad>(quads.size());
+                List<BakedQuad> scaledQuads = new ArrayList<>(quads.size());
 
                 for(BakedQuad quad : quads) {
                     scaledQuads.add(scaleQuad(quad));

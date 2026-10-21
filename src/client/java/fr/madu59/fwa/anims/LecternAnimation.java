@@ -80,7 +80,7 @@ public class LecternAnimation extends Animation {
         float time = (float)(nowTick - this.startTick);
         if (time <= getAnimDuration()) return defaultVal;
         else {
-            float uniqueOffset = (float)((hash + defaultVal * 67) % 100);
+            float uniqueOffset = (hash + defaultVal * 67) % 100;
             time += uniqueOffset;
             float slowWave = (float) Math.sin(time * 0.1f) * 0.05f;
 
@@ -94,7 +94,7 @@ public class LecternAnimation extends Animation {
     public void render(AnimationRenderingContext context) {
         if (textureId == null) textureId = ModCompat.MapAtlasesCompat.resolveTexture(position);
         PoseStack poseStack = context.getPoseStack();
-        Double nowTick = context.getNowTick();
+        double nowTick = context.getNowTick();
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         

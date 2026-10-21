@@ -26,9 +26,13 @@ public class ChainAnimation extends AbstractChainAnimation {
     @Override
     public void updateChainCount(){
         ClientLevel level = Minecraft.getInstance().level;
-        if(isLast == null && !level.getBlockState(position).isAir()){
-            isLast = SwingingBlockHelper.isLast(position);
-            if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir()) FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
+        if(isLast == null) {
+            assert level != null;
+            if (!level.getBlockState(position).isAir()) {
+                isLast = SwingingBlockHelper.isLast(position);
+                if (SettingsManager.CHAIN_GROUNDED.getValue() && isLast && !level.getBlockState(position.below()).isAir())
+                    FancyWorldAnimationsClient.onBlockUpdate(position, defaultState, defaultState);
+            }
         }
         chainCount = SwingingBlockHelper.getChainCount(position);
     }
