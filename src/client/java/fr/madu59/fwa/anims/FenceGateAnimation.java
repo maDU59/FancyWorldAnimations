@@ -29,17 +29,18 @@ public class FenceGateAnimation extends Animation{
     private List<BlockStateModelPart> parts;
     private BlockStateModel model;
     private FenceGate fenceGate;
-    private final Direction facing;
+    private Direction facing;
 
 
     public FenceGateAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-
-        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Override
     public void updateModel(){
+
+        facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+
         List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
