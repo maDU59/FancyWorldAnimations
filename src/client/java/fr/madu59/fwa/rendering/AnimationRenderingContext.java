@@ -11,6 +11,9 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimationRenderingContext {
+
+    private static long frameCount = 0;
+
     private final PoseStack poseStack;
     private final MultiBufferSource bufferSource;
     private final SubmitNodeCollector submitNodeCollector;
@@ -31,6 +34,7 @@ public class AnimationRenderingContext {
         this.isShadow = isShadow;
         this.frustum = frustum;
         this.cameraRenderState = cameraRenderState;
+        if(!isShadow) frameCount++;
     }
 
     public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, SubmitNodeCollector submitNodeCollector, Frustum frustum, double nowTick, boolean isShadow) {
@@ -45,6 +49,7 @@ public class AnimationRenderingContext {
         CameraRenderState cameraRenderState = new CameraRenderState();
         Minecraft.getInstance().gameRenderer.getMainCamera().extractRenderState(cameraRenderState, 0);
         this.cameraRenderState = cameraRenderState;
+        if(!isShadow) frameCount++;
     }
 
     public PoseStack getPoseStack() {
@@ -81,5 +86,9 @@ public class AnimationRenderingContext {
 
     public CameraRenderState getCameraRenderState(){
         return cameraRenderState;
+    }
+
+    public long getFrameCount(){
+        return frameCount;
     }
 }

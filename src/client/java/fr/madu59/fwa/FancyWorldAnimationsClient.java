@@ -2,6 +2,7 @@ package fr.madu59.fwa;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.madu59.fwa.anims.AbstractChainAnimation;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
@@ -31,7 +32,7 @@ import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
@@ -41,6 +42,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -177,7 +179,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(animations.isEmpty()) return;
 
-		RenderHelper.prepareFrame(context);
+		AnimationRenderer.prepareFrame(context);
 
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
@@ -185,15 +187,29 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		dist = dist * dist;
 
+		boolean isShadow = context.isShadow();
+		Frustum frustum = context.getFrustum();
+		double nowTick = context.getNowTick();
+
 		for (Animation animation : animations.animations.values()) {
-			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
-			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
-				renderAnimation(animation, context);
-			}
+
+			if(!context.isShadow()) animation.tick(nowTick);
+            if (!animation.isRendering()) continue;
+            double dx = camPos.x - (animation.getPos().getX() + 0.5);
+            double dy = camPos.y - (animation.getPos().getY() + 0.5);
+            double dz = camPos.z - (animation.getPos().getZ() + 0.5);
+            if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
+            if (animation.isOcclusionCulled() && !isShadow) continue;
+            if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
+
+			if(!context.isShadow()) animation.updateCache();
+			renderAnimation(animation, context);
 		}
+
+		AnimationRenderer.renderBuffers();
+
 		dimension = level.dimension();
-		if(!context.isShadow()) animations.clean(context.getNowTick());
+		if(!context.isShadow()) animations.clean(nowTick);
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
@@ -391,20 +407,20 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
 				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(false);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(false);
 			}
 		}
 		else{
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
 				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(true);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isActiveSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
 			Animation anim = animations.animations.get(lastPos);
-			if (anim != null) anim.needUpdate();
+			if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.needUpdate();
 		}
 	}
 

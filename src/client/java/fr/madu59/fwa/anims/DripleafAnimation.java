@@ -8,11 +8,10 @@ import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -24,16 +23,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class DripleafAnimation extends Animation{
 
-    private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private BlockStateModel model;
+    private List<BlockStateModelPart> parts;
 
     
     public DripleafAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override
@@ -70,13 +74,11 @@ public class DripleafAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
 
         int light = getLight();
-
-        MultiBufferSource bufferSource = context.getBufferSource();
         
         for(BlockStateModelPart part: parts){
-            renderFilteredQuads(poseStack, bufferSource, part.getQuads(null), false, light);
+            renderFilteredQuads(poseStack, part.getQuads(null), false, light);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, bufferSource, part.getQuads(dir), false, light);
+                renderFilteredQuads(poseStack, part.getQuads(dir), false, light);
             }
 
             float tiltAngle = getRotation(context.getNowTick(), getRotation(newState), getRotation(oldState));
@@ -95,18 +97,19 @@ public class DripleafAnimation extends Animation{
             poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
             poseStack.translate(-0.5, -0.5, -0.5);
 
-            renderFilteredQuads(poseStack, bufferSource, part.getQuads(null), true, light);
+            renderFilteredQuads(poseStack, part.getQuads(null), true, light);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, bufferSource, part.getQuads(dir), true, light);
+                renderFilteredQuads(poseStack, part.getQuads(dir), true, light);
             }
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, boolean wantLeaf, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantLeaf, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if (!path.contains("_stem") == wantLeaf) {
-                RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

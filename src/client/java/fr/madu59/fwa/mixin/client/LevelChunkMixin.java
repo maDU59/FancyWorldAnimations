@@ -68,6 +68,10 @@ public abstract class LevelChunkMixin extends ChunkAccess {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
+
+                        if (FancyWorldAnimationsClient.animations.containsAt(pos)) {
+                            FancyWorldAnimationsClient.animations.removeSafeAt(pos);
+                        }
                         
                         if (IS_ANIMATED_BLOCK.test(state)) {
                             BlockPos worldPos = pos.offset(x, minY + y, z);

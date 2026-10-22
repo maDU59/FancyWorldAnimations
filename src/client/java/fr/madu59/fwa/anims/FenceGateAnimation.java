@@ -9,12 +9,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper;
 import fr.madu59.fwa.utils.ModelSplitHelper.FenceGate;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -27,19 +26,26 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FenceGateAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
-    private final FenceGate fenceGate;
+    private List<BlockStateModelPart> parts;
+    private BlockStateModel model;
+    private FenceGate fenceGate;
     private final Direction facing;
 
 
     public FenceGateAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+    }
+
+    @Override
+    public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, newParts);
+        parts = newParts;
+
         BlockStateModelPart part = parts.get(0);
 
         List<BakedQuad> quads = new ArrayList<>();
@@ -89,9 +95,7 @@ public class FenceGateAnimation extends Animation{
 
         int light = getLight();
 
-        MultiBufferSource bufferSource = context.getBufferSource();
-
-        renderQuads(poseStack, bufferSource, fenceGate.postQuadList(), light);
+        renderQuads(poseStack, fenceGate.postQuadList(), light);
 
         boolean onAxisZ = (facing.getAxis() == Axis.Z);
         float leftPivotX = onAxisZ ? (1.0f / 16.0f) : 0.5f;
@@ -106,7 +110,7 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
-        renderQuads(poseStack, bufferSource, fenceGate.leftQuadList(), light);
+        renderQuads(poseStack, fenceGate.leftQuadList(), light);
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
@@ -115,12 +119,13 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(rightPivotX, 0.0f, rightPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
         poseStack.translate(-rightPivotX, 0.0f, -rightPivotZ);
-        renderQuads(poseStack, bufferSource, fenceGate.rightQuadList(), light);
+        renderQuads(poseStack, fenceGate.rightQuadList(), light);
     }
 
-    private void renderQuads(PoseStack poseStack, MultiBufferSource bufferSource, List<BakedQuad> quads, int light) {
+    private void renderQuads(PoseStack poseStack, List<BakedQuad> quads, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(bufferSource, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+            AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
         }
     }
 
