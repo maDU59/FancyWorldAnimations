@@ -27,15 +27,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LayeredCauldronAnimation extends Animation{
 
-    private final BlockState oldBlockState;
-    private final BlockState newBlockState;
-    private final boolean isInverted;
+    private BlockState oldBlockState;
+    private BlockState newBlockState;
+    private boolean isInverted;
     private BlockStateModel model;
     private List<BlockStateModelPart> parts;
     
     public LayeredCauldronAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
         if (newState.getBlock() instanceof CauldronBlock){
             newBlockState = oldState;
             oldBlockState = newState;
@@ -46,10 +49,7 @@ public class LayeredCauldronAnimation extends Animation{
             oldBlockState = oldState;
             isInverted = false;
         }
-    }
 
-    @Override
-    public void updateModel(){
         List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newBlockState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newBlockState);
@@ -79,6 +79,7 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     private double getHeight(BlockState state){
+        if (state == null) return 4.0/16.0;
         if (state.getBlock() instanceof LayeredCauldronBlock) return ((GetContentHeightInvoker) state.getBlock()).fwa$getContentHeight(state);
         if (state.getBlock() instanceof LavaCauldronBlock) return 15.0/16.0;
         return 4.0/16.0;
