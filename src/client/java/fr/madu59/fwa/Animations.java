@@ -66,4 +66,10 @@ public class Animations{
     public boolean isEmpty(){
         return animations.isEmpty();
     }
+
+    public void clearModelCache(){
+        for(Animation animation : this.animations.values()){
+            animation.clearModelCache();
+        }
+    }
 }

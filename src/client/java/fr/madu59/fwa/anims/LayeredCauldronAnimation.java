@@ -9,7 +9,7 @@ import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -30,8 +30,8 @@ public class LayeredCauldronAnimation extends Animation{
     private final BlockState oldBlockState;
     private final BlockState newBlockState;
     private final boolean isInverted;
-    private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private BlockStateModel model;
+    private List<BlockStateModelPart> parts;
     
     public LayeredCauldronAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -46,10 +46,15 @@ public class LayeredCauldronAnimation extends Animation{
             oldBlockState = oldState;
             isInverted = false;
         }
+    }
 
+    @Override
+    public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newBlockState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newBlockState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override
@@ -101,6 +106,7 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantLiquid, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             String last = path.split("/")[path.split("/").length-1];
@@ -120,7 +126,7 @@ public class LayeredCauldronAnimation extends Animation{
                     }
                 }
 
-                RenderHelper.renderQuad(poseStack, quad, 1.0f, r, g, b, light, getAnimationBlockData());
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, r, g, b, light, getAnimationBlockData());
             }
         }
     }

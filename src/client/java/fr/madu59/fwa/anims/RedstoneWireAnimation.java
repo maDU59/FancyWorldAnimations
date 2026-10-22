@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -21,8 +21,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RedstoneWireAnimation extends Animation{
 
-    private List<BlockStateModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
+    private List<BlockStateModelPart> parts;
+    private BlockStateModel model;
     private final float newR;
     private final float newG;
     private final float newB;
@@ -32,9 +32,6 @@ public class RedstoneWireAnimation extends Animation{
     
     public RedstoneWireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
-        model.collectParts(random, parts);
 
         int newColor = RedStoneWireBlock.getColorForPower(newState.getValue(BlockStateProperties.POWER));
         newR = (float) (newColor >> 16 & 255) / 255.0F;
@@ -44,6 +41,15 @@ public class RedstoneWireAnimation extends Animation{
         oldR = (float) (oldColor >> 16 & 255) / 255.0F;
         oldG = (float) (oldColor >> 8 & 255) / 255.0F;
         oldB = (float) (oldColor & 255) / 255.0F;
+    }
+
+    @Override
+    public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(defaultState);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override
@@ -84,6 +90,6 @@ public class RedstoneWireAnimation extends Animation{
 
         float[] color = getColor(context.getNowTick(), newR, newG, newB, oldR, oldG, oldB);
 
-        RenderHelper.renderModel(poseStack, parts, 1.0f, color[0], color[1], color[2], light, getAnimationBlockData());
+        AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1.0f, color[0], color[1], color[2], light, getAnimationBlockData());
     }
 }

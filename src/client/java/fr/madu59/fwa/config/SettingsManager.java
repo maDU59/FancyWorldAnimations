@@ -486,14 +486,6 @@ public class SettingsManager {
         true
     );
 
-    public static Option<Boolean> CHAIN_SWING_LIMIT = loadOptionWithDefaults(
-        "chain_swing_limit",
-        "fwa.config.option.swing_limit.name",
-        "fwa.config.option.swing_limit.description",
-        true,
-        true
-    );
-
     public static Option<Boolean> SHULKERBOX_STATE = loadOptionWithDefaults(
         "shulkerbox_state",
         "fwa.config.option.state.name",

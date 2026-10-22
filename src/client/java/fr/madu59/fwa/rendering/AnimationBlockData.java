@@ -9,13 +9,23 @@ public class AnimationBlockData {
     private final int y;
     private final int z;
     private final int light;
+    private final boolean shaded;
     
     public AnimationBlockData(BlockState state, BlockPos pos, int light){
+        this(state, pos, light, true);
+    }
+
+    public AnimationBlockData(BlockState state, BlockPos pos, int light, boolean shaded){
         this.state = state;
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
         this.light = light;
+        this.shaded = shaded;
+    }
+
+    public boolean isShaded(){
+        return shaded;
     }
 
     public int getPosX(){

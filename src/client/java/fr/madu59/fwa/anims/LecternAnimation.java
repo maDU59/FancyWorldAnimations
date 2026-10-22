@@ -20,15 +20,19 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LecternAnimation extends Animation {
 
-
-    private final BookModel bookModel;
+    private BookModel bookModel;
     private final float hash;
     private Identifier textureId;
 
     public LecternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
+        updateModel();
         this.hash = position.hashCode();
+    }
+
+    @Override
+    public void updateModel(){
+        this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
     }
 
     @Override

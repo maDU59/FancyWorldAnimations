@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -20,6 +21,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -30,7 +32,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class RenderHelper {
+public class AnimationRenderer {
 
     private static SubmitNodeCollector collector;
     private static float bottomShade = 0;
@@ -42,6 +44,7 @@ public class RenderHelper {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
+    private static final Map<RenderType, List<AnimationQuad>> buffers = new HashMap<>();
 
     private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
     .translation(0.5f, 0.5f, 0.5f)
@@ -58,70 +61,102 @@ public class RenderHelper {
         }
         shouldShade = !context.isShadow();
         collector = context.getSubmitNodeCollector();
+        buffers.clear();
     }
 
-    public static void renderModel(PoseStack poseStack, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+    public static void renderModel(PoseStack.Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < parts.size(); i++){
+            BlockStateModelPart part = parts.get(i);
             for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                renderQuads(poseStack, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light, blockData);
+                List<BakedQuad> quads = part.getQuads(DIRECTIONS_WITH_NULL[j]);
+                int n = quads.size();
+                if (n == 0) continue;
+                for (int k = 0; k < n; k++){
+                    renderQuad(pose, quads.get(k), a, r, g, b, light, blockData);
+                }
             }
         }
     }
 
-    public static void renderQuads(PoseStack poseStack, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        for (int i = 0; i < bakedQuads.size(); i++){
-            renderQuad(poseStack, bakedQuads.get(i), a, r, g, b, light, shouldShade, blockData);
+    public static void renderQuads(PoseStack.Pose pose, BakedQuad[] quads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        for (int i = 0; i < quads.length; i++){
+            renderQuad(pose, quads[i], a, r, g, b, light, blockData);
         }
     }
 
-    public static void renderQuad(PoseStack poseStack, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        renderQuad(poseStack, bakedQuad, a, r, g, b, light, shouldShade, blockData);
-    }
-
-    public static void renderQuad(PoseStack poseStack, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded, AnimationBlockData blockData){
+    public static void renderQuad(PoseStack.Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
-        float shade = isShaded? getShade(dir.x(), dir.y(), dir.z(), poseStack) : 1.0f;
+        float shade = blockData.isShaded()? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
+        int color = ARGB.colorFromFloat(a,r*shade,g*shade,b*shade);
+
+        RenderType renderType;
+        if(a < 1.0f){
+            renderType = RenderTypes.translucentMovingBlock();
+        } else {
+            renderType = switch (bakedQuad.materialInfo().layer()) {
+                case ChunkSectionLayer.TRANSLUCENT -> RenderTypes.translucentMovingBlock();
+                case ChunkSectionLayer.CUTOUT -> RenderTypes.cutoutMovingBlock();
+                case ChunkSectionLayer.SOLID -> RenderTypes.solidMovingBlock();
+                default -> RenderTypes.cutoutMovingBlock();
+            };
+        }
+
+        buffers.computeIfAbsent(renderType, k -> new ArrayList<>()).add(new AnimationQuad(pose, bakedQuad, light, color, blockData));
+    }
+
+    public static void renderBuffers(){
+        PoseStack poseStack = new PoseStack();
         QuadInstance quadInstance = new QuadInstance();
-        quadInstance.setLightCoords(light);
-        quadInstance.setColor(ARGB.colorFromFloat(a,r*shade,g*shade,b*shade));
-        RenderType renderType = a < 1.0f? RenderTypes.translucentMovingBlock() : bakedQuad.materialInfo().sprite().transparency().hasTranslucent()? RenderTypes.translucentMovingBlock() : RenderTypes.cutoutMovingBlock();
-        putBakedQuad(collector, poseStack, bakedQuad, quadInstance, renderType, blockData);
+        for(Map.Entry<RenderType, List<AnimationQuad>> entry : buffers.entrySet()){
+            RenderType renderType = entry.getKey();
+            collector.submitCustomGeometry(
+                poseStack,
+                renderType,
+                (Pose currentPose, VertexConsumer consumer) -> {
+                    AnimationBlockData lastBlockData = null;
+
+                    for(AnimationQuad quad : entry.getValue()){
+                        if(quad.blockData() != lastBlockData){
+                            if(lastBlockData != null){
+                                ModCompat.endBlock(consumer);
+                            }
+                            lastBlockData = quad.blockData();
+                            ModCompat.beginBlock(consumer, lastBlockData);
+                        }
+
+                        quadInstance.setLightCoords(quad.light());
+                        quadInstance.setColor(quad.color());
+                        consumer.putBakedQuad(
+                            quad.pose(), quad.bakedQuad(), quadInstance
+                        );
+                    }
+                    ModCompat.endBlock(consumer);
+                }
+            );
+        }
+        buffers.clear();
     }
 
-    public static void putBakedQuad(SubmitNodeCollector collector, PoseStack poseStack, BakedQuad bakedQuad, QuadInstance quadInstance, RenderType renderType, AnimationBlockData blockData){
-        collector.submitCustomGeometry(
-            poseStack,
-            renderType,
-            (Pose currentPose, VertexConsumer consumer) -> {
-                ModCompat.startQuad(consumer, blockData);
-
-                consumer.putBakedQuad(
-                    currentPose, bakedQuad, quadInstance
-                );
-
-                ModCompat.endQuad(consumer);
+    public static BakedQuad[] flattenModel(List<BlockStateModelPart> parts){
+        List<BakedQuad> quads = new ArrayList<>();
+        for (int i = 0; i < parts.size(); i++){
+            BlockStateModelPart part = parts.get(i);
+            for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
+                quads.addAll(part.getQuads(DIRECTIONS_WITH_NULL[j]));
             }
-        );
-    }
-
-    public static float getShade(float nx, float ny, float nz, PoseStack poseStack){
-        return getShade(nx, ny, nz, poseStack.last());
+        }
+        return quads.toArray(new BakedQuad[0]);
     }
 
     public static float getShade(float nx, float ny, float nz, PoseStack.Pose pose){
-        float shade = 1f;
-        if(shouldShade){
-            Vector3f normal = new Vector3f(nx, ny, nz);
-            normal.mul(pose.normal());
-            normal.normalize(); // Might not be needed
-            float nx2 = normal.x() * normal.x();
-            float ny2 = normal.y() * normal.y();
-            float nz2 = normal.z() * normal.z();
-
-            float yShade = normal.y() > 0 ? topShade : bottomShade;
-            shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
-        }
-        return shade;
+        if (!shouldShade) return 1f;
+        Matrix3fc m = pose.normal();
+        float x = m.m00() * nx + m.m10() * ny + m.m20() * nz;
+        float y = m.m01() * nx + m.m11() * ny + m.m21() * nz;
+        float z = m.m02() * nx + m.m12() * ny + m.m22() * nz;
+        float x2 = x * x, y2 = y * y, z2 = z * z;
+        float yShade = y > 0f ? topShade : bottomShade;
+        return (x2 * XShade + y2 * yShade + z2 * ZShade) / (x2 + y2 + z2);
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){

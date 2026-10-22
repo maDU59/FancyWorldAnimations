@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -22,16 +22,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ComposterAnimation extends Animation{
 
-    private final BlockStateModel model;
-    private List<BlockStateModelPart> parts = new ArrayList<>();
+    private BlockStateModel model;
+    private List<BlockStateModelPart> parts;
 
     
     public ComposterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
+        List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override
@@ -81,10 +86,11 @@ public class ComposterAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantCompost, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.materialInfo().sprite().contents().name().getPath();
             if ((path.endsWith("_compost") || path.contains("_ready")) == wantCompost) {
-                RenderHelper.renderQuad(poseStack, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

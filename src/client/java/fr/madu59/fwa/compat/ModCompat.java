@@ -142,12 +142,12 @@ public class ModCompat {
         );
     }
 
-    public static void startQuad(VertexConsumer consumer, AnimationBlockData data){
-        if(isIrisLoaded()) IrisCompat.startQuad(consumer, data);
+    public static void beginBlock(VertexConsumer consumer, AnimationBlockData data){
+        if(isIrisLoaded()) IrisCompat.beginBlock(consumer, data);
     }
 
-    public static void endQuad(VertexConsumer consumer){
-        if(isIrisLoaded()) IrisCompat.endQuad(consumer);
+    public static void endBlock(VertexConsumer consumer){
+        if(isIrisLoaded()) IrisCompat.endBlock(consumer);
     }
 
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
@@ -431,7 +431,7 @@ public class ModCompat {
 
     public static class IrisCompat{
 
-        public static void startQuad(VertexConsumer consumer, AnimationBlockData blockData){
+        public static void beginBlock(VertexConsumer consumer, AnimationBlockData blockData){
             if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
                 Object2IntMap<BlockState> blockStateIdsMap = net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.INSTANCE.getBlockStateIds();
                 if(blockStateIdsMap == null) return;
@@ -439,7 +439,7 @@ public class ModCompat {
             }
         }
 
-        public static void endQuad(VertexConsumer consumer){
+        public static void endBlock(VertexConsumer consumer){
             if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
                 blockSensitiveConsumer.endBlock();
             }

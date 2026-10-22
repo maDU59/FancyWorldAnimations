@@ -25,9 +25,7 @@ public class Animation {
     protected double toRemoveTick = 0;
     protected boolean removalApproved = false;
     protected AABB boundingBox;
-
-    protected Boolean isLast;
-    protected boolean needUpdate = true;
+    protected int cachedLight = -1;
 
     protected boolean isOcclusionCulled = false;
     protected AnimationBlockData defaultAnimationBlockData;
@@ -42,6 +40,11 @@ public class Animation {
         this.newState = newState;
         this.defaultAnimationBlockData = new AnimationBlockData(defaultState, position, getLight());
         updateBoundingBox();
+        updateModel();
+    }
+
+    public void updateModel(){
+
     }
 
     public boolean isUnique() {
@@ -110,14 +113,6 @@ public class Animation {
         return false;
     }
 
-    public void setLast(boolean isLast){
-        this.isLast = isLast;
-    }
-
-    public void needUpdate(){
-        needUpdate = true;
-    }
-
     public double getProgress(double nowTick) {
         double duration = getAnimDuration();
         if (duration <= 0) return 1.0;
@@ -145,13 +140,19 @@ public class Animation {
     }
 
     public void tick(double nowTick) {
+
+    }
+
+    public void updateCache(){
+        cachedLight = -1;
     }
 
     public void render(AnimationRenderingContext context) {
     }
 
     public int getLight(){
-        return getLight(position, newState);
+        if(cachedLight == -1) cachedLight = getLight(position, newState);
+        return cachedLight;
     }
 
     public int getLight(BlockPos pos, BlockState state){
@@ -184,5 +185,13 @@ public class Animation {
 
     public int getReverseCount(){
         return this.reverseCount;
+    }
+
+    public double distanceToPlayer(){
+        return boundingBox.distanceToSqr(Minecraft.getInstance().player.getClientPosition());
+    }
+
+    public void clearModelCache() {
+        updateModel();
     }
 }
