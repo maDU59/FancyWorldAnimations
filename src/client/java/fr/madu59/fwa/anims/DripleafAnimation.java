@@ -36,7 +36,7 @@ public class DripleafAnimation extends Animation{
         List<BlockStateModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(newState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
         parts = newParts;
     }
 
