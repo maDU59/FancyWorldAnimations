@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class BellAnimation extends Animation{
 
-    private final Minecraft client = Minecraft.getInstance();
     public BellModel bellModel;
     private final float hash;
     private final Direction facing;
@@ -30,7 +29,7 @@ public class BellAnimation extends Animation{
 
     @Override
     public void updateModel(){
-        this.bellModel = new BellModel(client.getEntityModels().bakeLayer(ModelLayers.BELL));
+        this.bellModel = new BellModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL));
     }
 
     @Override
