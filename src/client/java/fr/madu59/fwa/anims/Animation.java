@@ -188,7 +188,7 @@ public class Animation {
     }
 
     public double distanceToPlayer(){
-        return boundingBox.distanceToSqr(Minecraft.getInstance().player.getClientPosition());
+        return boundingBox.distanceToSqr(Minecraft.getInstance().player.position());
     }
 
     public void clearModelCache() {
