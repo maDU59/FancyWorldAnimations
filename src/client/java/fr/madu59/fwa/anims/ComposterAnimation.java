@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -23,16 +22,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ComposterAnimation extends Animation{
 
-    private final BlockStateModel model;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private BlockStateModel model;
+    private List<BlockModelPart> parts;
 
     
     public ComposterAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
+        List<BlockModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(newState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(newState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override
@@ -65,29 +69,28 @@ public class ComposterAnimation extends Animation{
 
         int light = getLight();
 
-        VertexConsumer buffer = getBuffer(context);
-        
         for(BlockModelPart part: parts){
-            renderFilteredQuads(poseStack, buffer, part.getQuads(null), false, light);
+            renderFilteredQuads(poseStack, part.getQuads(null), false, light);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, part.getQuads(dir), false, light);
+                renderFilteredQuads(poseStack, part.getQuads(dir), false, light);
             }
 
             float dy = getPosition(context.getNowTick(), getHeight(newState), getHeight(oldState));
             poseStack.translate(0,dy,0);
 
-            renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light);
+            renderFilteredQuads(poseStack, part.getQuads(null), true, light);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light);
+                renderFilteredQuads(poseStack, part.getQuads(dir), true, light);
             }
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantCompost, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantCompost, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if ((path.endsWith("_compost") || path.contains("_ready")) == wantCompost) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

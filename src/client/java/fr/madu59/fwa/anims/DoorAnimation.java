@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -25,8 +24,8 @@ import net.minecraft.world.phys.AABB;
 
 public class DoorAnimation extends Animation{
 
-    private final BlockStateModel model;
-    private List<BlockModelPart> parts = new ArrayList<>();
+    private BlockStateModel model;
+    private List<BlockModelPart> parts;
     private final float dX;
     private final float dZ;
     private final float pivotX;
@@ -35,9 +34,6 @@ public class DoorAnimation extends Animation{
 
     public DoorAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        model.collectParts(random, parts);
 
         BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -77,6 +73,15 @@ public class DoorAnimation extends Animation{
         }
         this.dX = dX;
         this.dZ = dZ;
+    }
+
+    @Override
+    public void updateModel(){
+        List<BlockModelPart> newParts = new ArrayList<>();
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, newParts);
+        parts = newParts;
     }
 
     @Override
@@ -132,7 +137,6 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = getLight();
-        VertexConsumer buffer = getBuffer(context);
-        RenderHelper.renderModel(buffer, poseStack.last(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
+        AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
     }
 }

@@ -8,18 +8,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
 
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationBlockData;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -143,12 +141,12 @@ public class ModCompat {
         );
     }
 
-    public static void startQuad(VertexConsumer consumer, AnimationBlockData data){
-        if(isIrisLoaded()) IrisCompat.startQuad(consumer, data);
+    public static void beginBlock(VertexConsumer consumer, AnimationBlockData data){
+        if(isIrisLoaded()) IrisCompat.beginBlock(consumer, data);
     }
 
-    public static void endQuad(VertexConsumer consumer){
-        if(isIrisLoaded()) IrisCompat.endQuad(consumer);
+    public static void endBlock(VertexConsumer consumer){
+        if(isIrisLoaded()) IrisCompat.endBlock(consumer);
     }
 
     // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
@@ -310,7 +308,7 @@ public class ModCompat {
                 Object portalState = ancientPortalStateClass.getConstructor().newInstance();
                 extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
                 renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
-                RenderHelper.endBatch(context.getBufferSource());
+                AnimationRenderer.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
             }
@@ -432,7 +430,7 @@ public class ModCompat {
 
     public static class IrisCompat{
 
-        public static void startQuad(VertexConsumer consumer, AnimationBlockData blockData){
+        public static void beginBlock(VertexConsumer consumer, AnimationBlockData blockData){
             if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
                 Object2IntMap<BlockState> blockStateIdsMap = net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.INSTANCE.getBlockStateIds();
                 if(blockStateIdsMap == null) return;
@@ -440,7 +438,7 @@ public class ModCompat {
             }
         }
 
-        public static void endQuad(VertexConsumer consumer){
+        public static void endBlock(VertexConsumer consumer){
             if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
                 blockSensitiveConsumer.endBlock();
             }

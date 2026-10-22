@@ -10,6 +10,8 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 @FunctionalInterface
 public interface SwingDriver {
-
+    /**
+     * Note that when making a swing driver you should try to respect all the settings provided by FWA like SettingsManager.SWINGING_WEATHER_STATE etc...
+     */
     boolean getSwing(BlockPos position, BlockState state, double nowTick, HangingSwing swing);
 }

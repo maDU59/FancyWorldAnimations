@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.PoseStack.Pose;
 
 import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.Minecraft;
@@ -22,14 +23,17 @@ import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class RenderHelper {
+public class AnimationRenderer {
 
     private static float bottomShade = 0;
     private static float topShade = 0;
@@ -40,6 +44,8 @@ public class RenderHelper {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
+    private static final Map<RenderType, List<AnimationQuad>> buffers = new HashMap<>();
+    private static MultiBufferSource bufferSource;
 
     private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
     .translation(0.5f, 0.5f, 0.5f)
@@ -55,55 +61,100 @@ public class RenderHelper {
             XShade = level.getShade(Direction.EAST, true);
         }
         shouldShade = !context.isShadow();
+        bufferSource = context.getBufferSource();
+        buffers.clear();
     }
 
-    public static void renderModel(VertexConsumer buffer, Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+    public static void renderModel(PoseStack.Pose pose, List<BlockModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
         for (int i = 0; i < parts.size(); i++){
+            BlockModelPart part = parts.get(i);
             for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
-                renderQuads(buffer, pose, parts.get(i).getQuads(DIRECTIONS_WITH_NULL[j]), a, r, g, b, light, blockData);
+                List<BakedQuad> quads = part.getQuads(DIRECTIONS_WITH_NULL[j]);
+                int n = quads.size();
+                if (n == 0) continue;
+                for (int k = 0; k < n; k++){
+                    renderQuad(pose, quads.get(k), a, r, g, b, light, blockData);
+                }
             }
         }
     }
 
-    public static void renderQuads(VertexConsumer buffer, Pose pose, List<BakedQuad> bakedQuads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        for (int i = 0; i < bakedQuads.size(); i++){
-            renderQuad(buffer, pose, bakedQuads.get(i), a, r, g, b, light, shouldShade, blockData);
+    public static void renderQuads(PoseStack.Pose pose, BakedQuad[] quads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        for (int i = 0; i < quads.length; i++){
+            renderQuad(pose, quads[i], a, r, g, b, light, blockData);
         }
     }
 
-    public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
-        renderQuad(buffer, pose, bakedQuad, a, r, g, b, light, shouldShade, blockData);
+    public static void renderQuad(PoseStack.Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        Vector3fc dir = bakedQuad.direction().getUnitVec3f();
+        float shade = blockData.isShaded()? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
+        int color = ARGB.colorFromFloat(a,r*shade,g*shade,b*shade);
+
+        RenderType renderType;
+        if(a < 1.0f){
+            renderType = RenderTypes.translucentMovingBlock();
+        } else {
+            renderType = switch (ItemBlockRenderTypes.getChunkRenderType(blockData.getBlockState())) {
+                case ChunkSectionLayer.TRANSLUCENT -> RenderTypes.translucentMovingBlock();
+                case ChunkSectionLayer.CUTOUT -> RenderTypes.cutoutMovingBlock();
+                case ChunkSectionLayer.SOLID -> RenderTypes.solidMovingBlock();
+                default -> RenderTypes.cutoutMovingBlock();
+            };
+        }
+
+        buffers.computeIfAbsent(renderType, k -> new ArrayList<>()).add(new AnimationQuad(pose, bakedQuad, light, color, blockData));
     }
 
-    public static void renderQuad(VertexConsumer buffer, Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, boolean isShaded, AnimationBlockData blockData){
-        Vector3fc dir = bakedQuad.direction().getUnitVec3f();
-        float shade = isShaded? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
+    public static void renderBuffers(){
+        for(Map.Entry<RenderType, List<AnimationQuad>> entry : buffers.entrySet()){
+            RenderType renderType = entry.getKey();
+            VertexConsumer consumer = bufferSource.getBuffer(renderType);
 
-        ModCompat.startQuad(buffer, blockData);
-        buffer.putBulkData(pose, bakedQuad, r * shade, g * shade, b * shade, a, light, OverlayTexture.NO_OVERLAY);
-        ModCompat.endQuad(buffer);
+            AnimationBlockData lastBlockData = null;
+
+            for(AnimationQuad quad : entry.getValue()){
+                if(quad.blockData() != lastBlockData){
+                    if(lastBlockData != null){
+                        ModCompat.endBlock(consumer);
+                    }
+                    lastBlockData = quad.blockData();
+                    ModCompat.beginBlock(consumer, lastBlockData);
+                }
+
+                Vector4f colors = ARGB.vector4fFromARGB32(quad.color());
+                consumer.putBulkData(quad.pose(), quad.bakedQuad(), colors.x, colors.y, colors.z, colors.w, quad.light(), OverlayTexture.NO_OVERLAY);
+            }
+            ModCompat.endBlock(consumer);
+        }
+        buffers.clear();
+    }
+
+    public static BakedQuad[] flattenModel(List<BlockModelPart> parts){
+        List<BakedQuad> quads = new ArrayList<>();
+        for (int i = 0; i < parts.size(); i++){
+            BlockModelPart part = parts.get(i);
+            for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
+                quads.addAll(part.getQuads(DIRECTIONS_WITH_NULL[j]));
+            }
+        }
+        return quads.toArray(new BakedQuad[0]);
+    }
+
+    public static float getShade(float nx, float ny, float nz, PoseStack.Pose pose){
+        if (!shouldShade) return 1f;
+        Matrix3fc m = pose.normal();
+        float x = m.m00() * nx + m.m10() * ny + m.m20() * nz;
+        float y = m.m01() * nx + m.m11() * ny + m.m21() * nz;
+        float z = m.m02() * nx + m.m12() * ny + m.m22() * nz;
+        float x2 = x * x, y2 = y * y, z2 = z * z;
+        float yShade = y > 0f ? topShade : bottomShade;
+        return (x2 * XShade + y2 * yShade + z2 * ZShade) / (x2 + y2 + z2);
     }
 
     public static void endBatch(MultiBufferSource bufferSource){
         if(bufferSource instanceof BufferSource bs){
             bs.endBatch();
         }
-    }
-
-    public static float getShade(float nx, float ny, float nz, Pose pose){
-        float shade = 1f;
-        if(shouldShade){
-            Vector3f normal = new Vector3f(nx, ny, nz);
-            normal.mul(pose.normal());
-            normal.normalize(); // Might not be needed
-            float nx2 = normal.x() * normal.x();
-            float ny2 = normal.y() * normal.y();
-            float nz2 = normal.z() * normal.z();
-
-            float yShade = normal.y() > 0 ? topShade : bottomShade;
-            shade =  (nx2 * XShade) + (ny2 * yShade) + (nz2 * ZShade);
-        }
-        return shade;
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){
@@ -134,8 +185,8 @@ public class RenderHelper {
 
             for(int i = start; i < end; i++) {
                 BlockModelPart part = parts.get(i);
-                if (!(part instanceof InvisibleBlockStateModelPart)) {
-                    parts.set(i, new InvisibleBlockStateModelPart(part));
+                if (!(part instanceof InvisibleBlockModelPart)) {
+                    parts.set(i, new InvisibleBlockModelPart(part));
                 }
             }
 
@@ -146,11 +197,11 @@ public class RenderHelper {
         }
     }
 
-    private static final class InvisibleBlockStateModelPart implements BlockModelPart {
+    private static final class InvisibleBlockModelPart implements BlockModelPart {
         private final BlockModelPart part;
         private final Map<Direction, List<BakedQuad>> directions = new HashMap<Direction, List<BakedQuad>>();
 
-        private InvisibleBlockStateModelPart(BlockModelPart originalPart) {
+        private InvisibleBlockModelPart(BlockModelPart originalPart) {
             this.part = originalPart;
         }
 
