@@ -110,7 +110,7 @@ public abstract class AbstractChainAnimation extends Animation {
         }
     }
 
-    public void updateChainCount(){
+    protected void updateChainCount(){
         chainCount = SwingingBlockHelper.getChainCount(position);
     }
 

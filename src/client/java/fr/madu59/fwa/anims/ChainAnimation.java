@@ -24,7 +24,7 @@ public class ChainAnimation extends AbstractChainAnimation {
     }
 
     @Override
-    public void updateChainCount(){
+    protected void updateChainCount(){
         ClientLevel level = Minecraft.getInstance().level;
         if(isLast == null && !level.getBlockState(position).isAir()){
             isLast = SwingingBlockHelper.isLast(position);

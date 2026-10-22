@@ -33,7 +33,8 @@ public class LanternAnimation extends AbstractChainAnimation {
         return true;
     }
 
-    public void updateChainCount(){
+    @Override
+    protected void updateChainCount(){
         if(!SettingsManager.CHAIN_STATE.getValue() && !SettingsManager.LANTERN_OVERRIDE.getValue()) chainCount = 1;
         else chainCount = SwingingBlockHelper.getChainCount(position);
     }
