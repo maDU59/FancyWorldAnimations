@@ -3,10 +3,10 @@ package fr.madu59.fwa.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BooleanSupplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -148,12 +148,16 @@ public class ModCompat {
         if(isIrisLoaded()) IrisCompat.endBlock(consumer);
     }
 
-    // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
+    public static void disableCulling(BlockState state){
+        if(isMoreCullingLoaded()){
+            MoreCullingCompat.disableBlockStateCullingForBlock(state);
+        }
+    }
+
+    // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA
 
     private static void disableIncompatibleOptions(){
-        if(isMoreCullingLoaded()){
-            MoreCullingCompat.disableBlockStateCulling();
-        }
+
     }
 
     // VAULT COMPATIBILITY
@@ -302,7 +306,7 @@ public class ModCompat {
 
             try{
                 BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
-                Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
+                Object rendererInstance = dispatcher.getRenderer(be);
 
                 Object portalState = ancientPortalStateClass.getConstructor().newInstance();
                 extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
@@ -412,15 +416,43 @@ public class ModCompat {
     // MORE CULLING COMPATIBILITY
 
     public static class MoreCullingCompat{
-        
-        public static void disableBlockStateCulling(){
+
+        public static void disableBlockStateCullingForBlock(BlockState state){
+            Block block = state.getBlock();
+            String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();
             try{
-                Class<?> configAdditionsClass = Class.forName("ca.fxco.moreculling.api.config.ConfigAdditions");
-                Method disableOptionMethod = configAdditionsClass.getMethod("disableOption", String.class, String.class, BooleanSupplier.class, Object.class);
-                disableOptionMethod.invoke(null, "moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", (BooleanSupplier) () -> false, false);
-                FancyWorldAnimations.LOGGER.info("Successfully disabled MoreCulling's blockStateCulling!");
+                Class<?> moreCullingClass = Class.forName("ca.fxco.moreculling.MoreCulling");
+
+                java.lang.reflect.Field configField = moreCullingClass.getField("CONFIG");
+                Object configInstance = configField.get(null);
+
+                if (configInstance != null) {
+                    java.lang.reflect.Field dontCullField = configInstance.getClass().getField("dontCull");
+
+                    @SuppressWarnings("unchecked")
+                    List<String> dontCullList = (List<String>) dontCullField.get(configInstance);
+
+                    if (dontCullList != null) {
+                        if (!dontCullList.contains(blockId)) {
+                            dontCullList.add(blockId);
+                        }
+                    }
+                }
+
+                Class<?> moreBlockCullingClass = Class.forName("ca.fxco.moreculling.api.block.MoreBlockCulling");
+
+                if (moreBlockCullingClass.isInstance(block)) {
+                    java.lang.reflect.Method canCullMethod = moreBlockCullingClass.getMethod("moreculling$canCull");
+                    java.lang.reflect.Method setCanCullMethod = moreBlockCullingClass.getMethod("moreculling$setCanCull", boolean.class);
+
+                    boolean canCull = (boolean) canCullMethod.invoke(block);
+
+                    if (canCull) {
+                        setCanCullMethod.invoke(block, false);
+                    }
+                }
             }catch(Exception e){
-                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling, visual issues may appear!");
+                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling for block {}, visual issues may appear!", blockId);
             }
         }
     }
