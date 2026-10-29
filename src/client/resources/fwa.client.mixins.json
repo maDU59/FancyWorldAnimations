@@ -1,26 +1,29 @@
 {
-	"required": true,
-	"package": "fr.madu59.fwa.mixin.client",
-	"plugin": "fr.madu59.fwa.compat.ModCompatPlugin",
-	"compatibilityLevel": "JAVA_25",
-	"client": [
-		"ClientLevelMixin",
-		"BlockEntityRenderDispatcherMixin",
-		"SetSectionDirtyInvoker",
-		"GetContentHeightInvoker",
-		"LevelChunkMixin",
-		"RenderSectionRegionMixin",
-		"blockentity.ChestLidControllerMixin",
-		"blockentity.ShulkerBoxModelMixin",
-		"blockentity.ext.BlockEntityRenderStateExtMixin",
-		"blockentity.renderer.BellRendererMixin",
-		"compat.sodium.BlockRendererMixin",
-		"compat.iris.ShadowRendererMixin",
-		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
-		"compat.entityculling.CullTaskMixin",
-		"core.ResourceManagerMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "fr.madu59.fwa.mixin.client",
+  "plugin": "fr.madu59.fwa.compat.ModCompatPlugin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "BlockEntityRenderDispatcherMixin",
+    "ClientLevelMixin",
+    "GetContentHeightInvoker",
+    "LevelChunkMixin",
+    "RenderSectionRegionMixin",
+    "SetSectionDirtyInvoker",
+    "blockentity.ChestLidControllerMixin",
+    "blockentity.ShulkerBoxModelMixin",
+    "blockentity.ext.BlockEntityRenderStateExtMixin",
+    "blockentity.renderer.BellRendererMixin",
+    "compat.entityculling.CullTaskMixin",
+    "compat.iris.ShadowRendererMixin",
+    "compat.scholar.ChiseledBookShelfBlockEntityMixin",
+    "compat.sodium.BlockRendererMixin",
+    "core.ResourceManagerMixin",
+    "blockentity.renderer.sign.AbstractSignRendererMixin",
+    "blockentity.renderer.sign.HangingSignRendererMixin",
+    "blockentity.renderer.sign.ext.HangingSignRenderStateMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
