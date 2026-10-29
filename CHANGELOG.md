@@ -1,2 +1,2 @@
 # What's new:
-- Improved MoreCulling compatibility to not fully disable Block State Culling
+- Added Swinging Hanging Signs

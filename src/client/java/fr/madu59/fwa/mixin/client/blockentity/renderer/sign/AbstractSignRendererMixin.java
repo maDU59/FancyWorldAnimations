@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.world.level.block.state.properties.RotationSegment;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -18,9 +19,13 @@ public abstract class AbstractSignRendererMixin<S extends SignRenderState> {
     @WrapMethod(method = "submitSignWithText")
     public void fwa$submitSignWithText(S state, PoseStack poseStack, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress, SubmitNodeCollector submitNodeCollector, Operation<Void> original) {
         poseStack.pushPose();
-        if(SettingsManager.HANGING_SIGN_STATE.getValue() && state instanceof HangingSignRenderStateExt ext && ext.fwa$getSwing() != 0.0f){
+        if(SettingsManager.HANGING_SIGN_STATE.getValue() && state instanceof HangingSignRenderStateExt ext && ext.fwa$getSwing() != null){
+            float signRotation = RotationSegment.convertToDegrees(ext.fwa$getDirection());
+
             poseStack.translate(0.5, 1.0, 0.5);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(ext.fwa$getSwing()));
+            poseStack.mulPose(Axis.YP.rotationDegrees(- signRotation));
+            poseStack.mulPose(Axis.XP.rotationDegrees(ext.fwa$getSwing().tiltX));
+            poseStack.mulPose(Axis.YP.rotationDegrees(signRotation));
             poseStack.translate(-0.5, -1.0, -0.5);
         }
         original.call(state, poseStack, breakProgress, submitNodeCollector);
