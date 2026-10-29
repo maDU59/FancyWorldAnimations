@@ -23,6 +23,7 @@
     "fwa.config.category.redstone":"REDSTONE WIRES",
     "fwa.config.category.shulkerbox":"SHULKER BOXES",
     "fwa.config.category.swinging":"SWINGING ANIMATIONS",
+    "fwa.config.category.hanging_sign":"HANGING SIGNS",
 
     "fwa.config.option.mod_toggle.name":"Mod state",
     "fwa.config.option.animation_render_distance.name":"Triggered animations render distance",

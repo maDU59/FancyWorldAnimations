@@ -6,11 +6,11 @@ package fr.madu59.fwa.api.animations;
  */
 public class HangingSwing {
 
-    public float tiltX;
+    public float tiltX = 0.0f;
 
-    public float tiltZ;
+    public float tiltZ = 0.0f;
 
-    public float spin;
+    public float spin = 0.0f;
 
     public void set(float tiltX, float tiltZ, float spin){
         this.tiltX = tiltX;
