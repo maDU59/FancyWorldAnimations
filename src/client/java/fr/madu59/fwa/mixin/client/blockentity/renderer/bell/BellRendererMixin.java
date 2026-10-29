@@ -1,7 +1,8 @@
-package fr.madu59.fwa.mixin.client.blockentity.renderer;
+package fr.madu59.fwa.mixin.client.blockentity.renderer.bell;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,7 +13,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
-import fr.madu59.fwa.rendering.blockentity.BlockEntityRenderStateExt;
+import fr.madu59.fwa.rendering.blockentity.bell.BellRenderStateExt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.bell.BellModel;
@@ -28,17 +29,18 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 
 @Mixin(value = BellRenderer.class, priority = 1001)
-public class BellRendererMixin {
+public abstract class BellRendererMixin {
 
     @Shadow
     public static SpriteId BELL_TEXTURE;
 
+    @Unique
     private final Identifier atlasId = Identifier.tryParse("minecraft:blocks");
 
     @Inject(method = "submit", at = @At("HEAD"), cancellable = true)
     public void fwa$submit(final BellRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera, CallbackInfo ci) {
-        if(((BlockEntityRenderStateExt)state).getPosition() == null) return;
-        Animation animation = FancyWorldAnimationsClient.animations.getAt(((BlockEntityRenderStateExt)state).getPosition());
+        if(((BellRenderStateExt)state).fwa$getPosition() == null) return;
+        Animation animation = FancyWorldAnimationsClient.animations.getAt(((BellRenderStateExt)state).fwa$getPosition());
         BellModel.State modelState = new BellModel.State(state.ticks, state.shakeDirection);
 
         if (modelState.shakeDirection() == null && animation != null && animation instanceof BellAnimation bellAnimation) {
@@ -61,6 +63,6 @@ public class BellRendererMixin {
 
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     public void obe$cancelExtract(CallbackInfo ci, @Local BellRenderState state, @Local BellBlockEntity be){
-        ((BlockEntityRenderStateExt)state).setPosition(be.getBlockPos());
+        ((BellRenderStateExt)state).fwa$setPosition(be.getBlockPos());
     }
 }

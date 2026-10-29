@@ -521,6 +521,14 @@ public class SettingsManager {
         true
     );
 
+    public static Option<Boolean> HANGING_SIGN_STATE = loadOptionWithDefaults(
+            "hanging_sign_state",
+            "fwa.config.option.state.name",
+            "fwa.config.option.state.description",
+            true,
+            false
+    );
+
     public static void saveSettings(List<Option<?>> options) {
         Map<String, String> map = toMap(options);
         try {
