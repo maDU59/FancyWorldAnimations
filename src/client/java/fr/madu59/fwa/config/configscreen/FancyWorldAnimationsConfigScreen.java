@@ -155,6 +155,9 @@ public class FancyWorldAnimationsConfigScreen extends Screen {
         list.button(SettingsManager.CHAIN_GROUNDED).isEnabled(() -> SettingsManager.CHAIN_STATE.getValue()).build();
         list.button(SettingsManager.LANTERN_OVERRIDE).isEnabled(() -> SettingsManager.CHAIN_STATE.getValue() || SettingsManager.LANTERN_STATE.getValue()).build();
 
+        list.category("fwa.config.category.hanging_sign").build();
+        list.button(SettingsManager.HANGING_SIGN_STATE).build();
+
         Button doneButton = Button.builder(Component.translatable("fwa.config.done"), b -> {
             this.minecraft.setScreen(this.parent);
             SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);

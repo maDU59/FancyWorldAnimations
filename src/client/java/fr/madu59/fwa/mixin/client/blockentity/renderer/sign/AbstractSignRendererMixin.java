@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.blockentity.sign.HangingSignRenderStateExt;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
@@ -17,7 +18,7 @@ public abstract class AbstractSignRendererMixin<S extends SignRenderState> {
     @WrapMethod(method = "submitSignWithText")
     public void fwa$submitSignWithText(S state, PoseStack poseStack, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress, SubmitNodeCollector submitNodeCollector, Operation<Void> original) {
         poseStack.pushPose();
-        if(state instanceof HangingSignRenderStateExt ext) {
+        if(SettingsManager.HANGING_SIGN_STATE.getValue() && state instanceof HangingSignRenderStateExt ext && ext.fwa$getSwing() != 0.0f){
             poseStack.translate(0.5, 1.0, 0.5);
             poseStack.mulPose(Axis.ZP.rotationDegrees(ext.fwa$getSwing()));
             poseStack.translate(-0.5, -1.0, -0.5);
