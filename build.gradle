@@ -71,6 +71,8 @@ dependencies {
     modImplementation("org.anarres:jcpp:1.4.14")
 	modImplementation "maven.modrinth:iris:1.7.6+1.20.1-fabric"
 	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
+
+	modCompileOnly "maven.modrinth:vulkanmod:ZhvilXaM"
 }
 
 processResources {
