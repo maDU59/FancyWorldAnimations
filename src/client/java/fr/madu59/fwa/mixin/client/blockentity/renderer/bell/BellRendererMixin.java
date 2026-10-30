@@ -1,5 +1,6 @@
 package fr.madu59.fwa.mixin.client.blockentity.renderer.bell;
 
+import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -20,7 +21,6 @@ import net.minecraft.client.model.object.bell.BellModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BellRenderer;
 import net.minecraft.client.renderer.blockentity.state.BellRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -56,7 +56,9 @@ public abstract class BellRendererMixin {
 
             TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(BELL_TEXTURE.texture());
 
-            submitNodeCollector.submitModelPart(bellBody, poseStack, RenderTypes.cutoutMovingBlock(), state.lightCoords, OverlayTexture.NO_OVERLAY, sprite);
+            RenderType renderType = BELL_TEXTURE.renderType(bellAnimation.bellModel.renderType());
+
+            submitNodeCollector.submitModelPart(bellBody, poseStack, renderType, state.lightCoords, OverlayTexture.NO_OVERLAY, sprite);
             ci.cancel();
         }
     }
