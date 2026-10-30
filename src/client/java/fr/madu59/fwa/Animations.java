@@ -1,13 +1,11 @@
 package fr.madu59.fwa;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.core.BlockPos;
 
@@ -25,30 +23,6 @@ public class Animations{
         LevelExtractor levelExtractor = Minecraft.getInstance().levelExtractor;
         animation.markForRemoval();
         ((SetSectionDirtyInvoker) levelExtractor).fwa$setSectionDirty(blockPos.getX() >> 4, blockPos.getY() >> 4, blockPos.getZ() >> 4, true);
-    }
-
-    public void clean(double nowTick) {
-        ClientLevel level = Minecraft.getInstance().level;
-        LevelExtractor levelExtractor = Minecraft.getInstance().levelExtractor;
-        Iterator<Animation> it = this.animations.values().iterator();
-        while (it.hasNext()) {
-            Animation animation = it.next();
-            BlockPos pos = animation.getPos();
-            if(level.isLoaded(pos)){
-                if (animation.isForRemoval()){
-                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-                        it.remove();
-                    }
-                }
-                else if (animation.isFinished(nowTick)) {
-                    animation.markForRemoval();
-                    ((SetSectionDirtyInvoker) levelExtractor).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
-                }
-            }
-            else{
-                it.remove();
-            }
-        }
     }
 
     public boolean containsAt(BlockPos blockPos) {

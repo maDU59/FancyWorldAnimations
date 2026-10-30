@@ -1,2 +1,2 @@
 # What's new:
-- Improved MoreCulling compatibility to not fully disable Block State Culling
+- Reduced CPU load when a lot of animations are running at the same time
