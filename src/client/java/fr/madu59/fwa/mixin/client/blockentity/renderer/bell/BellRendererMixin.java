@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.entity.BellBlockEntity;
 public abstract class BellRendererMixin {
 
     @Shadow
-    public static Material BELL_TEXTURE;
+    public static Material BELL_RESOURCE_LOCATION;
 
     @Unique
     private final ResourceLocation atlasId = ResourceLocation.tryParse("minecraft:blocks");
@@ -54,7 +54,7 @@ public abstract class BellRendererMixin {
             else rot = bellAnimation.animateIdle(time);
             bellAnimation.rotateBell(bellBody, rot);
 
-            TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(BELL_TEXTURE.texture());
+            TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(BELL_RESOURCE_LOCATION.texture());
 
             submitNodeCollector.submitModelPart(bellBody, poseStack, RenderType.cutoutMipped(), state.lightCoords, OverlayTexture.NO_OVERLAY, sprite);;
             ci.cancel();
