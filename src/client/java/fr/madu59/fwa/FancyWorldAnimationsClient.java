@@ -2,6 +2,7 @@ package fr.madu59.fwa;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.madu59.fwa.anims.AbstractChainAnimation;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
@@ -30,8 +31,10 @@ import fr.madu59.fwa.compat.Blacklist;
 import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -41,6 +44,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -77,6 +82,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
@@ -91,7 +99,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             ModCompat.init(); 
         });
-		ClientPlayConnectionEvents.DISCONNECT.register((clientPacketListener, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((listener, client) -> {
             animations.animations.clear();
         });
 		WorldRenderEvents.BEFORE_ENTITIES.register(context -> {
@@ -132,22 +140,26 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		boolean oldIsOpen = isOpen(oldState, type);
 		boolean newIsOpen = isOpen(newState, type);
 
+		int reverseCount = 0;
+
 		double startTick = getPartialTick();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = getPartialTick() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = getPartialTick() - animation.getAnimDuration() * (Curves.unease(1 - Curves.ease(animation.getProgress(getPartialTick()), animation.getCurve()), animation.getCurve()));
+				reverseCount = animation.getReverseCount() + 1;
 				animations.removeAt(blockPos);
 			}
 		}
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
-		startTick = syncDoors(startTick, blockPos, newState, type);
+		startTick = syncDoors(startTick, blockPos, newState, type, reverseCount);
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
+		animation.setReverseCount(reverseCount);
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 500000*500000) return;
+		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 10000*10000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
@@ -173,7 +185,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		}
 		if(animations.isEmpty()) return;
 
-		RenderHelper.prepareFrame(context);
+		AnimationRenderer.prepareFrame(context);
 
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
@@ -181,19 +193,62 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 		dist = dist * dist;
 
+		boolean isShadow = context.isShadow();
+		Frustum frustum = context.getFrustum();
+		double nowTick = context.getNowTick();
+
+		LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+		List<BlockPos> toRemove = new ArrayList<>();
+
 		for (Animation animation : animations.animations.values()) {
-			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
-			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
-				renderAnimation(animation, context);
+
+			BlockPos animationPos = animation.getPos();
+
+			if(!context.isShadow()) {
+				if (level.isLoaded(animationPos)) {
+					if (animation.isForRemoval()) {
+						if (!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+							toRemove.add(animationPos);
+						}
+					} else if (animation.isFinished(nowTick)) {
+						animation.markForRemoval();
+						((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(animationPos.getX() >> 4, animationPos.getY() >> 4, animationPos.getZ() >> 4, true);
+					}
+				} else {
+					toRemove.add(animationPos);
+				}
+
+				animation.tick(nowTick);
+			}
+
+            if (!animation.isRendering()) continue;
+            double dx = camPos.x - (animationPos.getX() + 0.5);
+            double dy = camPos.y - (animationPos.getY() + 0.5);
+            double dz = camPos.z - (animationPos.getZ() + 0.5);
+            if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
+            if (animation.isOcclusionCulled() && !isShadow) continue;
+            if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
+
+			if(!context.isShadow()) animation.updateCache();
+			renderAnimation(animation, context);
+		}
+
+		AnimationRenderer.renderBuffers();
+
+		dimension = level.dimension();
+
+		if(!context.isShadow()) {
+			for(BlockPos pos : toRemove){
+				animations.removeAt(pos);
 			}
 		}
-		dimension = level.dimension();
-		if(!context.isShadow()) animations.clean(context.getNowTick());
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
 	{
+		if(type == Type.DOOR && !SettingsManager.DOOR_REDSTONE.getValue() && isDifferentRedstonePower(oldState, newState)) return false;
+		if(type == Type.TRAPDOOR && !SettingsManager.TRAPDOOR_REDSTONE.getValue() && isDifferentRedstonePower(oldState, newState)) return false;
+		if(type == Type.FENCE_GATE && !SettingsManager.FENCEGATE_REDSTONE.getValue() && isDifferentRedstonePower(oldState, newState)) return false;
 		if(type == Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_INFINITE.getValue()) return true;
 		if(type == Type.CHISELED_BOOKSHELF) return oldState.getBlock() == newState.getBlock();
 		if(type == Type.JUKEBOX) return newState.getValue(BlockStateProperties.HAS_RECORD);
@@ -384,31 +439,31 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
 				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(false);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(false);
 			}
 		}
 		else{
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
 				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(true);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isActiveSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
 			Animation anim = animations.animations.get(lastPos);
-			if (anim != null) anim.needUpdate();
+			if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.needUpdate();
 		}
 	}
 
-	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type){
+	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type, int reverseCount){
 		if(type == Type.DOOR){
 			if(newState.getValueOrElse(DoorBlock.HALF, DoubleBlockHalf.LOWER) == DoubleBlockHalf.LOWER){
 				BlockPos abovePos = blockPos.above();
 				BlockState aboveState = Minecraft.getInstance().level.getBlockState(abovePos);
 				if(aboveState.getBlock() instanceof DoorBlock){
 					Animation anim = animations.animations.get(abovePos);
-					if(anim != null) startTick = anim.getStartTick();
+					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
 			else{
@@ -416,11 +471,15 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 				BlockState belowState = Minecraft.getInstance().level.getBlockState(belowPos);
 				if(belowState.getBlock() instanceof DoorBlock){
 					Animation anim = animations.animations.get(belowPos);
-					if(anim != null) startTick = anim.getStartTick();
+					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
 		}
 		return startTick;
+	}
+
+	public static boolean isDifferentRedstonePower(BlockState oldState, BlockState newState){
+		return oldState.getValueOrElse(BlockStateProperties.POWERED, false) != newState.getValueOrElse(BlockStateProperties.POWERED, false);
 	}
 
 	public static enum Type

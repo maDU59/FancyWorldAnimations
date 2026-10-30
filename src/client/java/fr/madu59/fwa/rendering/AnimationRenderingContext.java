@@ -9,6 +9,9 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimationRenderingContext {
+
+    private static long frameCount = 0;
+
     private final PoseStack poseStack;
     private final MultiBufferSource bufferSource;
     private final double nowTick;
@@ -25,6 +28,7 @@ public class AnimationRenderingContext {
         this.cameraPos = camera.position();
         this.isShadow = isShadow;
         this.frustum = frustum;
+        if(!isShadow) frameCount++;
     }
 
     public AnimationRenderingContext(PoseStack poseStack, Vec3 cameraPos, MultiBufferSource bufferSource, Frustum frustum, double nowTick, boolean isShadow) {
@@ -35,6 +39,7 @@ public class AnimationRenderingContext {
         this.cameraPos = cameraPos;
         this.isShadow = isShadow;
         this.frustum = frustum;
+        if(!isShadow) frameCount++;
     }
 
     public PoseStack getPoseStack() {
@@ -63,5 +68,9 @@ public class AnimationRenderingContext {
 
     public Frustum getFrustum(){
         return frustum;
+    }
+
+    public long getFrameCount(){
+        return frameCount;
     }
 }

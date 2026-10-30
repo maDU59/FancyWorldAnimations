@@ -64,6 +64,8 @@ dependencies {
     localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
 	modImplementation "maven.modrinth:iris:1.9.6+1.21.8-fabric"
 	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
+
+	modCompileOnly "maven.modrinth:vulkanmod:7pYvUnJk"
 }
 
 processResources {
