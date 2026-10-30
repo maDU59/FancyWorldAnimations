@@ -12,7 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.vulkanmod.render.chunk.build.renderer.BlockRenderer;
 
 @Mixin(BlockRenderer.class)
-public class VulkanMod {
+public class BlockRendererMixin {
     @Inject(method = "renderBlock", at = @At("HEAD"), cancellable = true)
     public void fwa$renderBlock(CallbackInfo ci, @Local(argsOnly = true) BlockPos pos){
         if(FancyWorldAnimationsClient.shouldCancelBlockRendering(pos)) ci.cancel();

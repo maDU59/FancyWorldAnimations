@@ -66,7 +66,7 @@ dependencies {
 	modImplementation "maven.modrinth:iris:1.8.0+1.21.3-fabric"
 	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
 
-	modCompileOnly "maven.modrinth:vulkanmod:RAtVo03C"
+	modCompileOnly "maven.modrinth:vulkanmod:mr9uxFGT"
 }
 
 processResources {

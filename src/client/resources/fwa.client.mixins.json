@@ -17,6 +17,7 @@
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
 		"compat.entityculling.CullTaskMixin",
+		"compat.vulkanmod.BlockRendererMixin",
 		"core.ResourceManagerMixin",
         "blockentity.renderer.sign.AbstractSignRendererMixin"
 	],
