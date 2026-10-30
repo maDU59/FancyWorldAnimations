@@ -8,10 +8,7 @@ import java.util.Map;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import org.joml.Matrix3fc;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector4f;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -108,7 +105,7 @@ public class AnimationRenderer {
                     ModCompat.beginBlock(consumer, lastBlockData);
                 }
 
-                consumer.putBulkData(quad.pose(), quad.bakedQuad(), ARGB.redFloat(quad.color()), ARGB.greenFloat(quad.color()), ARGB.blueFloat(quad.color()), ARGB.alphaFloat(quad.color()), quad.light(), OverlayTexture.NO_OVERLAY);
+                consumer.putBulkData(quad.pose(), quad.bakedQuad(), ARGB.from8BitChannel(ARGB.red(quad.color())), ARGB.from8BitChannel(ARGB.green(quad.color())), ARGB.from8BitChannel(ARGB.blue(quad.color())), ARGB.from8BitChannel(ARGB.alpha(quad.color())), quad.light(), OverlayTexture.NO_OVERLAY);;
             }
             ModCompat.endBlock(consumer);
         }

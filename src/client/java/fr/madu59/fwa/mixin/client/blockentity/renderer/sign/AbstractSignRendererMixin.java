@@ -10,7 +10,7 @@ import fr.madu59.fwa.api.animations.SwingDrivers;
 import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(AbstractSignRenderer.class)
+@Mixin(SignRenderer.class)
 public abstract class AbstractSignRendererMixin {
 
     @WrapMethod(method = "renderSignWithText")
