@@ -56,7 +56,9 @@ public abstract class BellRendererMixin {
 
             TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(atlasId).getSprite(BELL_RESOURCE_LOCATION.texture());
 
-            submitNodeCollector.submitModelPart(bellBody, poseStack, RenderType.cutoutMipped(), state.lightCoords, OverlayTexture.NO_OVERLAY, sprite);;
+            RenderType renderType = BELL_RESOURCE_LOCATION.renderType(RenderType::entitySolid);
+
+            submitNodeCollector.submitModelPart(bellBody, poseStack, renderType, state.lightCoords, OverlayTexture.NO_OVERLAY, sprite);;
             ci.cancel();
         }
     }
