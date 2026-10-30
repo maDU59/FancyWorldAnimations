@@ -8,6 +8,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 @Mixin(LevelChunk.class)
 public abstract class LevelChunkMixin extends ChunkAccess {
@@ -71,6 +71,10 @@ public abstract class LevelChunkMixin extends ChunkAccess {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
+
+                        if (FancyWorldAnimationsClient.animations.containsAt(pos)) {
+                            FancyWorldAnimationsClient.animations.removeSafeAt(pos);
+                        }
                         
                         if (IS_ANIMATED_BLOCK.test(state)) {
                             BlockPos worldPos = pos.offset(x, minY + y, z);
