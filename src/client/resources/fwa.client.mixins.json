@@ -12,13 +12,15 @@
 		"RenderSectionRegionMixin",
 		"blockentity.ChestLidControllerMixin",
 		"blockentity.ShulkerBoxModelMixin",
-		"blockentity.ext.BlockEntityRenderStateExtMixin",
-		"blockentity.renderer.BellRendererMixin",
+		"blockentity.renderer.bell.ext.BellRenderStateMixin",
+		"blockentity.renderer.bell.BellRendererMixin",
 		"compat.sodium.BlockRendererMixin",
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
 		"compat.entityculling.CullTaskMixin",
-		"core.ResourceManagerMixin"
+		"core.ResourceManagerMixin",
+        "blockentity.renderer.sign.AbstractSignRendererMixin",
+      "blockentity.renderer.sign.ext.SignRenderStateMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

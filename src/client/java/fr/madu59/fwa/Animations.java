@@ -1,6 +1,5 @@
 package fr.madu59.fwa;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,30 +24,6 @@ public class Animations{
         LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
         animation.markForRemoval();
         ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(blockPos.getX() >> 4, blockPos.getY() >> 4, blockPos.getZ() >> 4, true);
-    }
-
-    public void clean(double nowTick) {
-        ClientLevel level = Minecraft.getInstance().level;
-        LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
-        Iterator<Animation> it = this.animations.values().iterator();
-        while (it.hasNext()) {
-            Animation animation = it.next();
-            BlockPos pos = animation.getPos();
-            if(level.isLoaded(pos)){
-                if (animation.isForRemoval()){
-                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-                        it.remove();
-                    }
-                }
-                else if (animation.isFinished(nowTick)) {
-                    animation.markForRemoval();
-                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
-                }
-            }
-            else{
-                it.remove();
-            }
-        }
     }
 
     public boolean containsAt(BlockPos blockPos) {
