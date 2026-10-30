@@ -121,8 +121,7 @@ public class AnimationRenderer {
                     ModCompat.beginBlock(consumer, lastBlockData);
                 }
 
-                Vector4f colors = ARGB.vector4fFromARGB32(quad.color());
-                consumer.putBulkData(quad.pose(), quad.bakedQuad(), colors.x, colors.y, colors.z, colors.w, quad.light(), OverlayTexture.NO_OVERLAY);
+                consumer.putBulkData(quad.pose(), quad.bakedQuad(), ARGB.redFloat(quad.color()), ARGB.greenFloat(quad.color()), ARGB.blueFloat(quad.color()), ARGB.alphaFloat(quad.color()), quad.light(), OverlayTexture.NO_OVERLAY);
             }
             ModCompat.endBlock(consumer);
         }
