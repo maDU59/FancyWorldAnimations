@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -25,20 +24,29 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class EndPortalFrameAnimation extends Animation{
 
-    private List<BlockModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
-    private List<BlockModelPart> eyeParts = new ArrayList<>();
-    private final BlockStateModel eyeModel;
+    private List<BlockModelPart> parts;
+    private BlockStateModel model;
+    private List<BlockModelPart> eyeParts;
+    private BlockStateModel eyeModel;
     
     public EndPortalFrameAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
+
+    @Override
+    public void updateModel(){
+        List<BlockModelPart> newParts = new ArrayList<>();
         RandomSource random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        model.collectParts(random, parts);
+        model.collectParts(random, newParts);
+        parts = newParts;
+
+        List<BlockModelPart> newEyeParts = new ArrayList<>();
         BlockState eyeState = defaultState.setValue(BlockStateProperties.EYE, true);
         RandomSource eyeRandom = RandomSource.create(eyeState.getSeed(position));
         eyeModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(eyeState);
-        eyeModel.collectParts(eyeRandom, eyeParts);
+        eyeModel.collectParts(eyeRandom, newEyeParts);
+        eyeParts = newEyeParts;
     }
 
     @Override
@@ -84,18 +92,16 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            VertexConsumer buffer = getBuffer(context);
-
-            RenderHelper.renderModel(buffer, poseStack.last(), parts, 1f, 1f, 1f, 1f, light);
+            AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
             if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
                 ModCompat.EndRemasteredCompat.renderEndPortalFrameAnimation(context, poseStack, position, light);
             }
             else{
-                renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
+                renderFilteredQuads(poseStack, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
                 for(Direction dir : Direction.values()){
-                    renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light, 1f, 1f, 1f, 1f);
+                    renderFilteredQuads(poseStack, part.getQuads(dir), true, light, 1f, 1f, 1f, 1f);
                 }
             }
 
@@ -104,21 +110,20 @@ public class EndPortalFrameAnimation extends Animation{
             float time = (float)(context.getNowTick() - this.startTick);
             float alpha = 0.1f + Math.abs((float)Math.sin(time * 0.07)) * 0.3f;
 
-            VertexConsumer buffer = getBuffer(context, RenderType.translucentMovingBlock());
-
-            renderFilteredQuads(poseStack, buffer, part.getQuads(null), true, light, 0f, 1f, 0f, alpha);
+            renderFilteredQuads(poseStack, part.getQuads(null), true, light, 0f, 1f, 0f, alpha);
             for(Direction dir : Direction.values()){
-                renderFilteredQuads(poseStack, buffer, part.getQuads(dir), true, light, 0f, 1f, 0f, alpha);
+                renderFilteredQuads(poseStack, part.getQuads(dir), true, light, 0f, 1f, 0f, alpha);
             }
 
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.sprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, a, r, g, b, light);
+                AnimationRenderer.renderQuad(pose, quad, a, r, g, b, light, getAnimationBlockData());
             }
         }
     }

@@ -4,11 +4,9 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import com.google.common.reflect.Reflection;
 
 import fr.madu59.fwa.platform.PlatformHelper;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +24,9 @@ public class ModCompatPlugin implements IMixinConfigPlugin {
         }
         if (mixinClassName.contains(".entityculling.")) {
             return PlatformHelper.isModLoaded("entityculling");
+        }
+        if (mixinClassName.contains(".vulkanmod.")) {
+            return PlatformHelper.isModLoaded("vulkanmod");
         }
         return true;
     }

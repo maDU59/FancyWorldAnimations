@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client.iris;
+package fr.madu59.fwa.mixin.client.compat.iris;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

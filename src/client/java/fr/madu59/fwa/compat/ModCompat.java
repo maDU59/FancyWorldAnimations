@@ -3,18 +3,22 @@ package fr.madu59.fwa.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BooleanSupplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.platform.PlatformHelper;
+import fr.madu59.fwa.rendering.AnimationBlockData;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -26,6 +30,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.WritableBookItem;
@@ -54,6 +59,8 @@ public class ModCompat {
     private final static boolean IS_COPPERATIVE_LOADED = PlatformHelper.isModLoaded("copperative");
     private final static boolean IS_MORECULLING_LOADED = PlatformHelper.isModLoaded("moreculling");
     private final static boolean IS_FLASHBACK_LOADED = PlatformHelper.isModLoaded("flashback");
+
+    private static boolean IS_FA_OBJECTS_LOADED = false;
 
     private final static Map<ResourceLocation, ResourceLocation> VAULT_KEYS = new HashMap<>();
 
@@ -118,12 +125,40 @@ public class ModCompat {
         return IS_FLASHBACK_LOADED;
     }
 
-    // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA (E.G. MORE CULLING'S BLOCKSTATE CULLING)
+    public static boolean isFAObjectsLoaded(){
+        return IS_FA_OBJECTS_LOADED;
+    }
+
+    public static void reload(){
+        Minecraft client = Minecraft.getInstance();
+        if(client == null) return;
+        ResourceManager currentManager = client.getResourceManager();
+        if (currentManager == null) return;
+
+        IS_FA_OBJECTS_LOADED = currentManager.listPacks().anyMatch(pack -> pack.packId()
+            .toLowerCase(Locale.ROOT)
+            .contains("fa+objects")
+        );
+    }
+
+    public static void beginBlock(VertexConsumer consumer, AnimationBlockData data){
+        if(isIrisLoaded()) IrisCompat.beginBlock(consumer, data);
+    }
+
+    public static void endBlock(VertexConsumer consumer){
+        if(isIrisLoaded()) IrisCompat.endBlock(consumer);
+    }
+
+    public static void disableCulling(BlockState state){
+        if(isMoreCullingLoaded()){
+            MoreCullingCompat.disableBlockStateCullingForBlock(state);
+        }
+    }
+
+    // DISABLE MOD OPTIONS THAT ARE INCOMPATIBLE WITH FWA
 
     private static void disableIncompatibleOptions(){
-        if(isMoreCullingLoaded()){
-            MoreCullingCompat.disableBlockStateCulling();
-        }
+
     }
 
     // VAULT COMPATIBILITY
@@ -272,12 +307,12 @@ public class ModCompat {
 
             try{
                 BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
-                Object rendererInstance = dispatcher.getRenderer((BlockEntity) be);
+                Object rendererInstance = dispatcher.getRenderer(be);
 
                 Object portalState = ancientPortalStateClass.getConstructor().newInstance();
                 extractMethod.invoke(rendererInstance, be, portalState, 0, new Vec3(0,0,0), new CrumblingOverlay(0, context.getPoseStack().last()));
                 renderMethod.invoke(rendererInstance, portalState, context.getPoseStack(), context.getSubmitNodeCollector(), context.getCameraRenderState());
-                RenderHelper.endBatch(context.getBufferSource());
+                AnimationRenderer.endBatch(context.getBufferSource());
             }catch(Exception e){
                 return;
             }
@@ -382,15 +417,62 @@ public class ModCompat {
     // MORE CULLING COMPATIBILITY
 
     public static class MoreCullingCompat{
-        
-        public static void disableBlockStateCulling(){
+
+        public static void disableBlockStateCullingForBlock(BlockState state){
+            Block block = state.getBlock();
+            String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();
             try{
-                Class<?> configAdditionsClass = Class.forName("ca.fxco.moreculling.api.config.ConfigAdditions");
-                Method disableOptionMethod = configAdditionsClass.getMethod("disableOption", String.class, String.class, BooleanSupplier.class, Object.class);
-                disableOptionMethod.invoke(null, "moreculling.config.option.blockStateCulling", "Incompatible with the following mod: FWA", (BooleanSupplier) () -> false, false);
-                FancyWorldAnimations.LOGGER.info("Successfully disabled MoreCulling's blockStateCulling!");
+                Class<?> moreCullingClass = Class.forName("ca.fxco.moreculling.MoreCulling");
+
+                java.lang.reflect.Field configField = moreCullingClass.getField("CONFIG");
+                Object configInstance = configField.get(null);
+
+                if (configInstance != null) {
+                    java.lang.reflect.Field dontCullField = configInstance.getClass().getField("dontCull");
+
+                    @SuppressWarnings("unchecked")
+                    List<String> dontCullList = (List<String>) dontCullField.get(configInstance);
+
+                    if (dontCullList != null) {
+                        if (!dontCullList.contains(blockId)) {
+                            dontCullList.add(blockId);
+                        }
+                    }
+                }
+
+                Class<?> moreBlockCullingClass = Class.forName("ca.fxco.moreculling.api.block.MoreBlockCulling");
+
+                if (moreBlockCullingClass.isInstance(block)) {
+                    java.lang.reflect.Method canCullMethod = moreBlockCullingClass.getMethod("moreculling$canCull");
+                    java.lang.reflect.Method setCanCullMethod = moreBlockCullingClass.getMethod("moreculling$setCanCull", boolean.class);
+
+                    boolean canCull = (boolean) canCullMethod.invoke(block);
+
+                    if (canCull) {
+                        setCanCullMethod.invoke(block, false);
+                    }
+                }
             }catch(Exception e){
-                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling, visual issues may appear!");
+                FancyWorldAnimations.LOGGER.warn("Failed to disable MoreCulling's blockStateCulling for block {}, visual issues may appear!", blockId);
+            }
+        }
+    }
+
+    // IRIS COMPATIBILITY
+
+    public static class IrisCompat{
+
+        public static void beginBlock(VertexConsumer consumer, AnimationBlockData blockData){
+            if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
+                Object2IntMap<BlockState> blockStateIdsMap = net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings.INSTANCE.getBlockStateIds();
+                if(blockStateIdsMap == null) return;
+                blockSensitiveConsumer.beginBlock(blockStateIdsMap.getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
+            }
+        }
+
+        public static void endBlock(VertexConsumer consumer){
+            if (consumer instanceof net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder blockSensitiveConsumer) {
+                blockSensitiveConsumer.endBlock();
             }
         }
     }

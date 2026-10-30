@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.client.sodium;
+package fr.madu59.fwa.mixin.client.compat.sodium;
 
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.core.BlockPos;
@@ -8,11 +8,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 
 @Mixin(
    targets = {"net/caffeinemc/sodium/client/render/chunk/compile/pipeline/BlockRenderer", "net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer", "me/jellysquid/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer"},
-   remap = false
+   remap = false,
+   priority = 1001
 )
 public class BlockRendererMixin {
 
@@ -23,7 +24,7 @@ public class BlockRendererMixin {
         ordinal = 0
     )
     private BlockStateModel fwa$render(BlockStateModel originalModel, BlockStateModel model, BlockState state, BlockPos pos, BlockPos origin) {
-        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? RenderHelper.getInvisibleModel(originalModel) : originalModel;
+        return FancyWorldAnimationsClient.shouldCancelBlockRendering(pos) ? AnimationRenderer.getInvisibleModel(originalModel, state) : originalModel;
     }
 
 }

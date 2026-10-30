@@ -6,12 +6,11 @@ import java.util.List;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper;
 import fr.madu59.fwa.utils.ModelSplitHelper.FenceGate;
@@ -28,19 +27,27 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class FenceGateAnimation extends Animation{
 
-    private List<BlockModelPart> parts = new ArrayList<>();
-    private final BlockStateModel model;
-    private final FenceGate fenceGate;
-    private final Direction facing;
+    private List<BlockModelPart> parts;
+    private BlockStateModel model;
+    private FenceGate fenceGate;
+    private Direction facing;
 
 
     public FenceGateAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        RandomSource random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        model.collectParts(random, parts);
+    }
+
+    @Override
+    public void updateModel(){
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+
+        List<BlockModelPart> newParts = new ArrayList<>();
+        RandomSource random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        model.collectParts(random, newParts);
+        parts = newParts;
+
         BlockModelPart part = parts.get(0);
 
         List<BakedQuad> quads = new ArrayList<>();
@@ -90,9 +97,7 @@ public class FenceGateAnimation extends Animation{
 
         int light = getLight();
 
-        VertexConsumer buffer = getBuffer(context);
-
-        renderQuads(poseStack, buffer, fenceGate.postQuadList(), light);
+        renderQuads(poseStack, fenceGate.postQuadList(), light);
 
         boolean onAxisZ = (facing.getAxis() == Axis.Z);
         float leftPivotX = onAxisZ ? (1.0f / 16.0f) : 0.5f;
@@ -107,8 +112,7 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(leftAngle));
         poseStack.translate(-leftPivotX, 0.0f, -leftPivotZ);
-
-        renderQuads(poseStack, buffer, fenceGate.leftQuadList(), light);
+        renderQuads(poseStack, fenceGate.leftQuadList(), light);
 
         poseStack.translate(leftPivotX, 0.0f, leftPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-leftAngle));
@@ -117,12 +121,13 @@ public class FenceGateAnimation extends Animation{
         poseStack.translate(rightPivotX, 0.0f, rightPivotZ);
         poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rightAngle));
         poseStack.translate(-rightPivotX, 0.0f, -rightPivotZ);
-        renderQuads(poseStack, buffer, fenceGate.rightQuadList(), light);
+        renderQuads(poseStack, fenceGate.rightQuadList(), light);
     }
 
-    private void renderQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, int light) {
+    private void renderQuads(PoseStack poseStack, List<BakedQuad> quads, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
-            RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+            AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
         }
     }
 

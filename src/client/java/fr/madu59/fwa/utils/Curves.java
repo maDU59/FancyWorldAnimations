@@ -41,8 +41,10 @@ public class Curves {
         }
         else if (type instanceof Door c) {
             switch (c) {
+                case SPRINGY:
+                    return solveSpringyUnease(t);
                 case DEFAULT:
-                    return 1 - Math.pow(1 - t, 1/5);
+                    return 1.0 - Math.pow(1.0 - t, 0.2);
                 default:
                     return t;
             }
@@ -63,6 +65,22 @@ public class Curves {
         } else {
             return 1.0 - (value - 1.0);
         }
+    }
+
+    private static double solveSpringyUnease(double target) {
+        double x = target;
+        for (int i = 0; i < 8; i++) {
+            double current = ease(x, Door.SPRINGY);
+            double error = current - target;
+            if (Math.abs(error) < 1e-6) break;
+
+            double h = 1e-5;
+            double derivative = (ease(x + h, Door.SPRINGY) - ease(x - h, Door.SPRINGY)) / (2 * h);
+            if (Math.abs(derivative) < 1e-6) break;
+
+            x -= error / derivative;
+        }
+        return Math.max(0.0, Math.min(1.0, x));
     }
 
     public static double getSpeedCoeff(Speed speed){
