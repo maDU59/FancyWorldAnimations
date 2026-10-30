@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -21,8 +20,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RedstoneWireAnimation extends Animation{
 
-    private final RandomSource random;
-    private final BakedModel model;
+    private RandomSource random;
+    private BakedModel model;
     private final float newR;
     private final float newG;
     private final float newB;
@@ -32,8 +31,6 @@ public class RedstoneWireAnimation extends Animation{
     
     public RedstoneWireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
         int newColor = RedStoneWireBlock.getColorForPower(newState.getValue(BlockStateProperties.POWER));
         newR = (float) (newColor >> 16 & 255) / 255.0F;
@@ -43,6 +40,12 @@ public class RedstoneWireAnimation extends Animation{
         oldR = (float) (oldColor >> 16 & 255) / 255.0F;
         oldG = (float) (oldColor >> 8 & 255) / 255.0F;
         oldB = (float) (oldColor & 255) / 255.0F;
+    }
+
+    @Override
+    public void updateModel(){
+        random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
     @Override
@@ -80,10 +83,9 @@ public class RedstoneWireAnimation extends Animation{
         PoseStack poseStack = context.getPoseStack();
     
         int light = getLight();
-        VertexConsumer buffer = getBuffer(context);
 
         float[] color = getColor(context.getNowTick(), newR, newG, newB, oldR, oldG, oldB);
 
-        RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, color[0], color[1], color[2], light, random, defaultState);
+        AnimationRenderer.renderModel(poseStack.last().copy(), model, 1.0f, color[0], color[1], color[2], light, getAnimationBlockData(), random, defaultState);
     }
 }

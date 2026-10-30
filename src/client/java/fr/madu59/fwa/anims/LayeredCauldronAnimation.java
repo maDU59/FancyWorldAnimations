@@ -3,13 +3,12 @@ package fr.madu59.fwa.anims;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.mixin.client.GetContentHeightInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -25,15 +24,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LayeredCauldronAnimation extends Animation{
 
-    private final BlockState oldBlockState;
-    private final BlockState newBlockState;
-    private final boolean isInverted;
-    private final RandomSource random;
-    private final BakedModel model;
+    private BlockState oldBlockState;
+    private BlockState newBlockState;
+    private boolean isInverted;
+    private RandomSource random;
+    private BakedModel model;
     
     public LayeredCauldronAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
         if (newState.getBlock() instanceof CauldronBlock){
             newBlockState = oldState;
             oldBlockState = newState;
@@ -71,6 +73,7 @@ public class LayeredCauldronAnimation extends Animation{
     }
 
     private double getHeight(BlockState state){
+        if (state == null) return 4.0/16.0;
         if (state.getBlock() instanceof LayeredCauldronBlock) return ((GetContentHeightInvoker) state.getBlock()).fwa$getContentHeight(state);
         if (state.getBlock() instanceof LavaCauldronBlock) return 15.0/16.0;
         return 4.0/16.0;
@@ -82,23 +85,22 @@ public class LayeredCauldronAnimation extends Animation{
 
         int light = getLight();
 
-        VertexConsumer buffer = getBuffer(context);
-
-        renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), false, light);
+        renderFilteredQuads(poseStack, model.getQuads(newState, null, random), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, model.getQuads(newState, dir, random), false, light);
+            renderFilteredQuads(poseStack, model.getQuads(newState, dir, random), false, light);
         }
 
         float dy = getPosition(context.getNowTick(), getHeight(newBlockState), getHeight(oldBlockState));
         poseStack.translate(0,dy,0);
 
-        renderFilteredQuads(poseStack, buffer, model.getQuads(newState, null, random), true, light);
+        renderFilteredQuads(poseStack, model.getQuads(newState, null, random), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, model.getQuads(newState, dir, random), true, light);
+            renderFilteredQuads(poseStack, model.getQuads(newState, dir, random), true, light);
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantLiquid, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantLiquid, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             String last = path.split("/")[path.split("/").length-1];
@@ -114,7 +116,7 @@ public class LayeredCauldronAnimation extends Animation{
                     }
                 }
 
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, r, g, b, light);
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, r, g, b, light, getAnimationBlockData());
             }
         }
     }
