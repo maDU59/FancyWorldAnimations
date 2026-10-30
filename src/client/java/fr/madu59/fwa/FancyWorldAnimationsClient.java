@@ -31,6 +31,7 @@ import fr.madu59.fwa.compat.Blacklist;
 import fr.madu59.fwa.compat.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
@@ -42,7 +43,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -79,6 +82,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
@@ -90,10 +96,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BlacklistReloadListener());
 		FancyWorldAnimationsConfigScreen.registerCommand();
-		ClientPlayConnectionEvents.DISCONNECT.register((clientPacketListener, client) -> {
+		ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
             animations.animations.clear();
         });
-		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+		ClientLifecycleEvents.CLIENT_STARTED.register(_ -> {
             ModCompat.init(); 
         });
 		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
@@ -153,7 +159,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
 		animation.setReverseCount(reverseCount);
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 500000*500000) return;
+		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 10000*10000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
@@ -191,13 +197,34 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		Frustum frustum = context.getFrustum();
 		double nowTick = context.getNowTick();
 
+		LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+		List<BlockPos> toRemove = new ArrayList<>();
+
 		for (Animation animation : animations.animations.values()) {
 
-			if(!context.isShadow()) animation.tick(nowTick);
+			BlockPos animationPos = animation.getPos();
+
+			if(!context.isShadow()) {
+				if (level.isLoaded(animationPos)) {
+					if (animation.isForRemoval()) {
+						if (!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+							toRemove.add(animationPos);
+						}
+					} else if (animation.isFinished(nowTick)) {
+						animation.markForRemoval();
+						((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(animationPos.getX() >> 4, animationPos.getY() >> 4, animationPos.getZ() >> 4, true);
+					}
+				} else {
+					toRemove.add(animationPos);
+				}
+
+				animation.tick(nowTick);
+			}
+
             if (!animation.isRendering()) continue;
-            double dx = camPos.x - (animation.getPos().getX() + 0.5);
-            double dy = camPos.y - (animation.getPos().getY() + 0.5);
-            double dz = camPos.z - (animation.getPos().getZ() + 0.5);
+            double dx = camPos.x - (animationPos.getX() + 0.5);
+            double dy = camPos.y - (animationPos.getY() + 0.5);
+            double dz = camPos.z - (animationPos.getZ() + 0.5);
             if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
             if (animation.isOcclusionCulled() && !isShadow) continue;
             if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
@@ -209,7 +236,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		AnimationRenderer.renderBuffers();
 
 		dimension = level.dimension();
-		if(!context.isShadow()) animations.clean(nowTick);
+
+		if(!context.isShadow()) {
+			for(BlockPos pos : toRemove){
+				animations.removeAt(pos);
+			}
+		}
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
