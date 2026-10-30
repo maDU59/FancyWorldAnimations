@@ -1,24 +1,12 @@
 package fr.madu59.fwa.anims;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-
-import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.config.SettingsManager;
-import fr.madu59.fwa.platform.PlatformHelper;
-import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
@@ -26,30 +14,22 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class BellAnimation extends Animation{
 
-    private ModelPart bellBody;
-    private final BakedModel model;
+    public ModelPart bellModel;
     private final float hash;
-    private BellBlockEntity bellBlockEntity;
-    private final RandomSource random;
     private final Direction facing;
     private final BellAttachType attachment;
-    private final ResourceLocation atlasId = ResourceLocation.tryParse("minecraft:textures/atlas/blocks.png");
-    private final ResourceLocation textureId = ResourceLocation.tryParse("minecraft:entity/bell/bell_body");
     
     public BellAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         this.hash = position.hashCode();
-        if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
-            this.bellBlockEntity = bbe;
-        }
-        else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
-            FancyWorldAnimationsClient.removeAnimationAt(position);
-        }
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         attachment = defaultState.getValue(BlockStateProperties.BELL_ATTACHMENT);
+    }
+
+    @Override
+    public void updateModel(){
+        this.bellModel = Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL);
     }
 
     @Override
@@ -64,11 +44,12 @@ public class BellAnimation extends Animation{
 
     @Override
     public boolean hideOriginalBlock() {
-        return shouldUseFallbackRender();
+        return false;
     }
 
-    private boolean shouldUseFallbackRender() {
-        return PlatformHelper.isModLoaded("betterblockentities");
+    @Override
+    public boolean hideOriginalBlockEntity() {
+        return false;
     }
 
     public boolean hasInfiniteAnimation(){
@@ -80,7 +61,7 @@ public class BellAnimation extends Animation{
         return !hasInfiniteAnimation()? getAnimDuration() : Double.MAX_VALUE;
     }
 
-    private float animateIdle(float time){
+    public float animateIdle(float time){
         float uniqueOffset = (float)(hash % 100);
         time += uniqueOffset;
         float slowWave = (float) Math.sin(time * 0.1f) * 0.05f;
@@ -90,20 +71,24 @@ public class BellAnimation extends Animation{
         return ((slowWave + fastWave) / 2f) * Math.clamp(time - (float)getAnimDuration(), 0f, 5f)/5f;
     }
 
-    private float animatePlacement(double nowTick){
+    public float animatePlacement(double nowTick){
         double progress = getProgress(nowTick);
         return (float)Math.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
     }
 
-    private ModelPart rotateBell(ModelPart bellBody, float rot, Direction facing, BellAttachType attachment){
+    public void rotateBell(ModelPart bellBody, float rot){
+        rotateBell(bellBody, rot, facing, attachment);
+    }
+
+    public void rotateBell(ModelPart bellBody, float rot, Direction facing, BellAttachType attachment){
         float f = 0.0F;
         float g = 0.0F;
         switch (facing) {
             case NORTH:
-                f = -rot;
+                f = rot;
                 break;
             case SOUTH:
-                f = rot;
+                f = -rot;
                 break;
             case WEST:
                 g = -rot;
@@ -122,52 +107,10 @@ public class BellAnimation extends Animation{
         else{
             bellBody.xRot = f;
             bellBody.zRot = g;
-            }
-        return bellBody;
+        }
     }
 
-    @Override
-    public void render(AnimationRenderingContext context) {
-        ModelPart modelPart = Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL);
-        this.bellBody = modelPart.getChild("bell_body");
-        if (this.bellBody == null) {
-            return;
-        }
-        if(bellBlockEntity == null){
-            if(Minecraft.getInstance().level.getBlockEntity(position) instanceof BellBlockEntity bbe){
-                bellBlockEntity = bbe;
-            }
-            else if (Minecraft.getInstance().level.getBlockEntity(position) != null){
-                FancyWorldAnimationsClient.removeAnimationAt(position);
-                System.out.println("[REMOVAL] Invalid block removed");
-            }
-            return;
-        }
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(atlasId).apply(textureId);
-        PoseStack poseStack = context.getPoseStack();
-
-        int light = getLight();
-
-        if(shouldUseFallbackRender()){
-            RenderHelper.renderModel(getBuffer(context), poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
-        }
-
-        setupAnim(bellBlockEntity, Math.clamp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.0f, 1.0f));
-
-        if (bellBlockEntity.ticks == 0) {
-            float time = (float)(context.getNowTick() - this.startTick);
-            float rot;
-            if (time <= getAnimDuration()) rot = animatePlacement(context.getNowTick());
-            else rot = animateIdle(time);
-            bellBody = rotateBell(bellBody, rot, facing, attachment);
-        }
-
-        bellBody.render(poseStack, sprite.wrap(getBuffer(context)), light, OverlayTexture.NO_OVERLAY, -1);
-
-        RenderHelper.endBatch(context.getBufferSource());
-    }
-
-    public void setupAnim(BellBlockEntity bellBlockEntity, float f) {
+    public void setupAnim(ModelPart bellBody, BellBlockEntity bellBlockEntity, float f) {
         float g = (float)bellBlockEntity.ticks + f;
         float h = 0.0F;
         float k = 0.0F;
@@ -184,7 +127,7 @@ public class BellAnimation extends Animation{
             }
         }
 
-        this.bellBody.xRot = h;
-        this.bellBody.zRot = k;
+        bellBody.xRot = h;
+        bellBody.zRot = k;
     }
 }
