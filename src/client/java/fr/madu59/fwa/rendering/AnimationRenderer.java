@@ -90,7 +90,9 @@ public class AnimationRenderer {
         int color = ARGB.colorFromFloat(a,r*shade,g*shade,b*shade);
 
         RenderType renderType;
-        if(a < 1.0f){
+        if(a <= 0.0f){
+            return;
+        } else if(a < 1.0f){
             renderType = RenderTypes.translucentMovingBlock();
         } else {
             renderType = switch (bakedQuad.materialInfo().layer()) {
