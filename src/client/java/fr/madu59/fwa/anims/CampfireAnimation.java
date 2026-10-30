@@ -3,11 +3,10 @@ package fr.madu59.fwa.anims;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -21,13 +20,16 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class CampfireAnimation extends Animation{
 
-    private final BlockState state;
-    private final BakedModel model;
-    private final RandomSource random;
+    private BlockState state;
+    private BakedModel model;
+    private RandomSource random;
     
     public CampfireAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
 
+    @Override
+    public void updateModel(){
         if (oldIsOpen) state = oldState;
         else state = newState;
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
@@ -66,11 +68,9 @@ public class CampfireAnimation extends Animation{
         
         int light = getLight();
 
-        VertexConsumer buffer = getBuffer(context);
-
-        renderFilteredQuads(poseStack, buffer, model.getQuads(state, null, random), false, light);
+        renderFilteredQuads(poseStack, model.getQuads(state, null, random), false, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, model.getQuads(state, dir, random), false, light);
+            renderFilteredQuads(poseStack, model.getQuads(state, dir, random), false, light);
         }
 
         float scaleY;
@@ -86,17 +86,18 @@ public class CampfireAnimation extends Animation{
         poseStack.scale(scaleXZ,scaleY,scaleXZ);
         poseStack.translate(-0.5f,-1f/16f,-0.5f);
 
-        renderFilteredQuads(poseStack, buffer, model.getQuads(state, null, random), true, light);
+        renderFilteredQuads(poseStack, model.getQuads(state, null, random), true, light);
         for(Direction dir : Direction.values()){
-            renderFilteredQuads(poseStack, buffer, model.getQuads(state, dir, random), true, light);
+            renderFilteredQuads(poseStack, model.getQuads(state, dir, random), true, light);
         }
     }
 
-    private void renderFilteredQuads(PoseStack poseStack, VertexConsumer buffer, List<BakedQuad> quads, boolean wantFire, int light) {
+    private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantFire, int light) {
+        PoseStack.Pose pose = poseStack.last().copy();
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {
-                RenderHelper.renderQuad(buffer, poseStack.last(), quad, 1.0f, 1.0f, 1.0f, 1.0f, light);
+                AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
             }
         }
     }

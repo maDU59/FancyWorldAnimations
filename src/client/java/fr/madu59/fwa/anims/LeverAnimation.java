@@ -7,13 +7,12 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper;
@@ -30,14 +29,19 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LeverAnimation extends Animation{
     
-    private final RandomSource random;
-    private final BakedModel model;
-    private final Lever lever;
-    private final Direction facing;
-    private final AttachFace face;
+    private RandomSource random;
+    private BakedModel model;
+    private Lever lever;
+    private Direction facing;
+    private AttachFace face;
 
     public LeverAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
+
+    @Override
+    public void updateModel(){
+
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
 
@@ -99,9 +103,10 @@ public class LeverAnimation extends Animation{
 
         int light = getLight();
 
-        VertexConsumer buffer = getBuffer(context);
-
-        RenderHelper.renderQuads(buffer, poseStack.last(), lever.baseQuadList(), 1f, 1f, 1f, 1f, light);
+        PoseStack.Pose pose = poseStack.last().copy();
+        for(int i = 0; i < lever.baseQuadList().size(); i++){
+            AnimationRenderer.renderQuad(pose, lever.baseQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+        }
 
         double angle = getAngle(context.getNowTick(), facing);
 
@@ -151,7 +156,10 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
-        RenderHelper.renderQuads(buffer, poseStack.last(), lever.handleQuadList(), 1f, 1f, 1f, 1f, light);
+        pose = poseStack.last().copy();
+        for(int i = 0; i < lever.handleQuadList().size(); i++){
+            AnimationRenderer.renderQuad(pose, lever.handleQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
+        }
     }
 
     public Lever splitLeverQuads(List<BakedQuad> quads, Direction facing, AttachFace face){

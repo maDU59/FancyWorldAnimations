@@ -3,12 +3,12 @@ package fr.madu59.fwa.anims;
 import java.util.ArrayList;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -24,8 +24,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TrapDoorAnimation extends Animation{
 
-    private final BakedModel model;
-    private final RandomSource random;
+    private BakedModel model;
+    private RandomSource random;
     private final float pivotX;
     private final float pivotY;
     private final float pivotZ;
@@ -35,8 +35,8 @@ public class TrapDoorAnimation extends Animation{
     
     public TrapDoorAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
-        random = RandomSource.create(defaultState.getSeed(position));
-        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+
+        ModCompat.disableCulling(defaultState);
 
         BlockState closedState = defaultState.setValue(BlockStateProperties.OPEN, false);
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -63,6 +63,12 @@ public class TrapDoorAnimation extends Animation{
         float thickness = (float) (boundingBox.maxY - boundingBox.minY);
         float halfThickness = thickness > 0.0f ? thickness * 0.5f : (3.0f / 32.0f);
         dY = (half == Half.TOP) ? -halfThickness : halfThickness;
+    }
+
+    @Override
+    public void updateModel(){
+        random = RandomSource.create(defaultState.getSeed(position));
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
 
     @Override
@@ -136,7 +142,6 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = getLight();
-        VertexConsumer buffer = getBuffer(context);
-        RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
+        AnimationRenderer.renderModel(poseStack.last().copy(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData(), random, defaultState);
     }
 }
