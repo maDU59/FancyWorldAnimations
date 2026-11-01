@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.entityculling;
+package fr.madu59.fwa.mixin.compat.entityculling;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;

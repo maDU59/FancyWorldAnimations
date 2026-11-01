@@ -3,7 +3,10 @@
         "framedblocks",
         "copycats",
         "create_connected",
-        "potioncauldron"
+        "potioncauldron",
+        "domum_ornamentum",
+        "malisisdoorsreborn",
+        "outpostzero"
     ],
     "blocks":[
         "create:train_door",

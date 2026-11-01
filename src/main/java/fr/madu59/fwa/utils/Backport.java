@@ -1,5 +1,6 @@
 package fr.madu59.fwa.utils;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Vector3f;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -20,5 +21,17 @@ public class Backport {
 
     public static <T extends Comparable<T>> T getValueOrElse(BlockState state, Property<T> property, T defaultValue) {
         return state.hasProperty(property) ? state.getValue(property) : defaultValue;
+    }
+
+    public static PoseStack.Pose copyPose(PoseStack poseStack) {
+        return copyPose(poseStack.last());
+    }
+
+    public static PoseStack.Pose copyPose(PoseStack.Pose pose) {
+        return ((PoseExtension) (Object) pose).fwa$copy();
+    }
+
+    public interface PoseExtension {
+        PoseStack.Pose fwa$copy();
     }
 }
