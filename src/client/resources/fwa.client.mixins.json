@@ -19,7 +19,9 @@
 		"compat.entityculling.CullTaskMixin",
 		"compat.vulkanmod.BlockRendererMixin",
 		"core.ResourceManagerMixin",
-        "blockentity.renderer.sign.AbstractSignRendererMixin"
+        "blockentity.renderer.sign.AbstractSignRendererMixin",
+		"b3d.posestack.PoseConstructorInvoker",
+		"b3d.posestack.PoseMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

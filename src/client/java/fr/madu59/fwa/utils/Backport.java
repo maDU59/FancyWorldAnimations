@@ -24,11 +24,14 @@ public class Backport {
     }
 
     public static PoseStack.Pose copyPose(PoseStack poseStack) {
-        return copyPose(poseStack.last());;
+        return copyPose(poseStack.last());
     }
 
     public static PoseStack.Pose copyPose(PoseStack.Pose pose) {
-        //TODO: Implement this method to copy the pose. This is a placeholder implementation.
-        return null;
+        return ((PoseExtension) (Object) pose).fwa$copy();
+    }
+
+    public interface PoseExtension {
+        PoseStack.Pose fwa$copy();
     }
 }

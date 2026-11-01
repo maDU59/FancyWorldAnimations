@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -93,7 +94,7 @@ public class CampfireAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantFire, int light) {
-        PoseStack.Pose pose = poseStack.last();
+        PoseStack.Pose pose = Backport.copyPose(poseStack);
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if (path.contains("fire_fire") == wantFire) {

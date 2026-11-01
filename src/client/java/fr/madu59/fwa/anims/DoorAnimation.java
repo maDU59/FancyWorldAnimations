@@ -7,6 +7,7 @@ import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -133,6 +134,6 @@ public class DoorAnimation extends Animation{
         poseStack.translate(-pivotX, 0.0f, -pivotZ);
 
         int light = getLight();
-        AnimationRenderer.renderModel(poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData(), random, defaultState);
+        AnimationRenderer.renderModel(Backport.copyPose(poseStack), model, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData(), random, defaultState);
     }
 }

@@ -7,6 +7,7 @@ import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -140,6 +141,6 @@ public class TrapDoorAnimation extends Animation{
         poseStack.translate(-shiftX, -shiftY, -shiftZ);
 
         int light = getLight();
-        AnimationRenderer.renderModel(poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData(), random, defaultState);
+        AnimationRenderer.renderModel(Backport.copyPose(poseStack), model, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData(), random, defaultState);
     }
 }

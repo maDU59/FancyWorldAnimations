@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -78,7 +79,7 @@ public class ComposterAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantCompost, int light) {
-        PoseStack.Pose pose = poseStack.last();
+        PoseStack.Pose pose = Backport.copyPose(poseStack);
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if ((path.endsWith("_compost") || path.contains("_ready")) == wantCompost) {

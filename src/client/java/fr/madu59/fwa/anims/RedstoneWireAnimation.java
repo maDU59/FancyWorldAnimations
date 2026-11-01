@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -83,6 +84,6 @@ public class RedstoneWireAnimation extends Animation{
 
         float[] color = getColor(context.getNowTick(), newR, newG, newB, oldR, oldG, oldB);
 
-        AnimationRenderer.renderModel(poseStack.last(), model, 1.0f, color[0], color[1], color[2], light, getAnimationBlockData(), random, defaultState);
+        AnimationRenderer.renderModel(Backport.copyPose(poseStack), model, 1.0f, color[0], color[1], color[2], light, getAnimationBlockData(), random, defaultState);
     }
 }

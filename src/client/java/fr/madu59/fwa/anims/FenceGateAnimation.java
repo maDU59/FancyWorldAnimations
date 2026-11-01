@@ -119,7 +119,7 @@ public class FenceGateAnimation extends Animation{
     }
 
     private void renderQuads(PoseStack poseStack, List<BakedQuad> quads, int light) {
-        PoseStack.Pose pose = poseStack.last();
+        PoseStack.Pose pose = Backport.copyPose(poseStack);
         for (BakedQuad quad : quads) {
             AnimationRenderer.renderQuad(pose, quad, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData());
         }

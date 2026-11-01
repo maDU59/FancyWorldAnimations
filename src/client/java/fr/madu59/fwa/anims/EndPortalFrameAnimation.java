@@ -8,12 +8,12 @@ import fr.madu59.fwa.compat.ModCompat.EndRemasteredCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Backport;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -95,7 +95,7 @@ public class EndPortalFrameAnimation extends Animation{
 
         if(newIsOpen){
 
-            AnimationRenderer.renderModel(poseStack.last(), model, 1f, 1f, 1f, 1f, light, getAnimationBlockData(), random, defaultState);
+            AnimationRenderer.renderModel(Backport.copyPose(poseStack), model, 1f, 1f, 1f, 1f, light, getAnimationBlockData(), random, defaultState);
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
             renderFilteredQuads(poseStack, eyeModel.getQuads(eyeState, null, eyeRandom), true, light, 1f, 1f, 1f, 1f);
             for(Direction dir : Direction.values()){
@@ -116,7 +116,7 @@ public class EndPortalFrameAnimation extends Animation{
     }
 
     private void renderFilteredQuads(PoseStack poseStack, List<BakedQuad> quads, boolean wantEye, int light, float r, float g, float b, float a) {
-        PoseStack.Pose pose = poseStack.last();
+        PoseStack.Pose pose = Backport.copyPose(poseStack);
         for (BakedQuad quad : quads) {
             String path = quad.getSprite().contents().name().getPath();
             if (path.contains("eye") == wantEye) {

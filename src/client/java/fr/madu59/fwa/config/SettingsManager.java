@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 
 import fr.madu59.fwa.FancyWorldAnimations;
 import fr.madu59.fwa.compat.ModCompat;
-import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.ModelSplitHelper.splitMethod;

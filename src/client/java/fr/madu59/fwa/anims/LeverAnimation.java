@@ -103,7 +103,7 @@ public class LeverAnimation extends Animation{
 
         int light = getLight();
 
-        PoseStack.Pose pose = poseStack.last();
+        PoseStack.Pose pose = Backport.copyPose(poseStack);
         for(int i = 0; i < lever.baseQuadList().size(); i++){
             AnimationRenderer.renderQuad(pose, lever.baseQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
         }
@@ -156,7 +156,7 @@ public class LeverAnimation extends Animation{
             
         poseStack.translate(-pivotX, -pivotY, -pivotZ);
 
-        pose = poseStack.last();
+        pose = Backport.copyPose(poseStack);
         for(int i = 0; i < lever.handleQuadList().size(); i++){
             AnimationRenderer.renderQuad(pose, lever.handleQuadList().get(i), 1f, 1f, 1f, 1f, light, getAnimationBlockData());
         }
