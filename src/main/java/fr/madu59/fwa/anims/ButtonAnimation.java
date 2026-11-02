@@ -1,11 +1,10 @@
 package fr.madu59.fwa.anims;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
@@ -20,11 +19,15 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ButtonAnimation extends Animation{
 
-    private final BakedModel model;
-    private final RandomSource random;
+    private BakedModel model;
+    private RandomSource random;
     
     public ButtonAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
+    }
+
+    @Override
+    public void updateModel(){
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
     }
@@ -78,7 +81,6 @@ public class ButtonAnimation extends Animation{
         poseStack.translate(x, y, z);
 
         int light = getLight();
-        VertexConsumer buffer = getBuffer(context);
-        RenderHelper.renderModel(buffer, poseStack.last(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, random, defaultState);
+        AnimationRenderer.renderModel(poseStack.last().copy(), model, 1.0f, 1.0f, 1.0f, 1.0f, light, getAnimationBlockData(), random, defaultState);
     }
 }

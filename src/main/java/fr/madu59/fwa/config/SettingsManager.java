@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import fr.madu59.fwa.FancyWorldAnimations;
+import fr.madu59.fwa.compat.ModCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.utils.Curves;
@@ -72,6 +73,13 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> DOOR_REDSTONE = loadOptionWithDefaults(
+        "door_redstone",
+        "fwa.config.option.redstone.name",
+        "fwa.config.option.redstone.description",
+        true
+    );
+
     public static Option<Boolean> TRAPDOOR_STATE = loadOptionWithDefaults(
         "trapdoor_state",
         "fwa.config.option.state.name",
@@ -93,6 +101,13 @@ public class SettingsManager {
         1.0
     );
 
+    public static Option<Boolean> TRAPDOOR_REDSTONE = loadOptionWithDefaults(
+        "trapdoor_redstone",
+        "fwa.config.option.redstone.name",
+        "fwa.config.option.redstone.description",
+        true
+    );
+
     public static Option<Boolean> FENCEGATE_STATE = loadOptionWithDefaults(
         "fencegate_state",
         "fwa.config.option.state.name",
@@ -112,6 +127,13 @@ public class SettingsManager {
         "fwa.config.option.speed.name",
         "fwa.config.option.speed.description",
         1.0
+    );
+
+    public static Option<Boolean> FENCEGATE_REDSTONE = loadOptionWithDefaults(
+        "fencegate_redstone",
+        "fwa.config.option.redstone.name",
+        "fwa.config.option.redstone.description",
+        true
     );
 
     public static Option<Boolean> LEVER_STATE = loadOptionWithDefaults(
@@ -193,7 +215,7 @@ public class SettingsManager {
     );
 
     public static Option<Boolean> JUKEBOX_INFINITE = loadOptionWithDefaults(
-        "lectern_infinite",
+        "jukebox_infinite",
         "fwa.config.option.infinite.name",
         "fwa.config.option.infinite.description",
         true,
@@ -430,7 +452,7 @@ public class SettingsManager {
         "fwa.config.option.easing.name",
         "fwa.config.option.easing.description",
         Curves.Door.SPRINGY
-    );
+    ).isEnabled(() -> !ModCompat.isFAObjectsLoaded()).disabledValue(Curves.Door.DEFAULT);
 
     public static Option<Boolean> LANTERN_STATE = loadOptionWithDefaults(
         "lantern_state",
@@ -464,26 +486,47 @@ public class SettingsManager {
         true
     );
 
-    public static Option<Boolean> CHAIN_SWING_LIMIT = loadOptionWithDefaults(
-        "chain_swing_limit",
-        "fwa.config.option.swing_limit.name",
-        "fwa.config.option.swing_limit.description",
-        true,
-        true
-    );
-
     public static Option<Boolean> SHULKERBOX_STATE = loadOptionWithDefaults(
         "shulkerbox_state",
         "fwa.config.option.state.name",
         "fwa.config.option.state.description",
         true
-    );
+    ).isEnabled(() -> !ModCompat.isFAObjectsLoaded()).disabledValue(false);
 
     public static Option<Double> SHULKERBOX_SPEED = loadOptionWithDefaults(
         "shulkerbox_speed",
         "fwa.config.option.speed.name",
         "fwa.config.option.speed.description",
         1.0
+    );
+
+    public static Option<Float> SWINGING_SPEED = loadOptionWithDefaults(
+        "swinging_speed",
+        "fwa.config.option.speed.name",
+        "fwa.config.option.speed.description",
+        1.0f
+    );
+
+    public static Option<Float> SWINGING_INTENSITY = loadOptionWithDefaults(
+        "swinging_intensity",
+        "fwa.config.option.intensity.name",
+        "fwa.config.option.intensity.description",
+        1.0f
+    );
+
+    public static Option<Boolean> SWINGING_WEATHER_STATE = loadOptionWithDefaults(
+        "swinging_weather_state",
+        "fwa.config.option.weather.name",
+        "fwa.config.option.weather.description",
+        true
+    );
+
+    public static Option<Boolean> HANGING_SIGN_STATE = loadOptionWithDefaults(
+            "hanging_sign_state",
+            "fwa.config.option.state.name",
+            "fwa.config.option.state.description",
+            true,
+            false
     );
 
     public static void saveSettings(List<Option<?>> options) {
@@ -501,7 +544,7 @@ public class SettingsManager {
     private static Map<String, String> toMap(List<Option<?>> options) {
         Map<String, String> map = new LinkedHashMap<>();
         for (Option<?> option : options) {
-            if (option.getValue() != option.getDefaultValue()) map.put(option.getId(), option.getValue().toString());
+            if (option.getTrueValue() != option.getDefaultValue()) map.put(option.getId(), option.getTrueValue().toString());
         }
         return map;
     }

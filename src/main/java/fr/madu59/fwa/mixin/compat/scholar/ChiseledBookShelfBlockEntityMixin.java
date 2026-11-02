@@ -1,4 +1,4 @@
-package fr.madu59.fwa.mixin.scholar;
+package fr.madu59.fwa.mixin.compat.scholar;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
