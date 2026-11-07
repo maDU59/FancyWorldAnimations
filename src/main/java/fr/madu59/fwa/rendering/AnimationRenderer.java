@@ -87,10 +87,11 @@ public class AnimationRenderer {
             renderType = RenderType.translucentMovingBlock();
         } else {
             ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(blockData.getBlockState());
-            if(renderTypes.contains(RenderType.cutoutMipped()) || renderTypes.contains(RenderType.cutout())){
-                renderType = RenderType.cutoutMipped();;
-            } else if(renderTypes.contains(RenderType.translucent())){
+            if(renderTypes.contains(RenderType.translucent())){
                 renderType = RenderType.translucentMovingBlock();
+            }
+            else if(renderTypes.contains(RenderType.cutoutMipped()) || renderTypes.contains(RenderType.cutout())){
+                renderType = RenderType.cutoutMipped();;
             } else {
                 renderType = RenderType.solid();
             }
