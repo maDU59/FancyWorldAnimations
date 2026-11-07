@@ -22,7 +22,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isVerticalChain(BlockState blockState){
-        return blockState.getBlock() instanceof ChainBlock && blockState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
+        return FancyWorldAnimationsClient.typeOf(blockState) == FancyWorldAnimationsClient.Type.CHAIN && blockState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
     }
 
     public static boolean isVerticalChain(Animation animation){

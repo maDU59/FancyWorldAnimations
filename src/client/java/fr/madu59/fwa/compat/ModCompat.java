@@ -184,13 +184,6 @@ public class ModCompat {
         VAULT_KEYS.put(vaultId, itemId);
     }
 
-    // IDLING MODDED BLOCKS COMPATIBILITY
-
-    public static boolean isAnimatedModdedBlock(BlockState state){
-        if(WW_DISPLAY_LANTERNS.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()))) return true;
-        return false;
-    }
-
     // MAP ATLASES COMPATIBILITY
 
     public static class MapAtlasesCompat{
