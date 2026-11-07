@@ -84,6 +84,10 @@ public class ModCompat {
         AnimationAdditions.registerAnimationForBlock(WW_DISPLAY_LANTERNS, Type.LANTERN);
         AnimationAdditions.registerAnimationForBlock(ENDREM_ANCIENT_PORTAL_FRAME, Type.END_PORTAL_FRAME);
         AnimationAdditions.registerAnimationForBlock(ALEXSCAVES_GINGERBREAD_DOOR, Type.DOOR);
+        AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "lit_lantern"), Type.LANTERN);
+        AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "unlit_lantern"), Type.LANTERN);
+        AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "lit_soul_lantern"), Type.LANTERN);
+        AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "unlit_soul_lantern"), Type.LANTERN);
     }
 
     // LOADED MODS CHECK
