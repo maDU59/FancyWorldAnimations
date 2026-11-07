@@ -125,6 +125,8 @@ dependencies {
 
     implementation("maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
 
+    runtimeOnly("maven.modrinth:hardcore-torches:1.21.0-2.7")
+
 	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
 
     // Example optional mod dependency with JEI

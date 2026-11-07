@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.util.FastColor;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import org.joml.Vector3f;
 import java.util.Map;
 
@@ -85,7 +86,14 @@ public class AnimationRenderer {
         if(a < 1.0f){
             renderType = RenderType.translucentMovingBlock();
         } else {
-            renderType = ItemBlockRenderTypes.getMovingBlockRenderType(blockData.getBlockState());
+            ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(blockData.getBlockState());
+            if(renderTypes.contains(RenderType.cutoutMipped()) || renderTypes.contains(RenderType.cutout())){
+                renderType = RenderType.cutoutMipped();;
+            } else if(renderTypes.contains(RenderType.translucent())){
+                renderType = RenderType.translucentMovingBlock();
+            } else {
+                renderType = RenderType.solid();
+            }
         }
 
         buffers.computeIfAbsent(renderType, k -> new ArrayList<>()).add(new AnimationQuad(pose, bakedQuad, light, color, blockData));
