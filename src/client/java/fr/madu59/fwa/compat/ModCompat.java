@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient.Type;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
+import fr.madu59.fwa.compat.entityculling.EntityCullingCompat;
 import fr.madu59.fwa.compat.iris.IrisCompat;
 import fr.madu59.fwa.compat.moreculling.MoreCullingCompat;
 import fr.madu59.fwa.platform.PlatformHelper;
@@ -46,6 +47,7 @@ public final class ModCompat {
         registerVaultKeys();
         registerAnimations();
         disableIncompatibleOptions();
+        if(PlatformHelper.isModLoaded("entityculling")) EntityCullingCompat.init();
     }
 
     public static Type typeOf(Block block){

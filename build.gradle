@@ -35,6 +35,10 @@ repositories {
         name = "JitPack"
         url = "https://jitpack.io" 
     }
+	maven{
+		name = "trz7w"
+		url = "https://maven.tr7zw.dev/repository/maven-public/"
+	}
 }
 
 loom {
@@ -60,7 +64,7 @@ dependencies {
 	implementation "net.caffeinemc:sodium-fabric:0.9.2+mc26.3"
 
 	implementation "maven.modrinth:iris:1.11.6+26.3-fabric"
-	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
+	compileOnly "dev.tr7zw:TRansition-versionless:1.0.28-SNAPSHOT@jar"
 
 	compileOnly "maven.modrinth:vulkanmod:0.6.8+26.1.2"
 
@@ -71,6 +75,10 @@ dependencies {
 	compileOnly "maven.modrinth:moreculling:loquqFkT"
 	compileOnly "maven.modrinth:cloth-config:fg2uyxOW"
 	runtimeOnly "maven.modrinth:forge-config-api-port:JpKvrr9J"
+
+	implementation files("libs/ec.jar")
+
+	runtimeOnly "maven.modrinth:spark:1.10.187-fabric"
 }
 
 processResources {

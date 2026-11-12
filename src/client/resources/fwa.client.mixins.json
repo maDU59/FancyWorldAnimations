@@ -20,7 +20,6 @@
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
 		"compat.scholar.ColoredBookModelMixin",
-		"compat.entityculling.CullTaskMixin",
 		"compat.vulkanmod.BlockRendererMixin",
 		"core.ResourceManagerMixin"
 	],

@@ -203,28 +203,28 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			BlockPos animationPos = animation.getPos();
 
 			if(!context.isShadow()) {
-				if (level.isLoaded(animationPos)) {
-					if (animation.isForRemoval()) {
-						if (!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-							toRemove.add(animationPos);
-						}
-					} else if (animation.isFinished(nowTick)) {
-						animation.markForRemoval();
-						((SetSectionDirtyInvoker) levelExtractor).fwa$setSectionDirty(animationPos.getX() >> 4, animationPos.getY() >> 4, animationPos.getZ() >> 4, true);
-					}
-				} else {
+				if (!level.isLoaded(animationPos)) {
 					toRemove.add(animationPos);
+					continue;
+				}
+
+				if (animation.isForRemoval()) {
+					if (!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+						toRemove.add(animationPos);
+					}
+				} else if (animation.isFinished(nowTick)) {
+					animation.markForRemoval();
+					((SetSectionDirtyInvoker) levelExtractor).fwa$setSectionDirty(animationPos.getX() >> 4, animationPos.getY() >> 4, animationPos.getZ() >> 4, true);
 				}
 
 				animation.tick(nowTick);
 			}
 
-            if (!animation.isRendering()) continue;
+            if (!animation.isRendering() || (animation.isOcclusionCulled() && !isShadow)) continue;
             double dx = camPos.x - (animationPos.getX() + 0.5);
             double dy = camPos.y - (animationPos.getY() + 0.5);
             double dz = camPos.z - (animationPos.getZ() + 0.5);
             if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
-            if (animation.isOcclusionCulled() && !isShadow) continue;
             if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
 
 			if(!context.isShadow()) animation.updateCache();
