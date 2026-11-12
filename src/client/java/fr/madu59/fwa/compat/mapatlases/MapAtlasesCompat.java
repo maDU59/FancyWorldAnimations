@@ -1,14 +1,13 @@
 package fr.madu59.fwa.compat.mapatlases;
 
-import pepjebs.mapatlases.utils.AtlasLectern;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public final class MapAtlasesCompat{
-    private static final Identifier DEFAULT_BOOK_TEXTURE =
-            Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png");
     private static final Identifier ATLAS_TEXTURE_OVERWORLD =
             Identifier.tryParse("map_atlases:textures/entity/lectern_atlas.png");
     private static final Identifier ATLAS_TEXTURE_NETHER =
@@ -20,11 +19,25 @@ public final class MapAtlasesCompat{
 
     public static Identifier resolveTexture(BlockPos pos){
         Level level = Minecraft.getInstance().level;
-        if (level == null) return DEFAULT_BOOK_TEXTURE;
+        if (level == null) return null;
 
-        if (!(level.getBlockEntity(pos) instanceof AtlasLectern lectern) || !lectern.mapatlases$hasAtlas()) {
-            return DEFAULT_BOOK_TEXTURE;
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be == null) return null;
+
+        boolean hasAtlas = false;
+
+        CompoundTag nbt = be.getUpdateTag(level.registryAccess());
+
+        if (nbt.contains("Book")) {
+            CompoundTag bookTag = nbt.getCompound("Book").orElseThrow();
+            String bookId = bookTag.getString("id").orElseThrow();
+
+            if ("map_atlases:atlas".equals(bookId)) {
+                hasAtlas = true;
+            }
         }
+
+        if (!hasAtlas) return null;
 
         return getDimensionAtlasTexture(level);
     }

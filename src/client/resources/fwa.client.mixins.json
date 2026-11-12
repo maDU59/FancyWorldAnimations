@@ -14,9 +14,12 @@
 		"blockentity.ShulkerBoxModelMixin",
 		"blockentity.renderer.bell.ext.BellRenderStateMixin",
         "blockentity.renderer.bell.BellRendererMixin",
+		"blockentity.renderer.lectern.ext.LecternRenderStateMixin",
+		"blockentity.renderer.lectern.LecternRendererMixin",
 		"compat.sodium.BlockRendererMixin",
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
+		"compat.scholar.ColoredBookModelMixin",
 		"compat.entityculling.CullTaskMixin",
 		"compat.vulkanmod.BlockRendererMixin",
 		"core.ResourceManagerMixin"

@@ -28,4 +28,6 @@ public class ScholarCompat{
         if(slot < 0 || slot > 5) return ItemStack.EMPTY;
         return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
     }
+
+    //TODO: Correct the book color for the lectern book when the book is a scholar book
 }
