@@ -315,59 +315,6 @@ public class ModCompat {
         }
     }
 
-    // SCHOLAR COMPATIBILITY
-
-    public static class ScholarCompat{
-        public static final Identifier BOOKS_TEXTURE = Identifier.tryParse("scholar:block/chiseled_bookshelf_untinted_books");
-        public static final Map<BlockPos, NonNullList<ItemStack>> STORAGE = new ConcurrentHashMap<>();
-        private static Method getDefaultTintColorForSlotMethod;
-        private static Field ITEM_COLORS_FIELD;
-
-        static{
-            if (isScholarLoaded()) {
-                try{
-                    Class<?> chiseledBookshelfColorsClass = Class.forName("io.github.mortuusars.scholar.client.chiseled_bookshelf.ChiseledBookshelfColors");
-                    getDefaultTintColorForSlotMethod = chiseledBookshelfColorsClass.getMethod("getDefaultTintColorForSlot", BlockState.class, int.class);
-                    ITEM_COLORS_FIELD = chiseledBookshelfColorsClass.getDeclaredField("ITEM_COLORS");
-                }catch(Exception e){
-                    getDefaultTintColorForSlotMethod = null;
-                    ITEM_COLORS_FIELD = null;
-                }
-            }
-            else{
-                getDefaultTintColorForSlotMethod = null;
-                ITEM_COLORS_FIELD = null;
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public static int getColor(ItemStack stack, BlockState state, int slot){
-            if(slot < 0 || slot > 5) 
-                try { 
-                    return (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot);
-                } catch (Exception e) {
-                    return -1;
-                }
-            if (stack.isEmpty()) return -1;
-            else if (stack.getItem() instanceof WritableBookItem || stack.getItem() instanceof WrittenBookItem){
-                return DyedItemColor.getOrDefault(stack, 0xFF99452E);
-            }
-            else{
-                Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-                try {
-                    return ((Map<Identifier, Integer>)ITEM_COLORS_FIELD.get(null)).getOrDefault(itemId, (Integer) getDefaultTintColorForSlotMethod.invoke(null, state, slot));
-                } catch (Exception e) {
-                    return -1;
-                }
-            }
-        }
-
-        public static ItemStack getBookshelfItemStack(BlockPos pos, int slot){
-            if(slot < 0 || slot > 5) return ItemStack.EMPTY;
-            return STORAGE.getOrDefault(pos, NonNullList.withSize(6, ItemStack.EMPTY)).get(slot);
-        }
-    }
-
     // FLASHBACK COMPATIBILITY
 
     public static class FlashbackCompat{

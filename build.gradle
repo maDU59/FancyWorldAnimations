@@ -63,6 +63,9 @@ dependencies {
 	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
 
 	compileOnly "maven.modrinth:vulkanmod:0.6.8+26.1.2"
+
+	implementation "maven.modrinth:scholar:43vc4YZi"
+	compileOnly "maven.modrinth:forge-config-api-port:26.3.1"
 }
 
 processResources {

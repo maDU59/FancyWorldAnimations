@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.compat.ModCompat;
-import fr.madu59.fwa.compat.ModCompat.ScholarCompat;
+import fr.madu59.fwa.compat.scholar.ScholarCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
@@ -94,7 +94,7 @@ public class ChiseledBookShelfAnimation extends Animation{
                 colors = List.of(-1, tintSources.get(slot).colorInWorld(defaultState, Minecraft.getInstance().level, position));
             }
             else{
-                colors = List.of(-1, ScholarCompat.getColor(ScholarCompat.getBookshelfItemStack(position, slot), defaultState, slot));
+                colors = List.of(-1, ScholarCompat.getColor(ScholarCompat.getBookshelfItemStack(position, slot), defaultState, slot, position));
             }
         }
         else{
