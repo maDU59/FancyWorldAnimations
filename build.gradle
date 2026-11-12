@@ -65,7 +65,13 @@ dependencies {
 	compileOnly "maven.modrinth:vulkanmod:0.6.8+26.1.2"
 
 	implementation "maven.modrinth:scholar:43vc4YZi"
-	compileOnly "maven.modrinth:forge-config-api-port:26.3.1"
+	compileOnly "maven.modrinth:map-atlases:IvQaTGDa"
+	compileOnly "maven.modrinth:moonlight:Z4zBrgxb"
+	compileOnly "maven.modrinth:endrem:lw9DN2jy"
+	compileOnly "maven.modrinth:flashback:cV1pa0YV"
+	compileOnly "maven.modrinth:moreculling:loquqFkT"
+	compileOnly "maven.modrinth:cloth-config:fg2uyxOW"
+	compileOnly "maven.modrinth:forge-config-api-port:JpKvrr9J"
 }
 
 processResources {

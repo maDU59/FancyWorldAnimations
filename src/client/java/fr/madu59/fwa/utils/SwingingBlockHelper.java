@@ -4,7 +4,7 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.LanternAnimation;
-import fr.madu59.fwa.compat.Blacklist;
+import fr.madu59.fwa.compat.blacklist.Blacklist;
 import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

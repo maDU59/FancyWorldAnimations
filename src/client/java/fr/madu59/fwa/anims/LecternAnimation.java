@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.compat.ModCompat;
+import fr.madu59.fwa.compat.mapatlases.MapAtlasesCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
@@ -92,9 +93,9 @@ public class LecternAnimation extends Animation {
 
     @Override
     public void render(AnimationRenderingContext context) {
-        if (textureId == null) textureId = ModCompat.MapAtlasesCompat.resolveTexture(position);
+        if (textureId == null && ModCompat.isMapAtlasesLoaded()) textureId = MapAtlasesCompat.resolveTexture(position);
         PoseStack poseStack = context.getPoseStack();
-        Double nowTick = context.getNowTick();
+        double nowTick = context.getNowTick();
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         

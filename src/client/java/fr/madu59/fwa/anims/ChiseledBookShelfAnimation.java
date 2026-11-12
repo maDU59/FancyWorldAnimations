@@ -94,7 +94,7 @@ public class ChiseledBookShelfAnimation extends Animation{
                 colors = List.of(-1, tintSources.get(slot).colorInWorld(defaultState, Minecraft.getInstance().level, position));
             }
             else{
-                colors = List.of(-1, ScholarCompat.getColor(ScholarCompat.getBookshelfItemStack(position, slot), defaultState, slot, position));
+                colors = List.of(-1, ScholarCompat.getColor(ScholarCompat.getBookshelfItemStack(position, slot), defaultState, slot));
             }
         }
         else{
