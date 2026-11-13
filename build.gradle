@@ -76,7 +76,7 @@ dependencies {
 	compileOnly "maven.modrinth:cloth-config:fg2uyxOW"
 	runtimeOnly "maven.modrinth:forge-config-api-port:JpKvrr9J"
 
-	implementation files("libs/ec.jar")
+	implementation "maven.modrinth:entityculling:UWpkLRV5"
 
 	runtimeOnly "maven.modrinth:spark:1.10.187-fabric"
 }
