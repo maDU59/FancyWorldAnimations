@@ -1,5 +1,8 @@
 package fr.madu59.fwa;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.madu59.fwa.anims.Animation;
@@ -12,7 +15,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 
 public class Animations{
 
-    public final ConcurrentHashMap<Long, ConcurrentHashMap<BlockPos, Animation>> animations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Bucket> perSectionMap = new ConcurrentHashMap<>();
 
     public static long sectionKey(BlockPos pos) {
         return SectionPos.asLong(pos);
@@ -23,25 +26,25 @@ public class Animations{
     }
 
     public boolean hasSection(BlockPos blockPos) {
-        return animations.contains(sectionKey(blockPos));
+        return perSectionMap.containsKey(sectionKey(blockPos));
     }
     
     public void removeAt(BlockPos blockPos) {
-        ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
-        if (chunkAnimations != null) {
-            chunkAnimations.remove(blockPos);
-            if (chunkAnimations.isEmpty()) this.animations.remove(sectionKey(blockPos), chunkAnimations);
+        Bucket bucket = this.perSectionMap.get(sectionKey(blockPos));
+        if (bucket != null) {
+            bucket.remove(blockPos);
+            if (bucket.isEmpty()) this.perSectionMap.remove(sectionKey(blockPos), bucket);
         }
     }
 
     public void removeAt(SectionPos sectionPos) {
-        this.animations.remove(sectionPos.asLong());
+        this.perSectionMap.remove(sectionPos.asLong());
     }
 
     public void removeChunk(ChunkAccess chunk) {
         int minY = chunk.getMinSectionY();
         for (int i = 0; i < chunk.getSectionsCount(); i++) {
-            this.animations.remove(SectionPos.asLong(chunk.getPos().x(), minY + i, chunk.getPos().z()));
+            this.perSectionMap.remove(SectionPos.asLong(chunk.getPos().x(), minY + i, chunk.getPos().z()));
         }
     }
 
@@ -54,28 +57,80 @@ public class Animations{
     }
 
     public boolean containsAt(BlockPos blockPos) {
-        ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
-        return chunkAnimations != null && chunkAnimations.containsKey(blockPos);
+        Bucket bucket = this.perSectionMap.get(sectionKey(blockPos));
+        return bucket != null && bucket.containsKey(blockPos);
     }
 
     public Animation getAt(BlockPos blockPos) {
-        ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
-        return chunkAnimations == null ? null : chunkAnimations.get(blockPos);
+        Bucket bucket = this.perSectionMap.get(sectionKey(blockPos));
+        return bucket == null ? null : bucket.get(blockPos);
     }
 
     public void add(BlockPos pos, Animation anim) {
-        animations.computeIfAbsent(sectionKey(pos), key -> new ConcurrentHashMap<>()).put(pos, anim);
+        perSectionMap.computeIfAbsent(sectionKey(pos), key -> new Bucket()).put(pos, anim);
     }
 
     public boolean isEmpty(){
-        return animations.isEmpty();
+        return perSectionMap.isEmpty();
+    }
+
+    public void clear(){
+        perSectionMap.clear();
+    }
+
+    public Set<Map.Entry<Long, Bucket>> entrySet(){
+        return perSectionMap.entrySet();
+    }
+
+    public Collection<Bucket> values(){
+        return perSectionMap.values();
     }
 
     public void clearModelCache(){
-        for (ConcurrentHashMap<BlockPos, Animation> chunkAnimations : this.animations.values()) {
-            for (Animation animation : chunkAnimations.values()) {
+        for (Bucket bucket : this.perSectionMap.values()) {
+            for (Animation animation : bucket.values()) {
                 animation.clearModelCache();
             }
+        }
+    }
+
+    public static class Bucket {
+        private ConcurrentHashMap<BlockPos, Animation> animations = new ConcurrentHashMap<>();
+        private volatile boolean isDirty = true;
+        private volatile Animation[] flattenedAnimations = null;
+
+        public Animation get(BlockPos pos) {
+            return this.animations.get(pos);
+        }
+
+        public Collection<Animation> values() {
+            return this.animations.values();
+        }
+
+        public void remove(BlockPos pos) {
+            this.animations.remove(pos);
+            this.isDirty = true;
+        }
+
+        public void put(BlockPos pos, Animation animation) {
+            this.animations.put(pos, animation);
+            this.isDirty = true;
+        }
+
+        public boolean isEmpty() {
+            return this.animations.isEmpty();
+        }
+
+        public boolean containsKey(BlockPos pos) {
+            return this.animations.containsKey(pos);
+        }
+
+        public Animation[] getAnimations() {
+            if (this.flattenedAnimations == null || this.isDirty) {
+                isDirty = false;
+                this.flattenedAnimations = this.animations.values().toArray(new Animation[0]);
+            }
+            return this.flattenedAnimations;
         }
     }
 }

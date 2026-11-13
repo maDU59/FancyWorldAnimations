@@ -85,7 +85,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
@@ -98,7 +97,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BlacklistReloadListener());
 		FancyWorldAnimationsConfigScreen.registerCommand();
 		ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
-            animations.animations.clear();
+            animations.clear();
         });
 		ClientLifecycleEvents.CLIENT_STARTED.register(_ -> {
             ModCompat.init(); 
@@ -107,7 +106,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			animations.removeChunk(chunk);
 		});
 		ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> {
-			animations.animations.clear();
+			animations.clear();
 		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			timer = System.nanoTime() - startingTime;
@@ -182,7 +181,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 	{
 		ClientLevel level = Minecraft.getInstance().level;
 		if(level == null){
-			animations.animations.clear();
+			animations.clear();
 			return;
 		}
 		if(animations.isEmpty()) return;
@@ -202,7 +201,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LevelExtractor levelExtractor = Minecraft.getInstance().levelExtractor;
 		List<BlockPos> toRemove = new ArrayList<>();
 
-		for (Map.Entry<Long, ConcurrentHashMap<BlockPos, Animation>> chunkEntry : animations.animations.entrySet()) {
+		for (Map.Entry<Long, Animations.Bucket> chunkEntry : animations.entrySet()) {
 			if(chunkEntry.getValue().isEmpty()) continue;
 
 			int x = SectionPos.x(chunkEntry.getKey()) << 4;
@@ -210,7 +209,9 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			int z = SectionPos.z(chunkEntry.getKey()) << 4;
 			if(frustum != null && !frustum.isVisible(new AABB(x, y, z, x + 16, y + 16, z + 16))) continue;
 
-			for (Animation animation : chunkEntry.getValue().values()) {
+			Animation[] animations = chunkEntry.getValue().getAnimations();
+			for(int i = 0; i < animations.length; i++){
+				Animation animation = animations[i];
 				BlockPos animationPos = animation.getPos();
 
 				if(!context.isShadow()) {
