@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://madu59.github.io/",
-		"sources": "https://github.com/maDU59/FancyWorldAnimations/"
+		"sources": "https://github.com/maDU59/FancyWorldAnimations/",
+		"issues": "https://github.com/maDU59/FancyWorldAnimations/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/fwa/icon.png",
@@ -39,6 +40,16 @@
 		"fabric-api": ">=0.143.12+26.1"
 	},
 	"suggests": {
-		"another-mod": "*"
+
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/fwa",
+				"modmenu.modrinth": "https://modrinth.com/mod/fwa",
+				"modmenu.discord": "https://discord.gg/ATTZQQeVw4",
+				"modmenu.donate": "https://ko-fi.com/madu59_"
+			}
+		}
 	}
 }
