@@ -4,7 +4,7 @@ import fr.madu59.fwa.FancyWorldAnimationsClient;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.ChainAnimation;
 import fr.madu59.fwa.anims.LanternAnimation;
-import fr.madu59.fwa.compat.Blacklist;
+import fr.madu59.fwa.compat.blacklist.Blacklist;
 import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -22,7 +22,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isVerticalChain(BlockState blockState){
-        return blockState.getBlock() instanceof ChainBlock && blockState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
+        return FancyWorldAnimationsClient.typeOf(blockState) == FancyWorldAnimationsClient.Type.CHAIN && blockState.getValue(ChainBlock.AXIS) == Direction.Axis.Y;
     }
 
     public static boolean isVerticalChain(Animation animation){
@@ -55,7 +55,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isLast(BlockPos blockPos){
-        Animation anim = FancyWorldAnimationsClient.animations.animations.get(blockPos.below());
+        Animation anim = FancyWorldAnimationsClient.animations.getAt(blockPos.below());
         return !isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(blockPos.below())) && !(anim instanceof LanternAnimation || anim instanceof ChainAnimation);
     }
 
@@ -69,22 +69,22 @@ public class SwingingBlockHelper {
 
     public static BlockState getLastAnimation(BlockPos blockPos){
         MutableBlockPos pos = blockPos.mutable();
-        Animation anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+        Animation anim = FancyWorldAnimationsClient.animations.getAt(pos);
         if(anim == null) {
             pos.move(0,-1,0);
-            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            anim = FancyWorldAnimationsClient.animations.getAt(pos);
             if(anim == null) {
                 return Blocks.AIR.defaultBlockState();
             }
         }
         while (anim != null){
             pos.move(0,-1,0);
-            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            anim = FancyWorldAnimationsClient.animations.getAt(pos);
             if (anim != null && isActiveHangingLantern(anim.getDefaultState())) break;
         }
         if(anim == null) {
             pos.move(0,1,0);
-            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            anim = FancyWorldAnimationsClient.animations.getAt(pos);
         }
         return anim.getDefaultState();
     }
