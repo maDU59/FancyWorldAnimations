@@ -205,12 +205,10 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		for (Map.Entry<Long, ConcurrentHashMap<BlockPos, Animation>> chunkEntry : animations.animations.entrySet()) {
 			if(chunkEntry.getValue().isEmpty()) continue;
 
-			int sectionX = SectionPos.x(chunkEntry.getKey());
-			int sectionY = SectionPos.y(chunkEntry.getKey());
-			int sectionZ = SectionPos.z(chunkEntry.getKey());
-			BlockPos minPos = new BlockPos(sectionX << 4, sectionY << 4, sectionZ << 4);
-			BlockPos maxPos = minPos.offset(16, 16, 16);
-			if(frustum != null && !frustum.isVisible(new AABB(Vec3.atLowerCornerOf(minPos), Vec3.atLowerCornerOf(maxPos)))) continue;
+			int x = SectionPos.x(chunkEntry.getKey()) << 4;
+			int y = SectionPos.y(chunkEntry.getKey()) << 4;
+			int z = SectionPos.z(chunkEntry.getKey()) << 4;
+			if(frustum != null && !frustum.isVisible(new AABB(x, y, z, x + 16, y + 16, z + 16))) continue;
 
 			for (Animation animation : chunkEntry.getValue().values()) {
 				BlockPos animationPos = animation.getPos();
