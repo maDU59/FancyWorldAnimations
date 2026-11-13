@@ -13,10 +13,11 @@
 		"blockentity.ChestLidControllerMixin",
 		"blockentity.ShulkerBoxModelMixin",
 		"blockentity.renderer.bell.BellRendererMixin",
+		"blockentity.renderer.lectern.LecternRendererMixin",
 		"compat.sodium.BlockRendererMixin",
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
-		"compat.entityculling.CullTaskMixin",
+		"compat.scholar.ColoredBookModelMixin",
 		"core.ResourceManagerMixin",
 		"blockentity.renderer.sign.AbstractSignRendererMixin"
 	],

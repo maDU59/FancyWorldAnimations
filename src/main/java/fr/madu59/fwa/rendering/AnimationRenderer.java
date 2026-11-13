@@ -83,7 +83,9 @@ public class AnimationRenderer {
         int color = FastColor.ARGB32.colorFromFloat(a,r*shade,g*shade,b*shade);
 
         RenderType renderType;
-        if(a < 1.0f){
+        if(a <= 0.0f){
+            return;
+        } else if(a < 1.0f){
             renderType = RenderType.translucentMovingBlock();
         } else {
             ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(blockData.getBlockState());

@@ -41,6 +41,10 @@ repositories {
         name = "JitPack"
         url = "https://jitpack.io" 
     }
+	maven{
+		name = "trz7w"
+		url = "https://maven.tr7zw.dev/repository/maven-public/"
+	}
 }
 
 base {
@@ -125,9 +129,15 @@ dependencies {
 
     implementation("maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
 
-    runtimeOnly("maven.modrinth:hardcore-torches:1.21.0-2.7")
+    implementation "dev.tr7zw:TRansition:1.0.28-${project.minecraft_version}-neoforge-SNAPSHOT"
 
-	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
+    compileOnly "maven.modrinth:scholar:ZIsoNOTJ"
+    compileOnly "maven.modrinth:map-atlases-forge:ecuMnNO4"
+    compileOnly "maven.modrinth:endrem:Xzg42PX9"
+    compileOnly "maven.modrinth:flashback:nPzvTtsX"
+    compileOnly "maven.modrinth:moreculling:ucyxnpWe"
+
+    implementation "maven.modrinth:entityculling:DDaDZQ47"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
