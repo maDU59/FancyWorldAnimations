@@ -55,7 +55,7 @@ public class SwingingBlockHelper {
     }
 
     public static boolean isLast(BlockPos blockPos){
-        Animation anim = FancyWorldAnimationsClient.animations.animations.get(blockPos.below());
+        Animation anim = FancyWorldAnimationsClient.animations.getAt(blockPos.below());
         return !isActiveSwingingBlock(Minecraft.getInstance().level.getBlockState(blockPos.below())) && !(anim instanceof LanternAnimation || anim instanceof ChainAnimation);
     }
 
@@ -69,22 +69,22 @@ public class SwingingBlockHelper {
 
     public static BlockState getLastAnimation(BlockPos blockPos){
         MutableBlockPos pos = blockPos.mutable();
-        Animation anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+        Animation anim = FancyWorldAnimationsClient.animations.getAt(pos);
         if(anim == null) {
             pos.move(0,-1,0);
-            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            anim = FancyWorldAnimationsClient.animations.getAt(pos);
             if(anim == null) {
                 return Blocks.AIR.defaultBlockState();
             }
         }
         while (anim != null){
             pos.move(0,-1,0);
-            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            anim = FancyWorldAnimationsClient.animations.getAt(pos);
             if (anim != null && isActiveHangingLantern(anim.getDefaultState())) break;
         }
         if(anim == null) {
             pos.move(0,1,0);
-            anim = FancyWorldAnimationsClient.animations.animations.get(pos);
+            anim = FancyWorldAnimationsClient.animations.getAt(pos);
         }
         return anim.getDefaultState();
     }
