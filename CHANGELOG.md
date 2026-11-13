@@ -1,4 +1,5 @@
 # What's new:
-- Improved the lectern animation to improve its compatibility with other mods
-- Improved the jukebox animation to better guess the correct disc used when on a server
-- Fixed compatibility with Scholar mod
+- Performance improvements for large worlds with many animated blocks
+- Fixed compatibility with latest version of Entity Culling
+- Improved compatibility with modded blocks
+- Added support for Hardcore Torches mod lanterns ([@SwordMan](https://www.curseforge.com/members/swordman/projects))

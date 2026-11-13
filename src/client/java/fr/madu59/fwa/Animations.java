@@ -21,6 +21,10 @@ public class Animations{
     public static long sectionKey(int sectionX, int sectionY, int sectionZ) {
         return SectionPos.asLong(sectionX, sectionY, sectionZ);
     }
+
+    public boolean hasSection(BlockPos blockPos) {
+        return animations.contains(sectionKey(blockPos));
+    }
     
     public void removeAt(BlockPos blockPos) {
         ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
