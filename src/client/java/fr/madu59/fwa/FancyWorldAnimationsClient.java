@@ -26,9 +26,9 @@ import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.compat.ModCompat;
-import fr.madu59.fwa.compat.ModCompat.FlashbackCompat;
-import fr.madu59.fwa.compat.Blacklist;
-import fr.madu59.fwa.compat.BlacklistReloadListener;
+import fr.madu59.fwa.compat.flashback.FlashbackCompat;
+import fr.madu59.fwa.compat.blacklist.Blacklist;
+import fr.madu59.fwa.compat.blacklist.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
 import fr.madu59.fwa.mixin.client.SetSectionDirtyInvoker;
@@ -37,6 +37,8 @@ import fr.madu59.fwa.rendering.AnimationRenderer;
 import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -46,11 +48,10 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.BigDripleafBlock;
 import net.minecraft.world.level.block.Block;
@@ -73,23 +74,24 @@ import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
-import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static final Animations animations = new Animations();
 	private static long startingTime = System.nanoTime();
 	private static long timer = 0;
-	private static ResourceKey<Level> dimension;
 
 	@Override
 	public void onInitializeClient() {
@@ -101,6 +103,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(_ -> {
             ModCompat.init(); 
         });
+		ClientChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> {
+			animations.removeChunk(chunk);
+		});
+		ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> {
+			animations.animations.clear();
+		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(context -> {
 			timer = System.nanoTime() - startingTime;
 			if(SettingsManager.MOD_TOGGLE.getValue()) {
@@ -177,11 +185,6 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			animations.animations.clear();
 			return;
 		}
-		if(dimension != null && dimension != level.dimension()){
-			animations.animations.clear();
-			dimension = level.dimension();
-			return;
-		}
 		if(animations.isEmpty()) return;
 
 		AnimationRenderer.prepareFrame(context);
@@ -199,12 +202,18 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
 		List<BlockPos> toRemove = new ArrayList<>();
 
-		for (Animation animation : animations.animations.values()) {
+		for (Map.Entry<Long, ConcurrentHashMap<BlockPos, Animation>> chunkEntry : animations.animations.entrySet()) {
+			if(chunkEntry.getValue().isEmpty()) continue;
 
-			BlockPos animationPos = animation.getPos();
+			int x = SectionPos.x(chunkEntry.getKey()) << 4;
+			int y = SectionPos.y(chunkEntry.getKey()) << 4;
+			int z = SectionPos.z(chunkEntry.getKey()) << 4;
+			if(frustum != null && !frustum.isVisible(new AABB(x, y, z, x + 16, y + 16, z + 16))) continue;
 
-			if(!context.isShadow()) {
-				if (level.isLoaded(animationPos)) {
+			for (Animation animation : chunkEntry.getValue().values()) {
+				BlockPos animationPos = animation.getPos();
+
+				if(!context.isShadow()) {
 					if (animation.isForRemoval()) {
 						if (!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
 							toRemove.add(animationPos);
@@ -213,28 +222,24 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 						animation.markForRemoval();
 						((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(animationPos.getX() >> 4, animationPos.getY() >> 4, animationPos.getZ() >> 4, true);
 					}
-				} else {
-					toRemove.add(animationPos);
 				}
 
 				animation.tick(nowTick);
+
+				if (!animation.isRendering() || (animation.isOcclusionCulled() && !isShadow)) continue;
+
+				double dx = camPos.x - (animationPos.getX() + 0.5);
+				double dy = camPos.y - (animationPos.getY() + 0.5);
+				double dz = camPos.z - (animationPos.getZ() + 0.5);
+				if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
+				if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
+
+				if(!context.isShadow()) animation.updateCache();
+				renderAnimation(animation, context);
 			}
-
-            if (!animation.isRendering()) continue;
-            double dx = camPos.x - (animationPos.getX() + 0.5);
-            double dy = camPos.y - (animationPos.getY() + 0.5);
-            double dz = camPos.z - (animationPos.getZ() + 0.5);
-            if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
-            if (animation.isOcclusionCulled() && !isShadow) continue;
-            if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
-
-			if(!context.isShadow()) animation.updateCache();
-			renderAnimation(animation, context);
 		}
 
 		AnimationRenderer.renderBuffers();
-
-		dimension = level.dimension();
 
 		if(!context.isShadow()) {
 			for(BlockPos pos : toRemove){
@@ -400,7 +405,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isActiveSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
 				BlockPos abovePos = blockPos.above();
 				while(true) {
-					Animation anim = animations.animations.get(abovePos);
+					Animation anim = animations.getAt(abovePos);
 					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
 					anim.markForRemoval();
 					abovePos = abovePos.above();
@@ -408,7 +413,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			}
 			if(newState.isAir() || (SwingingBlockHelper.isActiveSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.containsAt(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
 					onBlockUpdate(abovePos, aboveState, aboveState, false);
 					abovePos = abovePos.above();
@@ -419,7 +424,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			if(!SwingingBlockHelper.isActiveHangingLantern(newState) && !SwingingBlockHelper.isActiveHangingLantern(level.getBlockState(SwingingBlockHelper.getLast(blockPos)))){
 				BlockPos abovePos = blockPos.above();
 				while(true) {
-					Animation anim = animations.animations.get(abovePos);
+					Animation anim = animations.getAt(abovePos);
 					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
 					anim.markForRemoval();
 					abovePos = abovePos.above();
@@ -427,7 +432,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 			}
 			if(SwingingBlockHelper.isActiveHangingLantern(newState) && SettingsManager.LANTERN_OVERRIDE.getValue()){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.containsAt(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
 					onBlockUpdate(abovePos, aboveState, aboveState, false);
 					abovePos = abovePos.above();
@@ -437,20 +442,20 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		BlockPos abovePos = blockPos.above();
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
-				Animation anim = animations.animations.get(abovePos);
+				Animation anim = animations.getAt(abovePos);
 				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(false);
 			}
 		}
 		else{
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
-				Animation anim = animations.animations.get(abovePos);
+				Animation anim = animations.getAt(abovePos);
 				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isActiveSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
-			Animation anim = animations.animations.get(lastPos);
+			Animation anim = animations.getAt(lastPos);
 			if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.needUpdate();
 		}
 	}
@@ -461,7 +466,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 				BlockPos abovePos = blockPos.above();
 				BlockState aboveState = Minecraft.getInstance().level.getBlockState(abovePos);
 				if(aboveState.getBlock() instanceof DoorBlock){
-					Animation anim = animations.animations.get(abovePos);
+					Animation anim = animations.getAt(abovePos);
 					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
@@ -469,7 +474,7 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 				BlockPos belowPos = blockPos.below();
 				BlockState belowState = Minecraft.getInstance().level.getBlockState(belowPos);
 				if(belowState.getBlock() instanceof DoorBlock){
-					Animation anim = animations.animations.get(belowPos);
+					Animation anim = animations.getAt(belowPos);
 					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
