@@ -1,4 +1,4 @@
-package fr.madu59.fwa.compat;
+package fr.madu59.fwa.compat.blacklist;
 
 import java.io.InputStreamReader;
 import java.nio.file.Files;

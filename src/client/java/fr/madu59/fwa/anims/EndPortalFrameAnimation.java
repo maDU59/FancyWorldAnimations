@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import fr.madu59.fwa.compat.ModCompat.EndRemasteredCompat;
+import fr.madu59.fwa.compat.ModCompat;
+import fr.madu59.fwa.compat.endremastered.EndRemasteredCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
@@ -37,7 +38,7 @@ public class EndPortalFrameAnimation extends Animation{
     public void updateModel(){
         random = RandomSource.create(defaultState.getSeed(position));
         model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
-        if(EndRemasteredCompat.isEndRemasteredPortal(newState)){
+        if(ModCompat.isEndRemasteredLoaded() && EndRemasteredCompat.isEndRemasteredPortal(newState)){
             if(!EndRemasteredCompat.isEmpty(newState)) eyeState = newState;
             else eyeState = Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(BlockStateProperties.EYE, true);
         }
@@ -71,7 +72,7 @@ public class EndPortalFrameAnimation extends Animation{
 
     @Override
     public BlockState getDefaultState(BlockState state){
-        if(EndRemasteredCompat.isEndRemasteredPortal(state)){
+        if(ModCompat.isEndRemasteredLoaded() && EndRemasteredCompat.isEndRemasteredPortal(state)){
             return Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(BlockStateProperties.EYE, false);
         }
         else{

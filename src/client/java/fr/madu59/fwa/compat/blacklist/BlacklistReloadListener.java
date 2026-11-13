@@ -1,4 +1,4 @@
-package fr.madu59.fwa.compat;
+package fr.madu59.fwa.compat.blacklist;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
