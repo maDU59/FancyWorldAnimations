@@ -1,9 +1,10 @@
-package fr.madu59.fwa.compat;
+package fr.madu59.fwa.compat.blacklist;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
+import fr.madu59.fwa.compat.blacklist.Blacklist;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -15,7 +16,7 @@ public class BlacklistReloadListener implements PreparableReloadListener{
         return CompletableFuture.runAsync(() -> {
                     Blacklist.load();
                     FancyWorldAnimationsClient.animations.clearModelCache();
-        }, backgroundExecutor)
-        .thenCompose(barrier::wait);
+                }, backgroundExecutor)
+                .thenCompose(barrier::wait);
     }
 }
