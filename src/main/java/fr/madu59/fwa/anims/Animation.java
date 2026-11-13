@@ -1,5 +1,6 @@
 package fr.madu59.fwa.anims;
 
+import fr.madu59.fwa.rendering.AnimationBlockData;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 import net.minecraft.client.Minecraft;
@@ -20,14 +21,14 @@ public class Animation {
     protected double toRemoveTick = 0.0;
     protected final BlockState oldState;
     protected final BlockState newState;
+    protected int reverseCount = 0;
     protected boolean toRemove = false;
     protected boolean removalApproved = false;
     protected AABB boundingBox;
-
-    protected Boolean isLast;
-    protected boolean needUpdate = true;
+    protected int cachedLight = -1;
 
     protected boolean isOcclusionCulled = false;
+    protected AnimationBlockData defaultAnimationBlockData;
 
     public Animation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         this.position = position;
@@ -37,7 +38,13 @@ public class Animation {
         this.newIsOpen = newIsOpen;
         this.oldState = oldState;
         this.newState = newState;
+        this.defaultAnimationBlockData = new AnimationBlockData(defaultState, position, getLight());
         updateBoundingBox();
+        updateModel();
+    }
+
+    public void updateModel(){
+
     }
 
     public boolean isUnique() {
@@ -106,14 +113,6 @@ public class Animation {
         return false;
     }
 
-    public void setLast(boolean isLast){
-        this.isLast = isLast;
-    }
-
-    public void needUpdate(){
-        needUpdate = true;
-    }
-
     public double getProgress(double nowTick) {
         double duration = getAnimDuration();
         if (duration <= 0) return 1.0;
@@ -141,13 +140,19 @@ public class Animation {
     }
 
     public void tick(double nowTick) {
+
+    }
+
+    public void updateCache(){
+        cachedLight = -1;
     }
 
     public void render(AnimationRenderingContext context) {
     }
 
     public int getLight(){
-        return getLight(position, newState);
+        if(cachedLight == -1) cachedLight = getLight(position, newState);
+        return cachedLight;
     }
 
     public int getLight(BlockPos pos, BlockState state){
@@ -168,5 +173,25 @@ public class Animation {
 
     public void setIsOcclusionCulled(boolean isOcclusionCulled){
         this.isOcclusionCulled = isOcclusionCulled;
+    }
+
+    public AnimationBlockData getAnimationBlockData(){
+        return this.defaultAnimationBlockData;
+    }
+
+    public void setReverseCount(int reverseCount){
+        this.reverseCount = reverseCount;
+    }
+
+    public int getReverseCount(){
+        return this.reverseCount;
+    }
+
+    public double distanceToPlayer(){
+        return boundingBox.distanceToSqr(Minecraft.getInstance().player.position());
+    }
+
+    public void clearModelCache() {
+        updateModel();
     }
 }

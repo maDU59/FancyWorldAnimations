@@ -2,6 +2,7 @@ package fr.madu59.fwa;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.madu59.fwa.anims.AbstractChainAnimation;
 import fr.madu59.fwa.anims.Animation;
 import fr.madu59.fwa.anims.BellAnimation;
 import fr.madu59.fwa.anims.ButtonAnimation;
@@ -25,17 +26,22 @@ import fr.madu59.fwa.anims.TripWireHookAnimation;
 import fr.madu59.fwa.anims.VaultAnimation;
 import fr.madu59.fwa.api.animations.AnimationAdditions;
 import fr.madu59.fwa.compat.ModCompat;
-import fr.madu59.fwa.compat.ModCompat.FlashbackCompat;
-import fr.madu59.fwa.compat.Blacklist;
-import fr.madu59.fwa.compat.BlacklistReloadListener;
+import fr.madu59.fwa.compat.flashback.FlashbackCompat;
+import fr.madu59.fwa.compat.blacklist.Blacklist;
+import fr.madu59.fwa.compat.blacklist.BlacklistReloadListener;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.config.configscreen.FancyWorldAnimationsConfigScreen;
+import fr.madu59.fwa.mixin.SetSectionDirtyInvoker;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
-import fr.madu59.fwa.rendering.RenderHelper;
+import fr.madu59.fwa.rendering.AnimationRenderer;
+import fr.madu59.fwa.utils.Curves;
 import fr.madu59.fwa.utils.SwingingBlockHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.BellBlock;
@@ -60,12 +66,12 @@ import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
-import net.minecraft.world.level.block.TripWireHookBlock;
 import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -77,8 +83,14 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mod(value = FancyWorldAnimations.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = FancyWorldAnimations.MOD_ID, value = Dist.CLIENT)
@@ -108,6 +120,11 @@ public class FancyWorldAnimationsClient{
 	@SubscribeEvent
 	public static void onLevelUnload(LevelEvent.Unload event){
 		animations.animations.clear();
+	}
+
+	@SubscribeEvent
+	public static void onChunkUnload(ChunkEvent.Unload event){
+		animations.removeChunk(event.getChunk());
 	}
 
 	@SubscribeEvent
@@ -148,22 +165,26 @@ public class FancyWorldAnimationsClient{
 		boolean oldIsOpen = isOpen(oldState, type);
 		boolean newIsOpen = isOpen(newState, type);
 
+		int reverseCount = 0;
+
 		double startTick = getPartialTick();
 
 		if (animations.containsAt(blockPos)) {
 			Animation animation = animations.getAt(blockPos);
 			if (animation.isUnique()) {
-				startTick = getPartialTick() - animation.getAnimDuration() * (1 - animation.getProgress(getPartialTick()));
+				startTick = getPartialTick() - animation.getAnimDuration() * (Curves.unease(1 - Curves.ease(animation.getProgress(getPartialTick()), animation.getCurve()), animation.getCurve()));
+				reverseCount = animation.getReverseCount() + 1;
 				animations.removeAt(blockPos);
 			}
 		}
 		if(!shouldStartAnimation(oldIsOpen, newIsOpen, type, oldState, newState, blockPos)) return;
 
-		startTick = syncDoors(startTick, blockPos, newState, type);
+		startTick = syncDoors(startTick, blockPos, newState, type, reverseCount);
 
 		Animation animation = createAnimation(blockPos, type, startTick, oldIsOpen, newIsOpen, oldState, newState);
+		animation.setReverseCount(reverseCount);
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 500000*500000) return;
+		if((!animation.hasInfiniteAnimation() && camPos.distanceToSqr(blockPos.getCenter()) > Math.pow(SettingsManager.ANIMATION_RENDER_DISTANCE.getValue(), 2)) || camPos.distanceToSqr(blockPos.getCenter()) > 10000*10000) return;
 		if (animation.isEnabled(newState)) animations.add(blockPos, animation);
 	}
 
@@ -184,7 +205,7 @@ public class FancyWorldAnimationsClient{
 		}
 		if(animations.isEmpty()) return;
 
-		RenderHelper.prepareFrame(context);
+		AnimationRenderer.prepareFrame(context);
 
 		Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
 		float dist = SettingsManager.INFINITE_ANIMATION_RENDER_DISTANCE.getValue();
@@ -192,14 +213,57 @@ public class FancyWorldAnimationsClient{
 
 		dist = dist * dist;
 
-		for (Animation animation : animations.animations.values()) {
-			animation.tick(context.getNowTick());
-			if(camPos.distanceToSqr(animation.getPos().getCenter()) > dist) continue;
-			if(animation.isRendering() && (!animation.isOcclusionCulled() || context.isShadow()) && (context.getFrustum() == null || context.getFrustum().isVisible(animation.getBoundingBox()))){
+		boolean isShadow = context.isShadow();
+		Frustum frustum = context.getFrustum();
+		double nowTick = context.getNowTick();
+
+		LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
+		List<BlockPos> toRemove = new ArrayList<>();
+
+		for (Map.Entry<Long, ConcurrentHashMap<BlockPos, Animation>> chunkEntry : animations.animations.entrySet()) {
+			if(chunkEntry.getValue().isEmpty()) continue;
+
+			int x = SectionPos.x(chunkEntry.getKey()) << 4;
+			int y = SectionPos.y(chunkEntry.getKey()) << 4;
+			int z = SectionPos.z(chunkEntry.getKey()) << 4;
+			if(frustum != null && !frustum.isVisible(new AABB(x, y, z, x + 16, y + 16, z + 16))) continue;
+
+			for (Animation animation : chunkEntry.getValue().values()) {
+				BlockPos animationPos = animation.getPos();
+
+				if(!context.isShadow()) {
+					if (animation.isForRemoval()) {
+						if (!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
+							toRemove.add(animationPos);
+						}
+					} else if (animation.isFinished(nowTick)) {
+						animation.markForRemoval();
+						((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(animationPos.getX() >> 4, animationPos.getY() >> 4, animationPos.getZ() >> 4, true);
+					}
+				}
+
+				animation.tick(nowTick);
+
+				if (!animation.isRendering() || (animation.isOcclusionCulled() && !isShadow)) continue;
+
+				double dx = camPos.x - (animationPos.getX() + 0.5);
+				double dy = camPos.y - (animationPos.getY() + 0.5);
+				double dz = camPos.z - (animationPos.getZ() + 0.5);
+				if (dx * dx + dy * dy + dz * dz > (double)dist) continue;
+				if (frustum != null && !frustum.isVisible(animation.getBoundingBox())) continue;
+
+				if(!context.isShadow()) animation.updateCache();
 				renderAnimation(animation, context);
 			}
 		}
-		if(!context.isShadow()) animations.clean(context.getNowTick());
+
+		AnimationRenderer.renderBuffers();
+
+		if(!context.isShadow()) {
+			for(BlockPos pos : toRemove){
+				animations.removeAt(pos);
+			}
+		}
 	}
 
 	private static boolean shouldStartAnimation(boolean oldIsOpen, boolean newIsOpen, Type type, BlockState oldState, BlockState newState, BlockPos pos)
@@ -359,7 +423,7 @@ public class FancyWorldAnimationsClient{
 			if(SettingsManager.CHAIN_GROUNDED.getValue() && (!newState.isAir() && (!SwingingBlockHelper.isActiveSwingingBlock(newState) || SwingingBlockHelper.isLastGrounded(blockPos)))){
 				BlockPos abovePos = blockPos.above();
 				while(true) {
-					Animation anim = animations.animations.get(abovePos);
+					Animation anim = animations.getAt(abovePos);
 					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
 					anim.markForRemoval();
 					abovePos = abovePos.above();
@@ -367,7 +431,7 @@ public class FancyWorldAnimationsClient{
 			}
 			if(newState.isAir() || (SwingingBlockHelper.isActiveSwingingBlock(newState) && !SwingingBlockHelper.isLastGrounded(blockPos))){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.containsAt(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
 					onBlockUpdate(abovePos, aboveState, aboveState, false);
 					abovePos = abovePos.above();
@@ -378,7 +442,7 @@ public class FancyWorldAnimationsClient{
 			if(!SwingingBlockHelper.isActiveHangingLantern(newState) && !SwingingBlockHelper.isActiveHangingLantern(level.getBlockState(SwingingBlockHelper.getLast(blockPos)))){
 				BlockPos abovePos = blockPos.above();
 				while(true) {
-					Animation anim = animations.animations.get(abovePos);
+					Animation anim = animations.getAt(abovePos);
 					if (anim == null || !SwingingBlockHelper.isVerticalChain(anim)) break;
 					anim.markForRemoval();
 					abovePos = abovePos.above();
@@ -386,7 +450,7 @@ public class FancyWorldAnimationsClient{
 			}
 			if(SwingingBlockHelper.isActiveHangingLantern(newState) && SettingsManager.LANTERN_OVERRIDE.getValue()){
 				BlockPos abovePos = blockPos.above();
-				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.animations.containsKey(abovePos)){
+				while(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos)) && !animations.containsAt(abovePos)){
 					BlockState aboveState = level.getBlockState(abovePos);
 					onBlockUpdate(abovePos, aboveState, aboveState, false);
 					abovePos = abovePos.above();
@@ -396,40 +460,40 @@ public class FancyWorldAnimationsClient{
 		BlockPos abovePos = blockPos.above();
 		if(SwingingBlockHelper.isActiveSwingingBlock(newState)){
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
-				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(false);
+				Animation anim = animations.getAt(abovePos);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(false);
 			}
 		}
 		else{
 			if(SwingingBlockHelper.isVerticalChain(level.getBlockState(abovePos))){
-				Animation anim = animations.animations.get(abovePos);
-				if (anim != null) anim.setLast(true);
+				Animation anim = animations.getAt(abovePos);
+				if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.setLast(true);
 			}
 		}
 		BlockPos belowPos = blockPos.below();
 		if(SwingingBlockHelper.isActiveSwingingBlock(level.getBlockState(belowPos))){
 			BlockPos lastPos = SwingingBlockHelper.getLast(belowPos);
-			Animation anim = animations.animations.get(lastPos);
-			if (anim != null) anim.needUpdate();
+			Animation anim = animations.getAt(lastPos);
+			if (anim != null && anim instanceof AbstractChainAnimation chainAnimation) chainAnimation.needUpdate();
 		}
 	}
 
-	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type){
+	public static double syncDoors(double startTick, BlockPos blockPos, BlockState newState, Type type, int reverseCount){
 		if(type == Type.DOOR){
 			if(newState.getValueOrElse(DoorBlock.HALF, DoubleBlockHalf.LOWER) == DoubleBlockHalf.LOWER){
 				BlockPos abovePos = blockPos.above();
 				BlockState aboveState = Minecraft.getInstance().level.getBlockState(abovePos);
 				if(aboveState.getBlock() instanceof DoorBlock){
-					Animation anim = animations.animations.get(abovePos);
-					if(anim != null) startTick = anim.getStartTick();
+					Animation anim = animations.getAt(abovePos);
+					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
 			else{
 				BlockPos belowPos = blockPos.below();
 				BlockState belowState = Minecraft.getInstance().level.getBlockState(belowPos);
 				if(belowState.getBlock() instanceof DoorBlock){
-					Animation anim = animations.animations.get(belowPos);
-					if(anim != null) startTick = anim.getStartTick();
+					Animation anim = animations.getAt(belowPos);
+					if(anim != null && anim.getReverseCount() >= reverseCount) startTick = anim.getStartTick();
 				}
 			}
 		}

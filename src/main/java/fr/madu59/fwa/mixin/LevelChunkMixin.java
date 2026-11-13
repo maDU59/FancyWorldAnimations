@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +26,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 @Mixin(LevelChunk.class)
 public abstract class LevelChunkMixin extends ChunkAccess {
@@ -34,14 +34,15 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     private static final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
 
     @Unique
-    private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> 
-    state.is(Blocks.END_PORTAL_FRAME) || 
-    state.is(Blocks.LECTERN) || 
-    state.is(Blocks.JUKEBOX) || 
-    state.is(Blocks.BELL) ||
-    state.getBlock() instanceof LanternBlock ||
-    state.getBlock() instanceof ChainBlock ||
-    ModCompat.isAnimatedModdedBlock(state);
+    private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> {
+        FancyWorldAnimationsClient.Type type = FancyWorldAnimationsClient.typeOf(state);
+        return type == FancyWorldAnimationsClient.Type.END_PORTAL_FRAME
+            || type == FancyWorldAnimationsClient.Type.LECTERN
+            || type == FancyWorldAnimationsClient.Type.JUKEBOX
+            || type == FancyWorldAnimationsClient.Type.BELL
+            || type == FancyWorldAnimationsClient.Type.LANTERN
+            || type == FancyWorldAnimationsClient.Type.CHAIN;
+    };
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory palettedContainerFactory, long l, LevelChunkSection @Nullable [] levelChunkSections, @Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, palettedContainerFactory, l, levelChunkSections, blendingData);
@@ -63,15 +64,18 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
     private void fwa$scanSectionFor(LevelChunkSection section, BlockPos pos, int minY){
-        if (section.getStates().maybeHas(IS_ANIMATED_BLOCK)){
+        if (section.getStates().maybeHas(IS_ANIMATED_BLOCK) || FancyWorldAnimationsClient.animations.hasSection(pos)){
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
+                        BlockPos worldPos = pos.offset(x, minY + y, z);
                         
                         if (IS_ANIMATED_BLOCK.test(state)) {
-                            BlockPos worldPos = pos.offset(x, minY + y, z);
                             FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
+                        }
+                        else if (FancyWorldAnimationsClient.animations.containsAt(worldPos)) {
+                            FancyWorldAnimationsClient.animations.removeSafeAt(pos);
                         }
                     }
                 }

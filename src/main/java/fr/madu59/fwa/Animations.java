@@ -1,7 +1,5 @@
 package fr.madu59.fwa;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.madu59.fwa.anims.Animation;
@@ -10,13 +8,42 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 public class Animations{
 
-    public final Map<BlockPos, Animation> animations = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Long, ConcurrentHashMap<BlockPos, Animation>> animations = new ConcurrentHashMap<>();
+
+    public static long sectionKey(BlockPos pos) {
+        return SectionPos.asLong(pos);
+    }
+
+    public static long sectionKey(int sectionX, int sectionY, int sectionZ) {
+        return SectionPos.asLong(sectionX, sectionY, sectionZ);
+    }
+
+    public boolean hasSection(BlockPos blockPos) {
+        return animations.contains(sectionKey(blockPos));
+    }
     
     public void removeAt(BlockPos blockPos) {
-        this.animations.remove(blockPos);
+        ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
+        if (chunkAnimations != null) {
+            chunkAnimations.remove(blockPos);
+            if (chunkAnimations.isEmpty()) this.animations.remove(sectionKey(blockPos), chunkAnimations);
+        }
+    }
+
+    public void removeAt(SectionPos sectionPos) {
+        this.animations.remove(sectionPos.asLong());
+    }
+
+    public void removeChunk(LevelChunk chunk) {
+        int minY = chunk.getMinSectionY();
+        for (int i = 0; i < chunk.getSectionsCount(); i++) {
+            this.animations.remove(SectionPos.asLong(chunk.getPos().x(), minY + i, chunk.getPos().z()));
+        }
     }
 
     public void removeSafeAt(BlockPos blockPos) {
@@ -27,43 +54,29 @@ public class Animations{
         ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(blockPos.getX() >> 4, blockPos.getY() >> 4, blockPos.getZ() >> 4, true);
     }
 
-    public void clean(double nowTick) {
-        ClientLevel level = Minecraft.getInstance().level;
-        LevelRenderer levelRenderer = Minecraft.getInstance().levelRenderer;
-        Iterator<Animation> it = this.animations.values().iterator();
-        while (it.hasNext()) {
-            Animation animation = it.next();
-            BlockPos pos = animation.getPos();
-            if(level.isLoaded(pos)){
-                if (animation.isForRemoval()){
-                    if(!(animation.hideOriginalBlock() || animation.hideOriginalBlockEntity()) || animation.isApprovedForRemoval(nowTick)) {
-                        it.remove();
-                    }
-                }
-                else if (animation.isFinished(nowTick)) {
-                    animation.markForRemoval();
-                    ((SetSectionDirtyInvoker) levelRenderer).fwa$setSectionDirty(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4, true);
-                }
-            }
-            else{
-                it.remove();
-            }
-        }
-    }
-
     public boolean containsAt(BlockPos blockPos) {
-        return this.animations.containsKey(blockPos);
+        ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
+        return chunkAnimations != null && chunkAnimations.containsKey(blockPos);
     }
 
     public Animation getAt(BlockPos blockPos) {
-        return this.animations.get(blockPos);
+        ConcurrentHashMap<BlockPos, Animation> chunkAnimations = this.animations.get(sectionKey(blockPos));
+        return chunkAnimations == null ? null : chunkAnimations.get(blockPos);
     }
 
     public void add(BlockPos pos, Animation anim) {
-        animations.put(pos, anim);
+        animations.computeIfAbsent(sectionKey(pos), key -> new ConcurrentHashMap<>()).put(pos, anim);
     }
 
     public boolean isEmpty(){
         return animations.isEmpty();
+    }
+
+    public void clearModelCache(){
+        for (ConcurrentHashMap<BlockPos, Animation> chunkAnimations : this.animations.values()) {
+            for (Animation animation : chunkAnimations.values()) {
+                animation.clearModelCache();
+            }
+        }
     }
 }

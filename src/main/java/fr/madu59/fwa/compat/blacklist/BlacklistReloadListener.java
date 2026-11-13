@@ -1,4 +1,4 @@
-package fr.madu59.fwa.compat;
+package fr.madu59.fwa.compat.blacklist;
 
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;

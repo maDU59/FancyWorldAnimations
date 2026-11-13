@@ -41,10 +41,14 @@ repositories {
         name = "JitPack"
         url = "https://jitpack.io" 
     }
-    maven { 
+    maven {
         name = "CodeMC"
-        url = "https://repo.codemc.org/repository/maven-public/" 
+        url = "https://repo.codemc.org/repository/maven-public/"
     }
+	maven{
+		name = "trz7w"
+		url = "https://maven.tr7zw.dev/repository/maven-public/"
+	}
 }
 
 base {
@@ -129,7 +133,15 @@ dependencies {
 
     compileOnly("net.caffeinemc:sodium-neoforge-mod:0.8.10+mc26.1.2")
     runtimeOnly("net.caffeinemc:sodium-neoforge:0.8.10+mc26.1.2")
-	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
+	compileOnly "dev.tr7zw:TRansition-versionless:1.0.28-SNAPSHOT@jar"
+
+	compileOnly "maven.modrinth:scholar:MzMe1NNq"
+	compileOnly "maven.modrinth:map-atlases-forge:NdJwZprF"
+	compileOnly "maven.modrinth:endrem:UnTCBuco"
+	compileOnly "maven.modrinth:flashback:2obIELyD"
+	compileOnly "maven.modrinth:moreculling:r6dLgc9r"
+
+	implementation "maven.modrinth:entityculling:4CRBC5eL"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
