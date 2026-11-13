@@ -44,7 +44,7 @@ public class AnimationRenderer {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
-    private static final Map<RenderType, List<AnimationQuad>> buffers = new HashMap<>();
+    private static final Map<RenderType, QuadBatch> buffers = new HashMap<>();
 
     private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
     .translation(0.5f, 0.5f, 0.5f)
@@ -61,7 +61,9 @@ public class AnimationRenderer {
         }
         shouldShade = !context.isShadow();
         collector = context.getSubmitNodeCollector();
-        buffers.clear();
+        for(QuadBatch batch: buffers.values()){
+            batch.clear();
+        }
     }
 
     public static void renderModel(PoseStack.Pose pose, List<BlockStateModelPart> parts, float a, float r, float g, float b, int light, AnimationBlockData blockData){
@@ -104,13 +106,15 @@ public class AnimationRenderer {
             };
         }
 
-        buffers.computeIfAbsent(renderType, k -> new ArrayList<>()).add(new AnimationQuad(pose, bakedQuad, light, color, blockData));
+        buffers.computeIfAbsent(renderType, k -> new QuadBatch()).add(pose, bakedQuad, light, color, blockData);
     }
 
     public static void renderBuffers(){
         PoseStack poseStack = new PoseStack();
         QuadInstance quadInstance = new QuadInstance();
-        for(Map.Entry<RenderType, List<AnimationQuad>> entry : buffers.entrySet()){
+        for(Map.Entry<RenderType, QuadBatch> entry : buffers.entrySet()){
+            QuadBatch batch = entry.getValue();
+            if(batch.size() == 0) continue;
             RenderType renderType = entry.getKey();
             collector.submitCustomGeometry(
                 poseStack,
@@ -118,26 +122,26 @@ public class AnimationRenderer {
                 (Pose currentPose, VertexConsumer consumer) -> {
                     AnimationBlockData lastBlockData = null;
 
-                    for(AnimationQuad quad : entry.getValue()){
-                        if(quad.blockData() != lastBlockData){
+                    for(int i = 0; i < batch.size(); i++){
+                        AnimationBlockData blockData = batch.blockData(i);
+                        if(blockData != lastBlockData){
                             if(lastBlockData != null){
                                 ModCompat.endBlock(consumer);
                             }
-                            lastBlockData = quad.blockData();
+                            lastBlockData = blockData;
                             ModCompat.beginBlock(consumer, lastBlockData);
                         }
 
-                        quadInstance.setLightCoords(quad.light());
-                        quadInstance.setColor(quad.color());
+                        quadInstance.setLightCoords(batch.light(i));
+                        quadInstance.setColor(batch.color(i));
                         consumer.putBakedQuad(
-                            quad.pose(), quad.bakedQuad(), quadInstance
+                            batch.pose(i), batch.bakedQuad(i), quadInstance
                         );
                     }
                     ModCompat.endBlock(consumer);
                 }
             );
         }
-        buffers.clear();
     }
 
     public static BakedQuad[] flattenModel(List<BlockStateModelPart> parts){
