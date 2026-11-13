@@ -6,6 +6,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.madu59.fwa.compat.ModCompat;
+import fr.madu59.fwa.compat.endremastered.EndRemasteredCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.rendering.AnimationRenderer;
@@ -94,14 +95,12 @@ public class EndPortalFrameAnimation extends Animation{
             AnimationRenderer.renderModel(poseStack.last().copy(), parts, 1f, 1f, 1f, 1f, light, getAnimationBlockData());
             poseStack.translate(0f,2f/8f - (float)Curves.ease(getProgress(context.getNowTick()), getCurve())/4f,0f);
 
-            if(ModCompat.isEndRemasteredLoaded() && ModCompat.EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
-                ModCompat.EndRemasteredCompat.renderEndPortalFrameAnimation(context, poseStack, position, light);
+            if(ModCompat.isEndRemasteredLoaded() && EndRemasteredCompat.isEndRemasteredPortal(defaultState)){
+                if(EndRemasteredCompat.renderEndPortalFrameAnimation(context, poseStack, position, light)) return;
             }
-            else{
-                renderFilteredQuads(poseStack, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
-                for(Direction dir : Direction.values()){
-                    renderFilteredQuads(poseStack, part.getQuads(dir), true, light, 1f, 1f, 1f, 1f);
-                }
+            renderFilteredQuads(poseStack, part.getQuads(null), true, light, 1f, 1f, 1f, 1f);
+            for(Direction dir : Direction.values()){
+                renderFilteredQuads(poseStack, part.getQuads(dir), true, light, 1f, 1f, 1f, 1f);
             }
 
         }

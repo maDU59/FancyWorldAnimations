@@ -34,14 +34,15 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     private static final BlockState fwa$AIR_STATE = Blocks.AIR.defaultBlockState();
 
     @Unique
-    private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> 
-    state.is(Blocks.END_PORTAL_FRAME) || 
-    state.is(Blocks.LECTERN) || 
-    state.is(Blocks.JUKEBOX) || 
-    state.is(Blocks.BELL) ||
-    state.getBlock() instanceof LanternBlock ||
-    state.getBlock() instanceof ChainBlock ||
-    ModCompat.isAnimatedModdedBlock(state);
+    private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> {
+        FancyWorldAnimationsClient.Type type = FancyWorldAnimationsClient.typeOf(state);
+        return type == FancyWorldAnimationsClient.Type.END_PORTAL_FRAME
+            || type == FancyWorldAnimationsClient.Type.LECTERN
+            || type == FancyWorldAnimationsClient.Type.JUKEBOX
+            || type == FancyWorldAnimationsClient.Type.BELL
+            || type == FancyWorldAnimationsClient.Type.LANTERN
+            || type == FancyWorldAnimationsClient.Type.CHAIN;
+    };
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory palettedContainerFactory, long l, LevelChunkSection @Nullable [] levelChunkSections, @Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, palettedContainerFactory, l, levelChunkSections, blendingData);

@@ -14,10 +14,13 @@
 		"blockentity.ShulkerBoxModelMixin",
 		"blockentity.renderer.bell.ext.BellRenderStateMixin",
         "blockentity.renderer.bell.BellRendererMixin",
+		"blockentity.renderer.lectern.ext.LecternRenderStateMixin",
+		"blockentity.renderer.lectern.LecternRendererMixin",
 		"compat.sodium.BlockRendererMixin",
 		"compat.iris.ShadowRendererMixin",
 		"compat.scholar.ChiseledBookShelfBlockEntityMixin",
-		"compat.entityculling.CullTaskMixin",
+		"compat.scholar.ColoredBookModelMixin",
+		"compat.vulkanmod.BlockRendererMixin",
 		"core.ResourceManagerMixin"
 	],
 	"injectors": {

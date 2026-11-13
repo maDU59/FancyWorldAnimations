@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import fr.madu59.fwa.compat.ModCompat;
+import fr.madu59.fwa.compat.mapatlases.MapAtlasesCompat;
 import fr.madu59.fwa.config.SettingsManager;
 import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
@@ -23,6 +24,8 @@ public class LecternAnimation extends Animation {
     private BookModel bookModel;
     private final float hash;
     private Identifier textureId;
+
+    private static final Identifier BOOK_TEXTURE = Identifier.tryParse("minecraft:textures/entity/enchantment/enchanting_table_book.png");
 
     public LecternAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -62,6 +65,11 @@ public class LecternAnimation extends Animation {
     }
 
     @Override
+    public boolean hideOriginalBlockEntity() {
+        return false;
+    }
+
+    @Override
     public BlockState getDefaultState(BlockState state){
         return state.setValue(BlockStateProperties.HAS_BOOK, false);
     }
@@ -92,14 +100,18 @@ public class LecternAnimation extends Animation {
 
     @Override
     public void render(AnimationRenderingContext context) {
-        if (textureId == null) textureId = ModCompat.MapAtlasesCompat.resolveTexture(position);
+        if(newIsOpen) return;
+        if (textureId == null) {
+            if(ModCompat.isMapAtlasesLoaded()) textureId = MapAtlasesCompat.resolveTexture(position);
+            if(textureId == null) textureId = BOOK_TEXTURE;
+        }
         PoseStack poseStack = context.getPoseStack();
-        Double nowTick = context.getNowTick();
+        double nowTick = context.getNowTick();
 
         Direction facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         
         int light = getLight();
-        BookModel.State bookState = new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));
+        BookModel.State bookState = animate(nowTick);
 
         bookModel.setupAnim(bookState);
         poseStack.translate(0.5F, 1.0625F, 0.5F);
@@ -108,5 +120,9 @@ public class LecternAnimation extends Animation {
         poseStack.translate(0.0F, -0.125F, 0.0F);
 
         context.getSubmitNodeCollector().submitModel(bookModel, bookState, poseStack, textureId, light, OverlayTexture.NO_OVERLAY, 0, null);
+    }
+
+    public BookModel.State animate(double nowTick){
+        return new BookModel.State((float)getAngle(Curves.ease(getProgress(nowTick), getCurve())), getPageAngle(0.1f, nowTick), getPageAngle(0.9f, nowTick));
     }
 }
