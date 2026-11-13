@@ -22,7 +22,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class ModCompat {
+public class ModCompat {
     public static final String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
     public static final Identifier ALEXSCAVES_GINGERBREAD_DOOR = Identifier.tryParse("alexscaves:gingerbread_door");
     public static final Identifier WW_DISPLAY_LANTERNS = Identifier.tryParse("wilderwild:display_lantern");
