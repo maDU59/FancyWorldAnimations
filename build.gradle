@@ -78,7 +78,7 @@ dependencies {
 	compileOnly "maven.modrinth:cloth-config:26.2.155+fabric"
 	runtimeOnly "maven.modrinth:forge-config-api-port:rSd3GiG8"
 
-	implementation files("libs/ec.jar")
+	implementation "maven.modrinth:entityculling:kHxKicVG"
 }
 
 processResources {
