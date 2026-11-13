@@ -85,14 +85,15 @@ public class AnimationRenderer {
     }
 
     public static void renderQuad(PoseStack.Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        if(a <= 0.0f){
+            return;
+        }
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
         float shade = blockData.isShaded()? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
         int color = ARGB.colorFromFloat(a,r*shade,g*shade,b*shade);
 
         RenderType renderType;
-        if(a <= 0.0f){
-            return;
-        } else if(a < 1.0f){
+        if(a < 1.0f){
             renderType = RenderTypes.translucentMovingBlock();
         } else {
             renderType = switch (bakedQuad.materialInfo().layer()) {
