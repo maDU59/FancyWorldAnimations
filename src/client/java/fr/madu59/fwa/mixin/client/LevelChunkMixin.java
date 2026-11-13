@@ -60,7 +60,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 
     @Unique
     private void fwa$scanSectionFor(LevelChunkSection section, BlockPos pos, int minY){
-        if (section.getStates().maybeHas(IS_ANIMATED_BLOCK)){
+        if (section.getStates().maybeHas(IS_ANIMATED_BLOCK) || FancyWorldAnimationsClient.animations.hasSection(pos)){
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
