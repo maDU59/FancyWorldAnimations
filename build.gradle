@@ -35,6 +35,10 @@ repositories {
         name = "JitPack"
         url = "https://jitpack.io" 
     }
+	maven{
+		name = "trz7w"
+		url = "https://maven.tr7zw.dev/repository/maven-public/"
+	}
 }
 
 loom {
@@ -63,9 +67,17 @@ dependencies {
 	localRuntime 'org.anarres:jcpp:1.4.14'
     localRuntime 'io.github.douira:glsl-transformer:3.0.0-pre3'
 	modImplementation "maven.modrinth:iris:1.9.6+1.21.8-fabric"
-	compileOnly "com.logisticscraft:occlusionculling:0.0.8-SNAPSHOT"
+	modImplementation "dev.tr7zw:TRansition:1.0.28-${project.minecraft_version}-fabric-SNAPSHOT"
 
 	modCompileOnly "maven.modrinth:vulkanmod:7pYvUnJk"
+
+	modCompileOnly "maven.modrinth:scholar:WgPzovE8"
+	modCompileOnly "maven.modrinth:map-atlases:sG1olwBl"
+	modCompileOnly "maven.modrinth:endrem:tSgcwnqq"
+	modCompileOnly "maven.modrinth:flashback:FHcUcr9a"
+	modCompileOnly "maven.modrinth:moreculling:ivOsScf8"
+
+	modImplementation "maven.modrinth:entityculling:Bt8oO4eI"
 }
 
 processResources {
