@@ -160,7 +160,7 @@ public abstract class AbstractChainAnimation extends Animation {
 
         updateCache(context.getFrameCount());
 
-        if(updatePoses == true){
+        if(updatePoses){
             PoseStack poseStack = new PoseStack();
             float swingScale = 0.7F/(float)Math.sqrt(Math.max(4,chainCount)-3);
             float prevFactor = 0.0F;
