@@ -9,15 +9,18 @@ import fr.madu59.fwa.rendering.AnimationRenderingContext;
 import fr.madu59.fwa.utils.Curves;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -29,7 +32,7 @@ public class JukeBoxAnimation extends Animation{
     public JukeBoxAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
 
-        ItemStack itemStack = new ItemStack(Items.MUSIC_DISC_13);
+        ItemStack itemStack = getDefaultMusicDisc();
         if(Minecraft.getInstance().level.getBlockEntity(position) instanceof JukeboxBlockEntity jukeboxBlockEntity){
             itemStack = jukeboxBlockEntity.getTheItem();
         }
@@ -46,7 +49,7 @@ public class JukeBoxAnimation extends Animation{
             }
         }
         if (itemStack.isEmpty()) {
-            itemStack = new ItemStack(Items.MUSIC_DISC_13);
+            itemStack = getDefaultMusicDisc();
         }
         discItemStack = itemStack;
     }
@@ -105,5 +108,11 @@ public class JukeBoxAnimation extends Animation{
         Minecraft.getInstance().getItemModelResolver().updateForTopItem(discState, discItemStack, ItemDisplayContext.FIXED, false, Minecraft.getInstance().level, null, position.hashCode());
 
         discState.render(poseStack, context.getBufferSource(), light, OverlayTexture.NO_OVERLAY);
+    }
+
+    private ItemStack getDefaultMusicDisc() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if(player != null && player.getMainHandItem().get(DataComponents.JUKEBOX_PLAYABLE) != null) return Minecraft.getInstance().player.getMainHandItem();
+        return new ItemStack(Items.MUSIC_DISC_13);
     }
 }
