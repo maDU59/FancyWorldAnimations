@@ -8,7 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class MoreCullingCompat{
+public class MoreCullingCompat{
     public static void disableBlockStateCullingForBlock(BlockState state){
         Block block = state.getBlock();
         String blockId = BuiltInRegistries.BLOCK.getKey(block).toString();

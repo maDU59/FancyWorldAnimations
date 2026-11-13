@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public class Animations{
 
@@ -38,7 +38,7 @@ public class Animations{
         this.animations.remove(sectionPos.asLong());
     }
 
-    public void removeChunk(LevelChunk chunk) {
+    public void removeChunk(ChunkAccess chunk) {
         int minY = chunk.getMinSectionY();
         for (int i = 0; i < chunk.getSectionsCount(); i++) {
             this.animations.remove(SectionPos.asLong(chunk.getPos().x(), minY + i, chunk.getPos().z()));
