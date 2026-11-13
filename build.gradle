@@ -70,17 +70,15 @@ dependencies {
 
 	compileOnly "maven.modrinth:vulkanmod:0.6.8+26.1.2"
 
-	compileOnly "maven.modrinth:scholar:43vc4YZi"
+	compileOnly "maven.modrinth:scholar:HSHlx0J9"
 	compileOnly "maven.modrinth:map-atlases:IvQaTGDa"
-	compileOnly "maven.modrinth:endrem:lw9DN2jy"
-	compileOnly "maven.modrinth:flashback:cV1pa0YV"
-	compileOnly "maven.modrinth:moreculling:loquqFkT"
-	compileOnly "maven.modrinth:cloth-config:fg2uyxOW"
-	runtimeOnly "maven.modrinth:forge-config-api-port:JpKvrr9J"
+	compileOnly "maven.modrinth:endrem:eE7yPJF8"
+	compileOnly "maven.modrinth:flashback:Um7qd3Na"
+	compileOnly "maven.modrinth:moreculling:Qc7V2eKG"
+	compileOnly "maven.modrinth:cloth-config:26.2.155+fabric"
+	runtimeOnly "maven.modrinth:forge-config-api-port:rSd3GiG8"
 
 	implementation files("libs/ec.jar")
-
-	runtimeOnly "maven.modrinth:spark:1.10.187-fabric"
 }
 
 processResources {
