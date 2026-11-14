@@ -20,7 +20,8 @@ public class ColoredBookModelMixin {
             method = "renderOnLectern",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/model/BookModel;setupAnim(FFFF)V"
+                    target = "Lnet/minecraft/client/model/BookModel;setupAnim(FFFF)V",
+                    remap = true
             )
     )
     private static void fwa$replaceBookState(BookModel instance, float f, float g, float h, float i, Operation<Void> original, @Local LecternBlockEntity be) {
