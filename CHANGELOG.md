@@ -6,3 +6,6 @@
 
 # Patch 1:
 - Fixed a crash with Scholar lecterns
+
+# Patch 2:
+- Fixed modded animations being rendered with the wrong render type

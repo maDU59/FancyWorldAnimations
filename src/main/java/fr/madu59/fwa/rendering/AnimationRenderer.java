@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.ChunkRenderTypeSet;
+import net.minecraftforge.client.model.data.ModelData;
 import org.joml.Vector3f;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public class AnimationRenderer {
     private static final Direction[] DIRECTIONS = Direction.values();
     private static final Map<RenderType, List<AnimationQuad>> buffers = new HashMap<>();
     private static MultiBufferSource bufferSource;
+    private static ClientLevel level;
 
     private static final float INVISIBLE_SCALE_VALUE = 0.0002f;
 
@@ -58,10 +60,12 @@ public class AnimationRenderer {
         }
         shouldShade = !context.isShadow();
         bufferSource = context.getBufferSource();
+        level = Minecraft.getInstance().level;
         buffers.clear();
     }
 
     public static void renderModel(PoseStack.Pose pose, BakedModel model, float a, float r, float g, float b, int light, AnimationBlockData blockData, RandomSource random, BlockState blockState){
+        blockData.setRenderTypes(model.getRenderTypes(blockData.getBlockState(), level.random, ModelData.EMPTY));
         for (int j = 0; j < DIRECTIONS_WITH_NULL.length; j++){
             List<BakedQuad> quads = model.getQuads(blockState, DIRECTIONS_WITH_NULL[j], random);
             int n = quads.size();
@@ -70,26 +74,32 @@ public class AnimationRenderer {
                 renderQuad(pose, quads.get(k), a, r, g, b, light, blockData);
             }
         }
+        blockData.setRenderTypes(null);
     }
 
     public static void renderQuads(PoseStack.Pose pose, BakedQuad[] quads, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        blockData.setRenderTypes(Minecraft.getInstance().getBlockRenderer().getBlockModel(blockData.getBlockState()).getRenderTypes(blockData.getBlockState(), level.random, ModelData.EMPTY));
         for (int i = 0; i < quads.length; i++){
             renderQuad(pose, quads[i], a, r, g, b, light, blockData);
         }
+        blockData.setRenderTypes(null);
     }
 
     public static void renderQuad(PoseStack.Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        if(a <= 0.0f) return;
         Vector3f dir = bakedQuad.getDirection().step();
         float shade = blockData.isShaded()? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
         int color = FastColor.ARGB32.color(Mth.floor(a * 255.0F),Mth.floor(r*shade * 255.0F),Mth.floor(g*shade * 255.0F),Mth.floor(b*shade * 255.0F));
 
         RenderType renderType;
-        if(a <= 0.0f){
-            return;
-        } else if(a < 1.0f){
+        if(a < 1.0f){
             renderType = RenderType.translucentMovingBlock();
         } else {
-            ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(blockData.getBlockState());
+            ChunkRenderTypeSet renderTypes = blockData.getRenderTypes();
+            if(renderTypes == null){
+                renderTypes = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockData.getBlockState()).getRenderTypes(blockData.getBlockState(), level.random, ModelData.EMPTY);
+            }
+
             if(renderTypes.contains(RenderType.translucent())){
                 renderType = RenderType.translucentMovingBlock();
             }

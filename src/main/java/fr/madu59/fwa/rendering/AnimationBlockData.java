@@ -1,7 +1,9 @@
 package fr.madu59.fwa.rendering;
 
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.ChunkRenderTypeSet;
 
 public class AnimationBlockData {
     private final BlockState state;
@@ -10,7 +12,8 @@ public class AnimationBlockData {
     private final int z;
     private final int light;
     private final boolean shaded;
-    
+    private ChunkRenderTypeSet renderTypes = null;
+
     public AnimationBlockData(BlockState state, BlockPos pos, int light){
         this(state, pos, light, true);
     }
@@ -46,5 +49,13 @@ public class AnimationBlockData {
 
     public int getLight(){
         return light;
+    }
+
+    public void setRenderTypes(ChunkRenderTypeSet renderTypes){
+        this.renderTypes = renderTypes;
+    }
+
+    public ChunkRenderTypeSet getRenderTypes(){
+        return renderTypes;
     }
 }
