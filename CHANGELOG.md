@@ -9,3 +9,6 @@
 
 # Patch 2:
 - Fixed modded animations being rendered with the wrong render type
+
+# Patch 3:
+- Just a reupload because somehow there was an error when building patch 2 and it didn't include the refmap
