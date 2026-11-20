@@ -2,6 +2,7 @@ package fr.madu59.fwa.mixin.client;
 
 import java.util.function.Predicate;
 
+import fr.madu59.fwa.config.SettingsManager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.chunk.*;
@@ -32,12 +33,12 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     @Unique
     private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> {
         FancyWorldAnimationsClient.Type type = FancyWorldAnimationsClient.typeOf(state);
-        return type == FancyWorldAnimationsClient.Type.END_PORTAL_FRAME
-            || type == FancyWorldAnimationsClient.Type.LECTERN
-            || type == FancyWorldAnimationsClient.Type.JUKEBOX
-            || type == FancyWorldAnimationsClient.Type.BELL
-            || type == FancyWorldAnimationsClient.Type.LANTERN
-            || type == FancyWorldAnimationsClient.Type.CHAIN;
+        return (type == FancyWorldAnimationsClient.Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.LECTERN && SettingsManager.LECTERN_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.JUKEBOX && SettingsManager.JUKEBOX_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.BELL && SettingsManager.BELL_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.LANTERN && SettingsManager.LANTERN_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.CHAIN && (SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue()));
     };
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory palettedContainerFactory, long l, LevelChunkSection @Nullable [] levelChunkSections, @Nullable BlendingData blendingData) {
