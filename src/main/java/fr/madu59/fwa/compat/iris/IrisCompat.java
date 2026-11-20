@@ -7,7 +7,7 @@ import net.irisshaders.iris.shaderpack.materialmap.WorldRenderingSettings;
 import net.irisshaders.iris.vertices.BlockSensitiveBufferBuilder;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class IrisCompat {
+public class IrisCompat {
     public static void beginBlock(VertexConsumer consumer, AnimationBlockData blockData) {
         if ((consumer instanceof BlockSensitiveBufferBuilder blockSensitiveConsumer)) {
             Object2IntMap<BlockState> blockStateIdsMap = WorldRenderingSettings.INSTANCE.getBlockStateIds();

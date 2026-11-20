@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
-public final class MapAtlasesCompat{
+public class MapAtlasesCompat{
     private static final ResourceLocation ATLAS_TEXTURE_OVERWORLD =
             ResourceLocation.tryParse("map_atlases:textures/entity/lectern_atlas.png");
     private static final ResourceLocation ATLAS_TEXTURE_NETHER =

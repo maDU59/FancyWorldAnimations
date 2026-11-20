@@ -6,7 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
-public final class EndRemasteredCompat{
+public class EndRemasteredCompat{
 
     public static boolean isEndRemasteredPortal(BlockState state){
         if(state == null) return false;
