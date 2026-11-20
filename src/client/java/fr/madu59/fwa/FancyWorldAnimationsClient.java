@@ -85,9 +85,11 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FancyWorldAnimationsClient implements ClientModInitializer {
 
+	private static final Map<Block, FancyWorldAnimationsClient.Type> typeOfCache = new ConcurrentHashMap<>();
 	public static final Animations animations = new Animations();
 	private static long startingTime = System.nanoTime();
 	private static long timer = 0;
@@ -333,29 +335,33 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	public static Type typeOf(BlockState state){
 		Block block = state.getBlock();
+		if(typeOfCache.containsKey(block)) return typeOfCache.get(block);
 		Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
-        if(AnimationAdditions.hasAnimation(blockId)) return AnimationAdditions.getAnimationType(blockId);
-		if(block instanceof DoorBlock) return Type.DOOR;
-		if(block instanceof TrapDoorBlock) return Type.TRAPDOOR;
-		if(block instanceof FenceGateBlock) return Type.FENCE_GATE;
-		if(block instanceof LeverBlock) return Type.LEVER;
-		if(block instanceof ChiseledBookShelfBlock) return Type.CHISELED_BOOKSHELF;
-		if(block instanceof LecternBlock) return Type.LECTERN;
-		if(block instanceof ButtonBlock) return Type.BUTTON;
-		if(block instanceof JukeboxBlock) return Type.JUKEBOX;
-		if(block instanceof EndPortalFrameBlock) return Type.END_PORTAL_FRAME;
-		if(block instanceof RepeaterBlock) return Type.REPEATER;
-		if(block instanceof LayeredCauldronBlock || block instanceof CauldronBlock || block instanceof LavaCauldronBlock) return Type.LAYERED_CAULDRON;
-		if(block instanceof BellBlock) return Type.BELL;
-		if(block instanceof CampfireBlock) return Type.CAMPFIRE;
-		if(block instanceof ComposterBlock) return Type.COMPOSTER;
-		//if(block instanceof TripWireHookBlock) return Type.TRIPWIRE_HOOK;
-		if(block instanceof VaultBlock) return Type.VAULT;
-		if(block instanceof LanternBlock) return Type.LANTERN;
-		if(block instanceof ChainBlock) return Type.CHAIN;
-		if(block instanceof BigDripleafBlock) return Type.DRIPLEAF;
-		if(block instanceof RedstoneWireBlock) return Type.REDSTONE_WIRE;
-		return ModCompat.typeOf(block);
+		Type type = Type.USELESS;
+        if(AnimationAdditions.hasAnimation(blockId)) type = AnimationAdditions.getAnimationType(blockId);
+		else if(block instanceof DoorBlock) type = Type.DOOR;
+		else if(block instanceof TrapDoorBlock) type = Type.TRAPDOOR;
+		else if(block instanceof FenceGateBlock) type = Type.FENCE_GATE;
+		else if(block instanceof LeverBlock) type = Type.LEVER;
+		else if(block instanceof ChiseledBookShelfBlock) type = Type.CHISELED_BOOKSHELF;
+		else if(block instanceof LecternBlock) type = Type.LECTERN;
+		else if(block instanceof ButtonBlock) type = Type.BUTTON;
+		else if(block instanceof JukeboxBlock) type = Type.JUKEBOX;
+		else if(block instanceof EndPortalFrameBlock) type = Type.END_PORTAL_FRAME;
+		else if(block instanceof RepeaterBlock) type = Type.REPEATER;
+		else if(block instanceof LayeredCauldronBlock || block instanceof CauldronBlock || block instanceof LavaCauldronBlock) type = Type.LAYERED_CAULDRON;
+		else if(block instanceof BellBlock) type = Type.BELL;
+		else if(block instanceof CampfireBlock) type = Type.CAMPFIRE;
+		else if(block instanceof ComposterBlock) type = Type.COMPOSTER;
+		//else if(block instanceof TripWireHookBlock) type = Type.TRIPWIRE_HOOK;
+		else if(block instanceof VaultBlock) type = Type.VAULT;
+		else if(block instanceof LanternBlock) type = Type.LANTERN;
+		else if(block instanceof ChainBlock) type = Type.CHAIN;
+		else if(block instanceof BigDripleafBlock) type = Type.DRIPLEAF;
+		else if(block instanceof RedstoneWireBlock) type = Type.REDSTONE_WIRE;
+		else type = ModCompat.typeOf(block);
+		typeOfCache.put(block, type);
+		return type;
 	}
 
 	private static Type typeOf(BlockState oldState, BlockState newState)
