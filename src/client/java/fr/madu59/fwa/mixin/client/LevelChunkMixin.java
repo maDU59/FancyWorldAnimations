@@ -3,6 +3,8 @@ package fr.madu59.fwa.mixin.client;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import fr.madu59.fwa.config.SettingsManager;
+
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -11,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fr.madu59.fwa.FancyWorldAnimationsClient;
-import fr.madu59.fwa.compat.ModCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -22,8 +23,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChainBlock;
-import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -40,12 +39,12 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     @Unique
     private static final Predicate<BlockState> IS_ANIMATED_BLOCK = state -> {
         FancyWorldAnimationsClient.Type type = FancyWorldAnimationsClient.typeOf(state);
-        return type == FancyWorldAnimationsClient.Type.END_PORTAL_FRAME
-            || type == FancyWorldAnimationsClient.Type.LECTERN
-            || type == FancyWorldAnimationsClient.Type.JUKEBOX
-            || type == FancyWorldAnimationsClient.Type.BELL
-            || type == FancyWorldAnimationsClient.Type.LANTERN
-            || type == FancyWorldAnimationsClient.Type.CHAIN;
+        return (type == FancyWorldAnimationsClient.Type.END_PORTAL_FRAME && SettingsManager.END_PORTAL_FRAME_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.LECTERN && SettingsManager.LECTERN_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.JUKEBOX && SettingsManager.JUKEBOX_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.BELL && SettingsManager.BELL_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.LANTERN && SettingsManager.LANTERN_STATE.getValue())
+            || (type == FancyWorldAnimationsClient.Type.CHAIN && (SettingsManager.LANTERN_STATE.getValue() || SettingsManager.CHAIN_STATE.getValue()));
     };
 
     protected LevelChunkMixin(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData) {
@@ -67,19 +66,19 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     }
 
     @Unique
-    private void fwa$scanSectionFor(LevelChunkSection section, BlockPos pos, int minY){
-        if (section.getStates().maybeHas(IS_ANIMATED_BLOCK) || FancyWorldAnimationsClient.animations.hasSection(pos)){
+    private void fwa$scanSectionFor(LevelChunkSection section, BlockPos chunkPos, int minY){
+        if (FancyWorldAnimationsClient.animations.hasSection(chunkPos.atY(minY)) || section.getStates().maybeHas(IS_ANIMATED_BLOCK)) {
+            BlockPos.MutableBlockPos worldPos = new BlockPos.MutableBlockPos();
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
-                        BlockPos worldPos = pos.offset(x, minY + y, z);
-
+                        worldPos.set(chunkPos.getX() + x, minY + y, chunkPos.getZ() + z);
                         if (IS_ANIMATED_BLOCK.test(state)) {
-                            FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
+                            FancyWorldAnimationsClient.onBlockUpdate(worldPos.immutable(), fwa$AIR_STATE, state);
                         }
                         else if (FancyWorldAnimationsClient.animations.containsAt(worldPos)) {
-                            FancyWorldAnimationsClient.animations.removeSafeAt(pos);
+                            FancyWorldAnimationsClient.animations.removeSafeAt(worldPos);
                         }
                     }
                 }
