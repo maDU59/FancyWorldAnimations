@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LecternAnimation extends Animation {
 
-    private BookModel bookModel;
+    private final static BookModel bookModel;
     private final float hash;
     private Identifier textureId;
 
@@ -35,9 +35,8 @@ public class LecternAnimation extends Animation {
         this.hash = position.hashCode();
     }
 
-    @Override
-    public void updateModel(){
-        this.bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
+    static {
+        bookModel = new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK));
     }
 
     @Override
