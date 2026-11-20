@@ -108,8 +108,7 @@ public class Animations{
         }
 
         public void remove(BlockPos pos) {
-            this.animations.remove(pos);
-            this.isDirty = true;
+            if (this.animations.remove(pos) != null) this.isDirty = true;
         }
 
         public void put(BlockPos pos, Animation animation) {

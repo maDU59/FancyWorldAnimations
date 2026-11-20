@@ -60,16 +60,17 @@ public abstract class LevelChunkMixin extends ChunkAccess {
     }
 
     @Unique
-    private void fwa$scanSectionFor(LevelChunkSection section, BlockPos pos, int minY){
-        if (FancyWorldAnimationsClient.animations.hasSection(pos.atY(minY)) || section.getStates().maybeHas(IS_ANIMATED_BLOCK)) {
+    private void fwa$scanSectionFor(LevelChunkSection section, BlockPos chunkPos, int minY){
+        if (FancyWorldAnimationsClient.animations.hasSection(chunkPos.atY(minY)) || section.getStates().maybeHas(IS_ANIMATED_BLOCK)) {
+            BlockPos.MutableBlockPos worldPos = new BlockPos.MutableBlockPos();
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
-                        BlockPos worldPos = pos.offset(x, minY + y, z);
+                        worldPos.set(chunkPos.getX() + x, minY + y, chunkPos.getZ() + z);
                         
                         if (IS_ANIMATED_BLOCK.test(state)) {
-                            FancyWorldAnimationsClient.onBlockUpdate(worldPos, fwa$AIR_STATE, state);
+                            FancyWorldAnimationsClient.onBlockUpdate(worldPos.immutable(), fwa$AIR_STATE, state);
                         }
                         else if (FancyWorldAnimationsClient.animations.containsAt(worldPos)) {
                             FancyWorldAnimationsClient.animations.removeSafeAt(worldPos);
