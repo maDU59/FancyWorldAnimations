@@ -42,7 +42,7 @@ public class AnimationRenderer {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
-    private static final Map<RenderType, List<AnimationQuad>> buffers = new HashMap<>();
+    private static final Map<RenderType, QuadBatch> buffers = new HashMap<>();
     private static MultiBufferSource bufferSource;
 
     private static final float INVISIBLE_SCALE_VALUE = 0.0002f;
@@ -57,7 +57,9 @@ public class AnimationRenderer {
         }
         shouldShade = !context.isShadow();
         bufferSource = context.getBufferSource();
-        buffers.clear();
+        for(QuadBatch batch: buffers.values()){
+            batch.clear();
+        }
     }
 
     public static void renderModel(PoseStack.Pose pose, BakedModel model, float a, float r, float g, float b, int light, AnimationBlockData blockData, RandomSource random, BlockState blockState){
@@ -78,43 +80,46 @@ public class AnimationRenderer {
     }
 
     public static void renderQuad(PoseStack.Pose pose, BakedQuad bakedQuad, float a, float r, float g, float b, int light, AnimationBlockData blockData){
+        if(a <= 0.0f){
+            return;
+        }
         Vector3fc dir = bakedQuad.getDirection().step();
         float shade = blockData.isShaded()? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
         int color = ARGB.colorFromFloat(a,r*shade,g*shade,b*shade);
 
         RenderType renderType;
-        if(a <= 0.0f){
-            return;
-        } else if(a < 1.0f){
+        if(a < 1.0f){
             renderType = RenderType.translucentMovingBlock();
         } else {
             renderType = ItemBlockRenderTypes.getMovingBlockRenderType(blockData.getBlockState());
         }
 
-        buffers.computeIfAbsent(renderType, k -> new ArrayList<>()).add(new AnimationQuad(pose, bakedQuad, light, color, blockData));
+        buffers.computeIfAbsent(renderType, k -> new QuadBatch()).add(pose, bakedQuad, light, color, blockData);
     }
 
     public static void renderBuffers(){
-        for(Map.Entry<RenderType, List<AnimationQuad>> entry : buffers.entrySet()){
+        for(Map.Entry<RenderType, QuadBatch> entry : buffers.entrySet()){
+            QuadBatch batch = entry.getValue();
+            if(batch.size() == 0) continue;
             RenderType renderType = entry.getKey();
             VertexConsumer consumer = bufferSource.getBuffer(renderType);
 
             AnimationBlockData lastBlockData = null;
 
-            for(AnimationQuad quad : entry.getValue()){
-                if(quad.blockData() != lastBlockData){
+            for(int i = 0; i < batch.size(); i++){
+                AnimationBlockData blockData = batch.blockData(i);
+                if(blockData != lastBlockData){
                     if(lastBlockData != null){
                         ModCompat.endBlock(consumer);
                     }
-                    lastBlockData = quad.blockData();
+                    lastBlockData = blockData;
                     ModCompat.beginBlock(consumer, lastBlockData);
                 }
 
-                consumer.putBulkData(quad.pose(), quad.bakedQuad(), ARGB.redFloat(quad.color()), ARGB.greenFloat(quad.color()), ARGB.blueFloat(quad.color()), ARGB.alphaFloat(quad.color()), quad.light(), OverlayTexture.NO_OVERLAY);
+                consumer.putBulkData(batch.pose(i), batch.bakedQuad(i), ARGB.redFloat(batch.color(i)), ARGB.greenFloat(batch.color(i)), ARGB.blueFloat(batch.color(i)), ARGB.alphaFloat(batch.color(i)), batch.light(i), OverlayTexture.NO_OVERLAY);
             }
             ModCompat.endBlock(consumer);
         }
-        buffers.clear();
     }
 
     public static BakedQuad[] flattenModel(BakedModel model, BlockState state, RandomSource random){
