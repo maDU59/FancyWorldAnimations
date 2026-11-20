@@ -1,2 +1,3 @@
 # What's new:
-- Performance improvements when animations are out of view
+- Performance improvements
+- Fixed EMF complaining about model creation (#108)
