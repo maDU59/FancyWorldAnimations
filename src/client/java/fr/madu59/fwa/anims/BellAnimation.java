@@ -21,10 +21,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class BellAnimation extends Animation{
 
-    public BellModel bellModel;
     private final float hash;
-    private final Direction facing;
-    private final BellAttachType attachment;
+    public final Direction facing;
+    public final BellAttachType attachment;
     
     public BellAnimation(BlockPos position, double startTick, boolean oldIsOpen, boolean newIsOpen, BlockState oldState, BlockState newState) {
         super(position, startTick, oldIsOpen, newIsOpen, oldState, newState);
@@ -32,11 +31,6 @@ public class BellAnimation extends Animation{
 
         facing = defaultState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         attachment = defaultState.getValue(BlockStateProperties.BELL_ATTACHMENT);
-    }
-
-    @Override
-    public void updateModel(){
-        this.bellModel = new BellModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BELL));
     }
 
     @Override
@@ -81,39 +75,5 @@ public class BellAnimation extends Animation{
     public float animatePlacement(double nowTick){
         double progress = getProgress(nowTick);
         return (float)Math.sin(progress * getAnimDuration() / 3.1415927) / (float)(4.0 + progress * getAnimDuration() / 3.0);
-    }
-
-    public void rotateBell(ModelPart bellBody, float rot){
-        rotateBell(bellBody, rot, facing, attachment);
-    }
-
-    public void rotateBell(ModelPart bellBody, float rot, Direction facing, BellAttachType attachment){
-        float f = 0.0F;
-        float g = 0.0F;
-        switch (facing) {
-            case NORTH:
-                f = rot;
-                break;
-            case SOUTH:
-                f = -rot;
-                break;
-            case WEST:
-                g = -rot;
-                break;
-            case EAST:
-                g = rot;
-                break;
-            default:
-                break;
-        }
-
-        if(attachment == BellAttachType.SINGLE_WALL){
-            bellBody.xRot = g;
-            bellBody.zRot = f;
-        }
-        else{
-            bellBody.xRot = f;
-            bellBody.zRot = g;
-        }
     }
 }
