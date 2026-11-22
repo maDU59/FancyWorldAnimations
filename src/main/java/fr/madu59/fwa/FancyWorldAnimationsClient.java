@@ -102,6 +102,7 @@ public class FancyWorldAnimationsClient{
 	public FancyWorldAnimationsClient(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(FancyWorldAnimationsConfigScreen.class);
 		bus.addListener(this::onRegisterClientReloadListeners);
+		bus.addListener(FancyWorldAnimationsClient::onClientSetup);
         ModLoadingContext.get().registerExtensionPoint(
 			ConfigScreenHandler.ConfigScreenFactory.class,
 			() -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> (
