@@ -69,6 +69,8 @@ public class ModCompat {
         AnimationAdditions.registerAnimationForBlock(Identifier.tryBuild("hardcore_torches", "unlit_lantern"), Type.LANTERN);
         AnimationAdditions.registerAnimationForBlock(Identifier.tryBuild("hardcore_torches", "lit_soul_lantern"), Type.LANTERN);
         AnimationAdditions.registerAnimationForBlock(Identifier.tryBuild("hardcore_torches", "unlit_soul_lantern"), Type.LANTERN);
+        AnimationAdditions.registerAnimationForBlock(Identifier.tryBuild("abyssal_decor", "seabrass_chain"), Type.CHAIN);
+        AnimationAdditions.registerAnimationForBlock(Identifier.tryBuild("abyssal_decor", "deepbronze_chain"), Type.CHAIN);
     }
 
     public static boolean isAmendmentsLoaded(){
