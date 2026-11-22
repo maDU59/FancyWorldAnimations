@@ -1,4 +1,3 @@
 # What's new:
-- Performance improvements
-- Fixed EMF complaining about model creation (#108)
-- Bug fixes (#109)
+- Added support for chains from Abyssal Decor
+- Fixed modded animations not being registered on Forge 1.20.1

@@ -13,23 +13,14 @@ import fr.madu59.fwa.compat.iris.IrisCompat;
 import fr.madu59.fwa.compat.moreculling.MoreCullingCompat;
 import fr.madu59.fwa.platform.PlatformHelper;
 import fr.madu59.fwa.rendering.AnimationBlockData;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.WritableBookItem;
-import net.minecraft.world.item.WrittenBookItem;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
 
 public class ModCompat {
     public static final String DRAMATIC_DOORS_NAMESPACE = "dramaticdoors";
@@ -78,6 +69,8 @@ public class ModCompat {
         AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "unlit_lantern"), Type.LANTERN);
         AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "lit_soul_lantern"), Type.LANTERN);
         AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("hardcore_torches", "unlit_soul_lantern"), Type.LANTERN);
+        AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("abyssal_decor", "seabrass_chain"), Type.CHAIN);
+        AnimationAdditions.registerAnimationForBlock(ResourceLocation.tryBuild("abyssal_decor", "deepbronze_chain"), Type.CHAIN);
     }
 
     public static boolean isAmendmentsLoaded(){
