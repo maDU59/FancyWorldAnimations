@@ -1,4 +1,2 @@
 # What's new:
-- Performance improvements
-- Fixed EMF complaining about model creation (#108)
-- Bug fixes (#109)
+- Fixed animations starting when they shouldn't in some cases (e.g. placing an already-opened door/trapdoor/fence-gate etc... or pushing an opened trapdoor with a piston)
