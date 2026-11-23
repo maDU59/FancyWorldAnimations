@@ -45,13 +45,7 @@ public abstract class BellRendererMixin {
     private final Identifier atlasId = Identifier.tryParse("minecraft:blocks");
 
     @WrapMethod(method = "submit")
-    public void fwa$submit(
-            final BellRenderState state,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final CameraRenderState camera,
-            final Operation<Void> original
-    ) {
+    public void fwa$submit(BellRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, Operation<Void> original) {
         if (((BellRenderStateExt) state).fwa$getPosition() == null) {
             original.call(state, poseStack, submitNodeCollector, camera);
             return;
