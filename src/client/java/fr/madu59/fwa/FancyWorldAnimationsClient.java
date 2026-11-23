@@ -301,12 +301,12 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 		if(type == Type.TRAPDOOR && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
 		if(type == Type.FENCE_GATE && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
 		if(type == Type.LEVER && state.hasProperty(BlockStateProperties.POWERED)) return state.getValue(BlockStateProperties.POWERED);
-		if(type == Type.LECTERN && state.hasProperty(BlockStateProperties.HAS_BOOK)) return state.getValue(BlockStateProperties.HAS_BOOK);
+		if(type == Type.LECTERN) return state.getValueOrElse(BlockStateProperties.HAS_BOOK, false);
 		if(type == Type.BUTTON && state.hasProperty(BlockStateProperties.POWERED)) return state.getValue(BlockStateProperties.POWERED);
-		if(type == Type.JUKEBOX && state.hasProperty(BlockStateProperties.HAS_RECORD)) return state.getValue(BlockStateProperties.HAS_RECORD);
+		if(type == Type.JUKEBOX) return state.getValueOrElse(BlockStateProperties.HAS_RECORD, false);;
 		if(type == Type.END_PORTAL_FRAME && state.hasProperty(BlockStateProperties.EYE)) return state.getValue(BlockStateProperties.EYE);
 		if(type == Type.BELL) return true;
-		if(type == Type.CAMPFIRE && state.hasProperty(CampfireBlock.LIT)) return state.getValue(CampfireBlock.LIT);
+		if(type == Type.CAMPFIRE) return state.getValueOrElse(CampfireBlock.LIT, false);
 		if(type == Type.TRIPWIRE_HOOK && state.hasProperty(BlockStateProperties.ATTACHED)) return state.getValue(BlockStateProperties.ATTACHED);
 		if(type == Type.VAULT && state.hasProperty(BlockStateProperties.VAULT_STATE)) return state.getValue(BlockStateProperties.VAULT_STATE) == VaultState.UNLOCKING;
 		return ModCompat.isOpen(state, type);
