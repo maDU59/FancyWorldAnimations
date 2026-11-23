@@ -56,8 +56,8 @@ public class ModCompat {
         return Type.USELESS;
     }
 
-    public static boolean isOpen(BlockState state, Type type){
-        return false;
+    public static Boolean isOpen(BlockState state, Type type){
+        return null;
     }
 
     private static void registerAnimations(){
