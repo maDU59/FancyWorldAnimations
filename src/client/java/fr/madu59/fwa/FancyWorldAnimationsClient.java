@@ -298,14 +298,14 @@ public class FancyWorldAnimationsClient implements ClientModInitializer {
 
 	private static Boolean isOpen(BlockState state, Type type)
 	{
-		if(type == Type.DOOR && state.hasProperty(BlockStateProperties.OPEN)) return Backport.getValue(state, BlockStateProperties.OPEN);
-		if(type == Type.TRAPDOOR && state.hasProperty(BlockStateProperties.OPEN)) return Backport.getValue(state, BlockStateProperties.OPEN);
-		if(type == Type.FENCE_GATE && state.hasProperty(BlockStateProperties.OPEN)) return Backport.getValue(state, BlockStateProperties.OPEN);
-		if(type == Type.LEVER && state.hasProperty(BlockStateProperties.POWERED)) return Backport.getValue(state, BlockStateProperties.POWERED);
+		if(type == Type.DOOR && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
+		if(type == Type.TRAPDOOR && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
+		if(type == Type.FENCE_GATE && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
+		if(type == Type.LEVER && state.hasProperty(BlockStateProperties.POWERED)) return state.getValue(BlockStateProperties.POWERED);
 		if(type == Type.LECTERN) return Backport.getValueOrElse(state, BlockStateProperties.HAS_BOOK, false);
-		if(type == Type.BUTTON && state.hasProperty(BlockStateProperties.POWERED)) return Backport.getValue(state, BlockStateProperties.POWERED);
+		if(type == Type.BUTTON && state.hasProperty(BlockStateProperties.POWERED)) return state.getValue(BlockStateProperties.POWERED);
 		if(type == Type.JUKEBOX) return Backport.getValueOrElse(state, BlockStateProperties.HAS_RECORD, false);;
-		if(type == Type.END_PORTAL_FRAME && state.hasProperty(BlockStateProperties.EYE)) return Backport.getValue(state, BlockStateProperties.EYE);
+		if(type == Type.END_PORTAL_FRAME && state.hasProperty(BlockStateProperties.EYE)) return state.getValue(BlockStateProperties.EYE);
 		if(type == Type.BELL) return true;
 		if(type == Type.CAMPFIRE) return Backport.getValueOrElse(state, CampfireBlock.LIT, false);
 		if(type == Type.TRIPWIRE_HOOK && state.hasProperty(BlockStateProperties.ATTACHED)) return state.getValue(BlockStateProperties.ATTACHED);
