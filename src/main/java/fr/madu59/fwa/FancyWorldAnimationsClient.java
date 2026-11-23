@@ -163,8 +163,15 @@ public class FancyWorldAnimationsClient{
 			return;
 		}
 
-		boolean oldIsOpen = isOpen(oldState, type);
-		boolean newIsOpen = isOpen(newState, type);
+		Boolean oldIsOpen = isOpen(oldState, type);
+		Boolean newIsOpen = isOpen(newState, type);
+		if(newIsOpen == null){
+			oldIsOpen = false;
+			newIsOpen = false;
+		}
+		else if(oldIsOpen == null){
+			oldIsOpen = newIsOpen;
+		}
 
 		int reverseCount = 0;
 
@@ -306,20 +313,20 @@ public class FancyWorldAnimationsClient{
 		poseStack.popPose();
 	}
 
-	private static boolean isOpen(BlockState state, Type type)
+	private static Boolean isOpen(BlockState state, Type type)
 	{
-		if(type == Type.DOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
-		if(type == Type.TRAPDOOR) return state.getValueOrElse(BlockStateProperties.OPEN, false);
-		if(type == Type.FENCE_GATE) return state.getValueOrElse(BlockStateProperties.OPEN, false);
-		if(type == Type.LEVER) return state.getValueOrElse(BlockStateProperties.POWERED, false);
+		if(type == Type.DOOR && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
+		if(type == Type.TRAPDOOR && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
+		if(type == Type.FENCE_GATE && state.hasProperty(BlockStateProperties.OPEN)) return state.getValue(BlockStateProperties.OPEN);
+		if(type == Type.LEVER && state.hasProperty(BlockStateProperties.POWERED)) return state.getValue(BlockStateProperties.POWERED);
 		if(type == Type.LECTERN) return state.getValueOrElse(BlockStateProperties.HAS_BOOK, false);
-		if(type == Type.BUTTON) return state.getValueOrElse(BlockStateProperties.POWERED, false);
-		if(type == Type.JUKEBOX) return state.getValueOrElse(BlockStateProperties.HAS_RECORD, false);
-		if(type == Type.END_PORTAL_FRAME) return state.getValueOrElse(BlockStateProperties.EYE, false);
+		if(type == Type.BUTTON && state.hasProperty(BlockStateProperties.POWERED)) return state.getValue(BlockStateProperties.POWERED);
+		if(type == Type.JUKEBOX) return state.getValueOrElse(BlockStateProperties.HAS_RECORD, false);;
+		if(type == Type.END_PORTAL_FRAME && state.hasProperty(BlockStateProperties.EYE)) return state.getValue(BlockStateProperties.EYE);
 		if(type == Type.BELL) return true;
 		if(type == Type.CAMPFIRE) return state.getValueOrElse(CampfireBlock.LIT, false);
-		if(type == Type.TRIPWIRE_HOOK) return state.getValueOrElse(BlockStateProperties.ATTACHED, false);
-		if(type == Type.VAULT) return state.getValueOrElse(BlockStateProperties.VAULT_STATE, VaultState.INACTIVE) == VaultState.UNLOCKING;
+		if(type == Type.TRIPWIRE_HOOK && state.hasProperty(BlockStateProperties.ATTACHED)) return state.getValue(BlockStateProperties.ATTACHED);
+		if(type == Type.VAULT && state.hasProperty(BlockStateProperties.VAULT_STATE)) return state.getValue(BlockStateProperties.VAULT_STATE) == VaultState.UNLOCKING;
 		return ModCompat.isOpen(state, type);
 	}
 
