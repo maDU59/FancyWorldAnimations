@@ -47,4 +47,8 @@ public class AnimationBlockData {
     public int getLight(){
         return light;
     }
+
+    public int getLightEmission(){
+        return state.getLightEmission();
+    }
 }
