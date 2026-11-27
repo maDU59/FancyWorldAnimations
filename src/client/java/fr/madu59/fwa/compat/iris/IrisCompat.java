@@ -12,7 +12,7 @@ public class IrisCompat {
         if ((consumer instanceof BlockSensitiveBufferBuilder blockSensitiveConsumer)) {
             Object2IntMap<BlockState> blockStateIdsMap = WorldRenderingSettings.INSTANCE.getBlockStateIds();
             if (blockStateIdsMap == null) return;
-            blockSensitiveConsumer.beginBlock(blockStateIdsMap.getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLight(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
+            blockSensitiveConsumer.beginBlock(blockStateIdsMap.getOrDefault(blockData.getBlockState(), -1), (byte) 0, (byte) blockData.getLightEmission(), blockData.getPosX(), blockData.getPosY(), blockData.getPosZ());
         }
     }
 
