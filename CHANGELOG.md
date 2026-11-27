@@ -1,2 +1,2 @@
 # What's new:
-- Fixed animations glowing with shaders using `at_midBlock.w`
+- Added CPU back face culling, improving performance when rendering animations

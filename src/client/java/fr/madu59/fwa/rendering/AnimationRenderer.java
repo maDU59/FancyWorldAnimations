@@ -5,11 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.joml.Matrix3fc;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -31,6 +26,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.*;
 
 public class AnimationRenderer {
 
@@ -38,13 +34,13 @@ public class AnimationRenderer {
     private static float topShade = 0;
     private static float ZShade = 0;
     private static float XShade = 0;
-    private static boolean shouldShade = true;
     private static final Direction[] DIRECTIONS_WITH_NULL = {
         null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST
     };
     private static final Direction[] DIRECTIONS = Direction.values();
     private static final Map<RenderType, QuadBatch> buffers = new HashMap<>();
     private static MultiBufferSource bufferSource;
+    private static AnimationRenderingContext context;
 
     private static final Matrix4f SHRINK_MATRIX = new Matrix4f()
     .translation(0.5f, 0.5f, 0.5f)
@@ -59,7 +55,7 @@ public class AnimationRenderer {
             ZShade = cardinalLighting.byFace(Direction.NORTH);
             XShade = cardinalLighting.byFace(Direction.EAST);
         }
-        shouldShade = !context.isShadow();
+        AnimationRenderer.context = context;
         bufferSource = context.getBufferSource();
         for(QuadBatch batch: buffers.values()){
             batch.clear();
@@ -90,6 +86,9 @@ public class AnimationRenderer {
         if(a <= 0.0f){
             return;
         }
+
+        if(shouldBeCulled(pose, bakedQuad)) return;
+
         Vector3fc dir = bakedQuad.direction().getUnitVec3f();
         float shade = blockData.isShaded()? getShade(dir.x(), dir.y(), dir.z(), pose) : 1.0f;
         int color = ARGB.colorFromFloat(a,r*shade,g*shade,b*shade);
@@ -151,7 +150,7 @@ public class AnimationRenderer {
     }
 
     public static float getShade(float nx, float ny, float nz, PoseStack.Pose pose){
-        if (!shouldShade) return 1f;
+        if (AnimationRenderer.context.isShadow()) return 1f;
         Matrix3fc m = pose.normal();
         float x = m.m00() * nx + m.m10() * ny + m.m20() * nz;
         float y = m.m01() * nx + m.m11() * ny + m.m21() * nz;
@@ -165,6 +164,36 @@ public class AnimationRenderer {
         if(bufferSource instanceof BufferSource bs){
             bs.endBatch();
         }
+    }
+
+    public static boolean shouldBeCulled(PoseStack.Pose pose, BakedQuad bakedQuad){
+        Matrix4f mat = pose.pose();
+        float t0x = mat.m30();
+        float t0y = mat.m31();
+        float t0z = mat.m32();
+
+        Vector3fc p0 = bakedQuad.position0();
+        Vector3fc p1 = bakedQuad.position1();
+        Vector3fc p2 = bakedQuad.position2();
+
+        float x0 = p0.x();
+        float y0 = p0.y();
+        float z0 = p0.z();
+
+        float e1x = p1.x() - x0, e1y = p1.y() - y0, e1z = p1.z() - z0;
+        float e2x = p2.x() - x0, e2y = p2.y() - y0, e2z = p2.z() - z0;
+
+        float dirX = e1y * e2z - e1z * e2y;
+        float dirY = e1z * e2x - e1x * e2z;
+        float dirZ = e1x * e2y - e1y * e2x;
+
+        float ux = mat.m00() * t0x + mat.m01() * t0y + mat.m02() * t0z;
+        float uy = mat.m10() * t0x + mat.m11() * t0y + mat.m12() * t0z;
+        float uz = mat.m20() * t0x + mat.m21() * t0y + mat.m22() * t0z;
+        float s2 = mat.m00() * mat.m00() + mat.m01() * mat.m01() + mat.m02() * mat.m02();
+
+        float d = s2 * (dirX * x0 + dirY * y0 + dirZ * z0) + (dirX * ux + dirY * uy + dirZ * uz);
+        return d > 0f;
     }
 
     public static BlockStateModel getInvisibleModel(BlockStateModel originalModel, BlockState state){
